@@ -1,0 +1,13 @@
+a:link, a:visited { color: #444; text-decoration: none; -webkit-transition: color .4s ease-in-out; -moz-transition: color .4s ease-in-out; -ms-transition: color .4s ease-in-out; -o-transition: color .4s ease-in-out; transition: color .4s ease-in-out; }
+a:hover { color: #c36; text-decoration: underline; }
+.pagnation { text-align: center; margin-top: 32px; }
+.pagnation a { display: inline-block; width: 34px; height: 34px; line-height: 34px; overflow: hidden; background: url(../images/sprite.png) no-repeat 0 -29px; margin-left: 4px; font-size: 16px; vertical-align: top; -webkit-transition: all .4s ease-in-out; -moz-transition: all .4s ease-in-out; -ms-transition: all .4s ease-in-out; -o-transition: all .4s ease-in-out; transition: all .4s ease-in-out; }
+.pagnation a:hover { background-position: 0 -64px; color: #fff; text-decoration: none }
+.pagnation .page-prev, .pagnation .page-next { line-height: 555px; }
+.pagnation .page-prev { background-position: -35px -29px; }
+.pagnation .page-prev:hover { background-position: -35px -64px; }
+.pagnation .page-next { background-position: -70px -29px; }
+.pagnation .page-next:hover { background-position: -70px -64px; }
+.pagnation .current { background-position: 0px -64px; color: #fff }
+.pagnation-tips { margin-top: 10px; color: #999; text-align: center }
+

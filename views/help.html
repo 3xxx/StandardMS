@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+{{template "header"}}
+<title>Help - 水利设计CMS系统</title>
+</head>
+
+<body>
+<div class="navbar navba-default navbar-fixed-top">
+  <div class="container-fill">{{template "navbar" .}}</div>
+</div>
+
+
+  <div class="col-md-12">
+  <p>1.<a href="/static/HydroCMS2015-10-27.rar">HydroCMS系统整体打包下载；</a><a href="/static/HydroCMS水利设计成果管理系统使用说明.docx">HydroCMS水利设计成果管理系统使用说明。</a></p>
+  <p>2.本内容管理系统(HydroCMS)使用对象为设计团队、项目组等，实现了：<br/>
+  &nbsp;&nbsp;&nbsp;&nbsp;1）添加项目及其分类、往相应的分类中批量添加成果（根据选中的附件，自动截取编号和文档名）、往分类中编写设代日记、成果保存到服务器上的树状目录内（attachment目录下的树状目录）方便管理员操作；成果的多版本解决方案：向成果里继续添加A版、B版;<br/>
+  &nbsp;&nbsp;&nbsp;&nbsp;2）检索成果名；<br/>
+  &nbsp;&nbsp;&nbsp;&nbsp;3）批量下载；<br/>
+  &nbsp;&nbsp;&nbsp;&nbsp;4）用户注册登陆、管理员对用户权限管理；<br/>
+  &nbsp;&nbsp;&nbsp;&nbsp;5）成果目录导出Excel；上传计划目录：如果上传的成果对应上计划目录，则计划目录可以直接点击查看成果；<br/>
+  &nbsp;&nbsp;&nbsp;&nbsp;6）自定义分类目录——即方便用户个人资料管理展示；<br/>
+  等基本功能。后续需要完善：设代资料分类管理；成果的标签功能（如供水、枢纽、堤防...）。</p>
+  <p>3.使用流程：a）建立项目&目录；——b）进入项目，找到目录中的成果分类，点击进入；——c）找到“添加成果(一对一模式或一对多模式)”按钮，点击进入，在下方选择多个文件作为附件——点击“上传”即可。“一对一模式”的文件命名方式见下条；“一对多模式”需要手工填写“编号”和“文件名”等，这样，多个附件保存在此编号下，适用于图纸引用、参照等情况以及报告多个章节情况；“多对一模式”指一个dwg文件中存在多个图号……</p>
+  <p>4.“一对一模式”文件名必须如“SL888BT-500-888泵站枢纽布置图.dwg”，即由“编号+名称”组成，这样可自动截取成果“编号”和成果“名称”。如果“名称”的首位是个数字，请用“空格”隔开“编号”和“名称”；文件名中不能含“#”，其他符号未测试。一个分类中的“编号”必须是唯一的，但不同分类下，如pdf分类下和dwg分类下的编号可以相同。</p>
+  <p>5.项目负责人或专业负责人往某个分类下导入计划目录。</p>
+   <p>6.用户注册登录后权限为4级，可查看pdf和jpg格式成果，未注册游客只能浏览目录，设计人员需要请管理员进行权限提升，然后可建立项目和发布成果……，1级权限为管理，2级权限为项目负责人，可建立项目，删除本项目下成果；3级权限为设计人员，可建立成果，可修改本人发布的成果；4级为业主单位，只能浏览pdf和jpg。</p>
+   <p>7.管理员可批量导入用户数据表——进行用户权限修改</p>
+  <p>8.该应用基本特性：数据库为sqlite3.8.8.1（无服务型）；采用beego1.4.3开源框架（golang1.4.1开源语言）；前端框架使用了Bootstrap；前端表格排序使用jquery.tablesorter；前端编辑器使用editormd；批量上传使用了Uploadify v3.2.1插件；代码编辑器用的是Sublime Text 3。</p>
+  <p>9.选择这个框架的理由：a)直接编译成exe文件运行，无需部署和安装服务；b)基于理由a，整个应用可以拷贝携带到任何机器上使用，相当于桌面软件；局域网外访问通过gpdi外网主页上的vpn，输入用户名和密码后，用chrome输入ip即可访问；c)golang语言及beego框架是开源、跨平台（Mac/Linux(Ubuntu)/Windows/Android）的，将来应用领域广；d)Windows平台下安装简单，所依赖的第三方库较少，github上的库下载比较方便（如：go get github.com/astaxie/beego）</p>
+  <p>10.浏览器用 <a href="/static/ChromeStandalone_V42.0.2311.135_Setup.1430289688.exe">Google Chrome</a>；其他浏览器如<a href="/static/Firefox_V35.rar">Mozilla Firefox</a>，<a href="/static/opera_stable_28.0.1750.48_windows.1427092324.exe">Opera</a>，<a href="/static/EIE11_ZH-CN_WOL_WIN764.EXE">IE需要9.0以上</a>对前端插件的支持不好。</p>
+  <p>11.参考学习资料：视频《Go Web基础》（无闻）；《Go语言编程》（许式伟）；视频《Beego入门教程》（谢孟军）；《beego手册》；MySql数据库相关...</p>
+  <p>12.源码如下：</p>
+  <ol>
+   <li> <a href="/m">models源码</a></li>
+   <li> <a href="/v">views源码</a></li>
+   <li> <a href="/c">controllers源码</a></li>
+   <li> <a href="/s">static源码</a></li>
+   <li> <a href="/t">test源码</a></li>
+   <li> <a href="/a">attachment文件夹</a></li>
+   <li> <a href="/d">数据库</a>,下载后使用<a href="/static/SQLite Expert Professional 3.5.58.2478.rar">SQLite Expert version 3.5</a>查看</li>
+ </ol>
+   <p>13.管理工具/开发软件如下：</p>
+  <ol>
+   <li> <a href="/static/Sublime Text 3.rar">Sublime Text 3代码编辑器</a></li>
+   <li> <a href="/static/Beyond CompareHA.rar">BCompare.exe文件对比</a></li>
+   <li> <a href="/static/FileLocatorPro_7.2.2038_PortableSoft.7z">FileLocatorPro文件全文搜索</a></li>
+   <li> <a href="/static/fiddler4setup4.5.1.0.1432113128.exe">Fiddler4记录路由传参</a></li>
+   <li> <a href="/static/SQLite Expert Professional 3.5.58.2478.rar">数据库查看软件SQLite Expert version 3.5</a></li>
+ </ol>
+ <hr/>
+ <img style="-webkit-user-select: none; cursor: zoom-in;" src="/static/高程系换算关系示意图.jpg" width="600" ><hr/>
+ <img style="-webkit-user-select: none; cursor: zoom-in;" src="/static/22.jpg" width="1800" ><hr/>
+ <img style="-webkit-user-select: none; cursor: zoom-in;" src="/static/1 1.png" width="876" ><hr/>
+  <img style="-webkit-user-select: none; cursor: zoom-in;" src="/static/2 2.png" width="876" >
+  <!-- <img style="-webkit-user-select: none; cursor: zoom-in;" src="/static/22.jpg" width="876"> -->
+   <hr /><!--标签水平线-->
+<!-- <object data="/static/avi.avi" type="video/avi" /> -->
+<!-- <embed src="/static/avi.avi" /> -->
+<!-- <img dynsrc="/static/avi.avi" /> -->
+<!-- <object classid="clsid:22D6F312-B0F6-11D0-94AB-0080C74C7E95">
+<param name="FileName" value="/static/wmv.wmv" />
+</object> -->
+
+<!-- <video width="320" height="240" controls="controls">
+  <source src="movie.ogg" type="video/ogg">
+  <source src="/static/mp4.mp4" type="video/mp4">
+Your browser does not support the video tag.
+</video> -->
+
+<!-- <object width="400" height="400"
+classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
+codebase="http://download.macromedia.com
+/pub/shockwave/cabs/flash/swflash.cab#4,0,0,0">
+<param name="SRC" value="bookmark.swf">
+<embed src="/static/swf.swf" width="400" height="400"/>
+</object> -->
+
+<!-- <object width="100%" height="80%"
+classid="clsid:8E27C92B-1264-101C-8A2F-040224009C02">
+<param name="BackColor" value="14544622">
+<param name="DayLength" value="1">
+</object> -->
+   <!-- <p>JavaScript函数值传递测试</p>
+   <p id="demo"></p>
+
+  <form method="GET" action="/help">
+   <label>复选框值传递测试</label>
+  <div class="checkbox">
+    <label>
+      <input type="checkbox"  name="checkbox" value="ghj">规划阶段</label>
+  </div>
+  <div class="checkbox">
+    <label>
+      <input type="checkbox"  name="checkbox" value="xj">项目建议书阶段</label>
+  </div> -->
+  <!-- <input type="hidden" id="demo" name="demo"> -->
+  <!-- <input type="hidden" id="tempString" name="tempString" />
+<button type="submit" class="btn btn-default" onclick="aa();">添加</button>
+</form> -->
+
+<!--           <div id="UploadBox">
+                <div class="ops">
+                    <input type="file" name="uploadify" id="uploadify" />
+                    <input type="button" id="btnUpload" value="" />
+                    <input type="button" id="btnCancel" value="" />
+                </div>
+                <div id="fileQueue"></div>
+          </div> -->
+<!--文件类型框 -->
+<!-- <select>
+ <asp:Repeater runat="server" ID="repTypes">
+  <ItemTemplate>
+   <option value='Eval'></option>
+  </ItemTemplate>
+ </asp:Repeater>
+ </select> -->
+
+
+	</div>
+  
+<!-- <script> -->
+ <!-- // function CheckAll() -->
+<!-- // { -->
+ <!-- // var text = '{ "employees" : [' + -->
+ <!-- // '{ "firstName":"John" , "lastName":"Doe" },' + -->
+ <!-- // '{ "firstName":"Anna" , "lastName":"Smith" },' + -->
+ <!-- // '{ "firstName":"Peter" , "lastName":"Jones" } ]}';  -->
+<!-- // var obj=""; -->
+<!-- // var obj = JSON.parse(text); -->
+<!-- // return obj; -->
+<!-- // document.getElementById("demo").innerHTML=CheckAll().employees[2].firstName;//放在这里就不行 -->
+<!-- // } -->
+<!-- // document.getElementById("demo").innerHTML=CheckAll().employees[2].firstName;//这里就行 -->
+<!-- // document.getElementById("demo").innerHTML=obj.employees[2].firstName + " " + obj.employees[2].lastName;//当object放到函数里后，就传不出来了 -->
+<!-- </script> -->
+
+<!-- <script>
+function aa() 
+{  
+     var bb = "";  
+     var temp = ""; 
+     var a = document.getElementsByName("checkbox");
+     for ( var i = 0; i<a.length; i++) {  
+     if (a[i].checked) {  
+     temp = a[i].value;  
+     bb = bb + "," +temp;  
+     }  
+     } 
+     document.getElementById("tempString").value = bb
+      .substring(1, bb.length);  
+     }
+</script> -->
+<!-- <script>
+ document.getElementById("demo").innerHTML =CheckAll().employees[2].firstName;//这个可行，要传具体的值进来才能显示出来。整个函数传过来可能是显示不了，但确实传了呢？也不一定
+
+ document.getElementById("demo").innerHTML =obj.employees[2].firstName + " " + obj.employees[2].lastName;//当object放到函数里后，就传不出来了
+</script> -->
+
+
+
+<!-- <script>
+  $(document).ready(function () {
+            $("#uploadify").uploadify({
+                swf: '/static/js/uploadify/uploadify.swf',
+                uploader: '/topic',
+                cancelImg: '/static/js/uploadify/uploadify-cancel.png',
+                formData: { 'folder': 'UploadFile' },
+                progressData: 'speed',
+                fileSizeLimit: '10000KB',
+                queueID: 'fileQueue',
+                auto: false,
+                multi: true,
+                height: 27,
+                buttonImage: '/static/js/uploadify/selectFile.jpg',
+                wmode: 'transparent',
+                onUploadComplete: function (event, queueID, fileObj, response, data) {
+                    // alert(fileObj.name);文件上传成功 
+                },
+                onError: function (event, queueID, fileObj) {
+                    alert("文件:" + fileObj.name + " 上传失败");
+                },
+                onUploadStart: function (file) {
+                   //********根据file.id可以找到每一个条目
+                    var attachType = $("#" + file.id).find("select").val();
+                    this.addPostParam("attach_type", attachType);
+                    this.addPostParam("file_name", encodeURI(file.name)); //在onUploadStart事件中添加文件名参数
+                },
+                onQueueComplete: function () {
+                    //全部上传完成后刷新
+                    window.location.href = window.location.href;
+                },
+                onDialogClose: function () {
+                    var attachTypes = $("#attachTypes");
+                   
+                    //克隆文件类型
+                    var items = $(".fileName");
+                    if (items.length > 0) {
+                        items.each(function () {
+                            var nowitem = $(this);
+                            if (nowitem.parent().find("select").length < 1) {
+                                var cloneTypes = attachTypes.clone();
+                                cloneTypes.removeAttr("id");
+                                cloneTypes.insertAfter(nowitem);
+                            }
+                        });
+                    }
+
+                }
+            });
+            //开始上传
+            $("#btnUpload").click(function () {
+                $("#uploadify").uploadify('upload', '*');
+            });
+
+            //取消上传
+            $("#btnCancel").click(function () {
+                $("#uploadify").uploadify('cancel', '*');
+            });
+        });
+  </script>  -->     
+<script type="text/javascript">
+  
+  function create_table()
+  {
+   var num = document.getElementById("num").value;
+   if(num == null )
+   {
+    num = 1;
+   }
+   var s1 = document.getElementById("d1");
+   var vTable = document.createElement("Table");
+   for(i=0; i<num; i++)
+   {
+    vTr = vTable.insertRow();
+    vTd = vTr.insertCell();
+    vTd.innerHTML="文件"+(i+1)+"：<input type=\"text\" name=\"file\" id=\"file\" />";
+   }//type=\"file\"
+   s1.appendChild(vTable);
+  }
+  
+  function check_file()
+  {
+   var n=0;
+   var flist = document.all.file;
+   if(flist.length != undefined)
+   {
+    for(i=0;i<flist.length;i++)
+    {
+     if(flist[i].value != undefined)
+     { 
+      alert(flist[i].value);
+     } 
+    }
+   }else{
+    alert(flist.value);
+   }
+   
+  }
+  
+ </script>
+
+
+ 
+<!-- <body onload="create_table();">
+ <form id="form1" name="form1" onsubmit="check_file();">
+  <input type="text" id="num" name="num" style="width:50px;" value="1" /><input type="button" onclick="create_table()"  value="设定" />
+  <table cellpadding="0" cellspacing="0" border="0" bgcolor="#CCCCCC" id="t1">
+  <tr>
+   <td><div id="d1"></div></td>
+  </tr>
+ </table>
+ <input type="submit" value="上传" />
+ </form>
+
+</div> 
+
+
+<div class="panel-group" id="accordion">
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h4 class="panel-title">
+        <a data-toggle="collapse" data-parent="#accordion" 
+          href="#collapseOne">
+          点击我进行展开，再次点击我进行折叠。第 1 部分
+        </a>
+      </h4>
+    </div>
+    <div id="collapseOne" class="panel-collapse collapse in">
+      <div class="panel-body">
+        Nihil anim keffiyeh helvetica, craft beer labore wes anderson 
+        cred nesciunt sapiente ea proident. Ad vegan excepteur butcher 
+        vice lomo.
+      </div>
+    </div>
+  </div>
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h4 class="panel-title">
+        <a data-toggle="collapse" data-parent="#accordion" 
+          href="#collapseTwo">
+          点击我进行展开，再次点击我进行折叠。第 2 部分
+        </a>
+      </h4>
+    </div>
+    <div id="collapseTwo" class="panel-collapse collapse">
+      <div class="panel-body">
+        Nihil anim keffiyeh helvetica, craft beer labore wes anderson 
+        cred nesciunt sapiente ea proident. Ad vegan excepteur butcher 
+        vice lomo.
+      </div>
+    </div>
+  </div>
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h4 class="panel-title">
+        <a data-toggle="collapse" data-parent="#accordion" 
+          href="#collapseThree">
+          点击我进行展开，再次点击我进行折叠。第 3 部分
+        </a>
+      </h4>
+    </div>
+    <div id="collapseThree" class="panel-collapse collapse">
+      <div class="panel-body">
+        Nihil anim keffiyeh helvetica, craft beer labore wes anderson 
+        cred nesciunt sapiente ea proident. Ad vegan excepteur butcher 
+        vice lomo.
+      </div>
+    </div>
+  </div>
+</div>
+
+<button type="button" class="btn btn-primary" data-toggle="collapse" 
+   data-target="#demo">
+   简单的可折叠组件
+</button>
+
+<div id="demo" class="collapse in">
+  Nihil anim keffiyeh helvetica, craft beer labore wes anderson 
+  cred nesciunt sapiente ea proident. Ad vegan excepteur butcher 
+  vice lomo.
+</div>
+
+<div class="panel-group" id="accordion">
+   <div class="panel panel-default">
+      <div class="panel-heading">
+         <h4 class="panel-title">
+            <a data-toggle="collapse" data-parent="#accordion" 
+               href="#collapse1">
+               点击我进行展开，再次点击我进行折叠。第 1 部分--hide 方法
+            </a>
+         </h4>
+      </div>
+      <div id="collapse1" class="panel-collapse collapse in">
+         <div class="panel-body">
+            Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred 
+            nesciunt sapiente ea proident. Ad vegan excepteur butcher vice 
+            lomo.
+         </div>
+      </div>
+   </div>
+   <div class="panel panel-success">
+      <div class="panel-heading">
+         <h4 class="panel-title">
+            <a data-toggle="collapse" data-parent="#accordion" 
+               href="#collapse2">
+               点击我进行展开，再次点击我进行折叠。第 2 部分--show 方法
+            </a>
+         </h4>
+      </div>
+      <div id="collapse2" class="panel-collapse collapse">
+         <div class="panel-body">
+            Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred 
+            nesciunt sapiente ea proident. Ad vegan excepteur butcher vice 
+            lomo.
+         </div>
+      </div>
+   </div>
+   <div class="panel panel-info">
+      <div class="panel-heading">
+         <h4 class="panel-title">
+            <a data-toggle="collapse" data-parent="#accordion" 
+               href="#collapse3">
+               点击我进行展开，再次点击我进行折叠。第 3 部分--toggle 方法
+            </a>
+         </h4>
+      </div>
+      <div id="collapse3" class="panel-collapse collapse">
+         <div class="panel-body">
+            Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred 
+            nesciunt sapiente ea proident. Ad vegan excepteur butcher vice 
+            lomo.
+         </div>
+      </div>
+   </div>
+   <div class="panel panel-warning">
+      <div class="panel-heading">
+         <h4 class="panel-title">
+            <a data-toggle="collapse" data-parent="#accordion" 
+               href="#collapse4">
+               点击我进行展开，再次点击我进行折叠。第 4 部分--options 方法
+            </a>
+         </h4>
+      </div>
+      <div id="collapse4" class="panel-collapse collapse">
+         <div class="panel-body">
+            Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred 
+            nesciunt sapiente ea proident. Ad vegan excepteur butcher vice 
+            lomo.
+         </div>
+      </div>
+   </div>
+</div>
+<script type="text/javascript">
+   // $(function () { $('#collapse4').collapse({
+      // toggle: false
+   // })});
+   // $(function () { $('#collapse2').collapse('show')});
+   // $(function () { $('#collapse3').collapse('toggle')});
+   // $(function () { $('#collapse1').collapse('hide')});
+</script>  
+-->
+
+</body> 
+</html>
+<!--  // var valus = document.getElementsByName("aaa");
+  // if(a.length!=0)
+  // {
+  // var str = ""；
+  // for(var i=0;i<a.length;i++)  
+  // {
+  // if(a[i].checked)
+  // {
+  // str+= a[i].value;
+// }
+// }
+// } -->

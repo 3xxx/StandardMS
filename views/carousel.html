@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+{{template "header"}}
+<title>成果分类查看 - 档案共享系统</title>
+<style type="text/css">    
+  <style type="text/css">
+#aa{display:block;
+position:relative;
+margin:auto;
+}
+</style>
+</style>    
+ <!-- <script type="text/javascript" src="/static/js/jquery.min.js"></script> -->
+ <link rel="stylesheet" href="/static/css/styles.css">
+ <!-- <link rel="stylesheet" href="/static/css/bootstrap-combined.min.css"> -->
+ <!-- <link rel="stylesheet" href="/static/css/layoutit.css"> -->
+ <!-- <link rel="shortcut icon" href="http:/www.jqueryba.com/favicon.ico" type="image/x-icon"> -->
+<!-- <link rel="profile" href="http:/gmpg.org/xfn/11"> -->
+<!-- <link rel="alternate" type="application/rss+xml" title="RSS 2.0" href="http:/www.jqueryba.com/rss/">  -->
+</head>
+<div class="navbar navba-default navbar-fixed-top">
+  <div class="container-fill">{{template "navbar" .}}</div>
+</div>
+
+<body>
+<!-- <div class="row-fluide"> 
+              <div class="preview">轮换图</div>
+              <div class="view">
+                <div class="carousel slide" id="myCarousel">
+                  <ol class="carousel-indicators">
+                    <li class="" data-slide-to="0" data-target="#myCarousel"></li>
+                    <li data-slide-to="1" data-target="#myCarousel" class=""></li>
+                    <li data-slide-to="2" data-target="#myCarousel" class="active"></li>
+                  </ol>
+                  <div class="carousel-inner">
+                    <div class="item"> <img alt="" src="/static/images/4133dd468ddd11e1abd61231381b6d77_7.jpg">
+                      <div class="carousel-caption" contenteditable="true">
+                        <h4>棒球</h4>
+                        <p>棒球运动是一种以棒打球为主要特点，集体性、对抗性很强的球类运动项目，在美国、日本尤为盛行。</p>
+                      </div>
+                    </div>
+                    <div class="item"> <img alt="" src="/static/images/4133dd468ddd11e1abd61231381b6d77_7.jpg">
+                      <div class="carousel-caption" contenteditable="true">
+                        <h4>冲浪</h4>
+                        <p>冲浪是以海浪为动力，利用自身的高超技巧和平衡能力，搏击海浪的一项运动。运动员站立在冲浪板上，或利用腹板、跪板、充气的橡皮垫、划艇、皮艇等驾驭海浪的一项水上运动。</p>
+                      </div>
+                    </div>
+                    <div class="item active"> <img alt="" src="/static/images/ca0bceca8dca11e19dc71231380fe523_7.jpg">
+                      <div class="carousel-caption" contenteditable="true">
+                        <h4>自行车</h4>
+                        <p>以自行车为工具比赛骑行速度的体育运动。1896年第一届奥林匹克运动会上被列为正式比赛项目。环法赛为最著名的世界自行车锦标赛。</p>
+                      </div>
+                    </div>
+                  </div>
+                  <a data-slide="prev" href="file:///C:/Users/ADMINI~1/AppData/Local/Temp/Rar$EXa0.366/layoutit/index.html#myCarousel" class="left carousel-control">‹</a> <a data-slide="next" href="file:///C:/Users/ADMINI~1/AppData/Local/Temp/Rar$EXa0.366/layoutit/index.html#myCarousel" class="right carousel-control">›</a> </div>
+              </div>
+            </div> -->
+     <!--  <div class="carousel slide" id="carousel-88221">
+        <ol class="carousel-indicators">
+          <li data-slide-to="0" data-target="#carousel-88221">
+          </li>
+          <li data-slide-to="1" data-target="#carousel-88221">
+          </li>
+          <li data-slide-to="2" data-target="#carousel-88221" class="active">
+          </li>
+        </ol>
+        <div class="carousel-inner">
+          <div class="item">
+            <img alt="" src="/static/images/4133dd468ddd11e1abd61231381b6d77_7.jpg" />
+            <div class="carousel-caption">
+              <h4>
+                棒球
+              </h4>
+              <p>
+                棒球运动是一种以棒打球为主要特点，集体性、对抗性很强的球类运动项目，在美国、日本尤为盛行。
+              </p>
+            </div>
+          </div>
+          <div class="item">
+            <img alt="" src="/static/images/4133dd468ddd11e1abd61231381b6d77_7.jpg" />
+            <div class="carousel-caption">
+              <h4>
+                冲浪
+              </h4>
+              <p>
+                冲浪是以海浪为动力，利用自身的高超技巧和平衡能力，搏击海浪的一项运动。运动员站立在冲浪板上，或利用腹板、跪板、充气的橡皮垫、划艇、皮艇等驾驭海浪的一项水上运动。
+              </p>
+            </div>
+          </div>
+          <div class="item active">
+            <img alt="" src="/static/images/ca0bceca8dca11e19dc71231380fe523_7.jpg" />
+            <div class="carousel-caption">
+              <h4>
+                自行车
+              </h4>
+              <p>
+                以自行车为工具比赛骑行速度的体育运动。1896年第一届奥林匹克运动会上被列为正式比赛项目。环法赛为最著名的世界自行车锦标赛。
+              </p>
+            </div>
+          </div>
+        </div> 
+        <a data-slide="prev" href="#carousel-88221" class="left carousel-control">‹</a> 
+        <a data-slide="next" href="#carousel-88221" class="right carousel-control">›</a>
+      </div> -->
+
+
+
+
+  <div class="bs-example">
+      <div id="carousel-example-generic" class="carousel slide" data-ride="carousel" >
+        <ol class="carousel-indicators">
+        {{range $index, $elem :=.Attachment}}
+          <li data-target="#carousel-example-generic" data-slide-to="{{$index}}" class=""></li>
+        {{end}} 
+        </ol>
+        <div class="carousel-inner">
+<!--            <div class="item active">
+            <img src="/static/images/4133dd468ddd11e1abd61231381b6d77_7.jpg" alt="Second slide">
+          </div> -->       
+        {{range $index, $elem :=.Attachment}}
+          <div {{if eq 0 $index}} class="item active" {{else}}class="item"{{end}}  align=center>
+            <img src="{{.Route}}" alt="First slide" width="40%">
+              <div class="carousel-caption">
+                <h3>{{.FileName}}</h3>
+                <p>{{.Content}}</p>
+              </div>
+          </div>
+         {{end}} 
+         </div>
+        <a class="left carousel-control" href="#carousel-example-generic" data-slide="prev">
+          <span class="glyphicon glyphicon-chevron-left"></span>
+        </a>
+        <a class="right carousel-control" href="#carousel-example-generic" data-slide="next">
+          <span class="glyphicon glyphicon-chevron-right"></span>
+        </a>
+      </div>
+  </div>                 
+<!--            <li data-target="#carousel-example-generic" data-slide-to="0" class=""></li>
+          <li data-target="#carousel-example-generic" data-slide-to="1" class=""></li> 
+          <li data-target="#carousel-example-generic" data-slide-to="2" class=""></li> -->
+        
+<!--           <div class="item">
+            <img src="/static/images/4133dd468ddd11e1abd61231381b6d77_7.jpg" alt="Second slide">
+          </div>
+          <div class="item">
+            <img src="/static/images/ca0bceca8dca11e19dc71231380fe523_7.jpg" alt="Third slide">
+          </div> -->
+
+
+
+
+<!-- <div class="col-lg-8">
+  {{$tid:=.Topic.Id}}
+  {{$isLogin:=.IsLogin}}
+{{range .Replies}}
+  <h4>
+    {{.Name}}
+    <small>{{dateformat .Created "2006-01-02"}}</small>
+    {{if $isLogin}}
+    <a href="/reply/delete?tid={{$tid}}&rid={{.Id}}">删除</a>
+    {{end}}
+  </h4>
+  {{.Content}}
+{{end}}
+  <h4>本文回复</h4>
+  <form method="post" action="/reply/add">
+    <input type="hidden" name="tid" value="{{.Topic.Id}}">
+    <div class="form-group">
+      <label>显示昵称：</label>
+      <input type="text" class="form-control" name="nickname"></div>
+    <div class="form-group">
+      <label>内容：</label>
+      <textarea name="content" id="" cols="30" rows="10" class="form-control"></textarea>
+    </div>
+    <button class="btn btn-default">提交回复</button>
+  </form>
+</div> -->
+
+
+
+       
+ </body>    
+</html>  
+
+
+
+
+<!-- </body> -->
