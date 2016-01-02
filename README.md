@@ -149,7 +149,7 @@ D:\quick\static\
 
 在view\目录下的help.html中修改链接：
 
-<a href="/static/HydroCMS.rar">HydroCMS系统整体打包下载；</a>
+HydroCMS系统整体打包下载；
 
 当然，可以建立项目和目录，上传附件。
 
