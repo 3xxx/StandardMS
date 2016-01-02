@@ -1,4 +1,3 @@
-<!-- {{template "./public/header.tpl"}} -->
 <!DOCTYPE html>
 {{template "header"}}
 <title>{{.Topic.Title}} - 水利设计CMS系统</title>
