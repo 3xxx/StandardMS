@@ -122,6 +122,10 @@ func (c *TopicController) Add() { //参考下面的 modify,这个add是topic/add
 		c.TplNames = "topic_user_one_add.html"
 	case "5": //自定义一对多模式
 		c.TplNames = "topic_user_many_add.html"
+	// default:
+	// fmt.Printf("Default")
+	case "6": //用百度的插件上传
+		c.TplNames = "topic_one_addbaidu.html"
 		// default:
 		// fmt.Printf("Default")
 	}
@@ -367,6 +371,7 @@ func (c *TopicController) Topic_one_add() { //一对一模式
 	}
 	//获取上传的文件
 	_, h, err := c.GetFile("image")
+	beego.Info(h.Filename)
 	if err != nil {
 		beego.Error(err)
 	}
@@ -384,6 +389,98 @@ func (c *TopicController) Topic_one_add() { //一对一模式
 		// path = "./attachment" + "/" + h.Filename
 		// f.Close()                                             // 关闭上传的文件，不然的话会出现临时文件不能清除的情况
 		err = c.SaveToFile("image", path) //.Join("attachment", attachment)) //存文件    WaterMark(path)    //给文件加水印
+		if err != nil {
+			beego.Error(err)
+		}
+		filesize, _ = FileSize(path)
+		filesize = filesize / 1000.0
+	}
+	if title == "" || tnumber == "" {
+		//将附件的编号和名称写入数据库
+		filename1, filename2 := SubStrings(attachment)
+		//当2个文件都取不到filename1的时候，数据库里的tnumber的唯一性检查出错。
+		// beego.Info(filename1)
+		// beego.Info(filename2)
+		if filename1 == "" {
+			filename1 = filename2 //如果编号为空，则用文件名代替，否则多个编号为空导致存入数据库唯一性检查错误
+		}
+		tnumber = filename1
+		title = filename2
+	}
+	ck, err := c.Ctx.Request.Cookie("uname")
+	if err != nil {
+		beego.Error(err)
+	}
+	uname := ck.Value
+	// var err error
+	// var tid string //这里是增加的，不知为何教程没有
+	// path := ".\\attachment\\" + categoryproj.Number + " " + categoryproj.Title + "\\" + categoryphase.Title + "\\" + categoryspec.Title + "\\" + category + "\\" + h.Filename
+	// route := "/attachment/{{.TopicProj.Number}} {{.TopicProj.Title}}/{{.TopicPhase.Title}}/{{.TopicSpec.Title}}/{{.TopicChengguo.Title}}/{{.Topic.Attachment}}"
+	// route := "/attachment/" + categoryproj.Number + categoryproj.Title + "/" + categoryphase.Title + "/" + categoryspec.Title + "/" + category + "/" + h.Filename
+	route := category1.Url + h.Filename
+	// topicid := c.Input().Get("topicid")
+	var topicid int64
+	if len(tid) == 0 {
+		topicid, err = models.AddTopicOne(title, tnumber, category, categoryid, uname, content, attachment)
+		if err != nil {
+			beego.Error(err)
+		}
+		cid := strconv.FormatInt(topicid, 10)
+		filesize := strconv.FormatInt(filesize, 10)
+		err = models.AddAttachment(attachment, filesize, path, route, cid, uname)
+		if err != nil {
+			beego.Error(err)
+		}
+		// beego.Info(attachment)
+	} else {
+		err = models.ModifyTopic(tid, title, tnumber, category, categoryid, content)
+	}
+	if err != nil {
+		beego.Error(err)
+	}
+	c.TplNames = "topic_one_add.tpl" //不加这句上传出错，虽然可以成功上传
+	// c.Redirect("/topic", 302)
+}
+
+func (c *TopicController) Topic_one_addbaidu() { //一对一模式
+	//解析表单
+	tid := c.Input().Get("tid") //教程里漏了这句，导致修改总是变成添加文章
+	title := c.Input().Get("title")
+	tnumber := c.Input().Get("tnumber")
+	content := c.Input().Get("content")
+	category := c.Input().Get("category")
+	categoryid := c.Input().Get("categoryid")
+
+	//获取文件保存路径，有了categoryid可以求出整个路径
+	//取得成果类型id的专业parentid以及阶段parentid以及项目parentid才行
+	// categoryproj, err := models.GetCategoryProj(categoryid)
+	// categoryphase, err := models.GetCategoryPhase(categoryid)
+	// categoryspec, err := models.GetCategorySpec(categoryid)
+	category1, err := models.GetCategory(categoryid)
+	if err != nil {
+		beego.Error(err)
+		// c.Redirect("/", 302)//这里注释掉，否则在图纸页面无法进入添加页面，因为传入的id为空，导致err发生
+		return
+	}
+	//获取上传的文件
+	_, h, err := c.GetFile("file")
+	if err != nil {
+		beego.Error(err)
+	}
+	var attachment string
+	var path string
+	var filesize int64
+	if h != nil {
+		//保存附件
+		attachment = h.Filename
+		// beego.Info(attachment)
+		// path = ".\\attachment\\" + categoryproj.Number + categoryproj.Title + "\\" + categoryphase.Title + "\\" + categoryspec.Title + "\\" + category + "\\" + h.Filename
+		path = category1.DiskDirectory + h.Filename
+		// path := c.Input().Get("url")  //存文件的路径
+		// path = path[3:]
+		// path = "./attachment" + "/" + h.Filename
+		// f.Close()                                             // 关闭上传的文件，不然的话会出现临时文件不能清除的情况
+		err = c.SaveToFile("file", path) //.Join("attachment", attachment)) //存文件    WaterMark(path)    //给文件加水印
 		if err != nil {
 			beego.Error(err)
 		}

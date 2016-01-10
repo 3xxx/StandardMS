@@ -60,7 +60,7 @@
         <li {{if .IsHelp}}class="active"{{end}}>
           <a href="/help">自述</a>
         </li>
-        <li>
+        <li {{if .IsTask}}class="active"{{end}}>
           <a href="/todo">Todo</a>
         </li>        
       </ul>

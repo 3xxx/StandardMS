@@ -42,6 +42,7 @@ h3 {line-height: 150%;
 <div class="col-sm-5">
   <button id="directNextpage" class="btn btn-default" onclick="window.open('/topic/add?id={{.Category.Id}}&mid=1')">A+(1to1)</button>
   <button id="directNextpage" class="btn btn-default" onclick="parent.location.href='/topic/add?id={{.Category.Id}}&mid=2'">B+(1toM)</button>
+  <button id="directNextpage" class="btn btn-default" onclick="parent.location.href='/topic/add?id={{.Category.Id}}&mid=6'">C+(1to1)</button>
   <button id="directNextpage" class="btn btn-default" onclick="window.open('/catalog/view?id={{.Category.Id}}')">Plan Catalog</button>
   <input type="button" id="print" value="打印" onclick="print()" class="btn btn-default">
   <!-- <a href="/catalog/view?id={{.Category.Id}}" class="btn btn-default">Plan Catalog</a> -->

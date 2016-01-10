@@ -78,3 +78,11 @@ func main() {
 //  0 0 * * * *　　　　　　　　               毎时 0 分 每隔 1 小时 执行
 //  0 2 8-20/3 * * *　　　　　　             8:02,11:02,14:02,17:02,20:02 执行
 //  0 30 5 1,15 * *　　　　　　              1 日 和 15 日的 5:30 执行
+
+// 请问，beego CORS 跨域如何实现？
+// beego.InsertFilter("*", beego.BeforeRouter,cors.Allow(&cors.Options{
+// 		AllowOrigins: []string{"*"},
+// 		AllowMethods: []string{"*"},
+// 		ExposeHeaders: []string{"Content-Length"},
+// 		AllowCredentials: true,
+// 	}))

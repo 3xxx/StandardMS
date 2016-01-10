@@ -12,7 +12,6 @@ h4 {
   }
 </style> -->
 </head>
-
 <body>
 <div class="navbar navba-default navbar-fixed-top">
   <div class="container-fill">{{template "navbar" .}}</div>

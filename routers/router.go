@@ -79,6 +79,8 @@ func init() {
 	beego.Router("/topic/topic_many_add", &controllers.TopicController{}, "post:Topic_many_add")
 	//一对一模式添加文章
 	beego.Router("/topic/topic_one_add", &controllers.TopicController{}, "post:Topic_one_add")
+	beego.Router("/topic/topic_one_addbaidu", &controllers.TopicController{}, "post:Topic_one_addbaidu")
+
 	//删除文章中的附件delete必须用get，为什么？
 	beego.Router("/attachment/delete", &controllers.TopicController{}, "get:DeleteAttachment")
 
