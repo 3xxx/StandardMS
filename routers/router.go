@@ -7,6 +7,9 @@ import (
 )
 
 func init() {
+	beego.Router("/category/uploadimages", &controllers.CategoryController{}, "*:Uploadimagesct")
+	beego.Router("/controller", &controllers.UeditorController{}, "get:ControllerUE")
+	beego.Router("/controller", &controllers.UeditorController{}, "post:UploadImage")
 	//除了<form里用了post，其他都要默认用get或*代替！！！！！
 	beego.Router("/todo", &controllers.TaskController{}) //MainController{}
 	beego.Router("/todo/task", &controllers.TaskController{}, "get:ListTasks;post:NewTask")
@@ -44,6 +47,14 @@ func init() {
 	beego.Router("/test", &controllers.MainController{}, "*:Test")
 	beego.Router("/test1", &controllers.MainController{}, "*:Test1")
 	beego.Router("/test2", &controllers.MainController{}, "*:Test2")
+
+	beego.Router("/topic/uploadimages", &controllers.TopicController{}, "*:Uploadimagesmd")
+
+	// beego.Router("/", &controllers.MainController{})
+	// beego.SetStaticPath("/ueditor", "ueditor")
+	beego.Router("/ue", &controllers.UEController{})
+	beego.AutoRouter(&controllers.UEController{})
+
 	beego.Router("/catalog/import_xls_catalog", &controllers.CatalogController{}, "post:Import_Xls_Catalog")
 	beego.Router("/catalog/add", &controllers.CatalogController{}, "get:Get")
 	beego.Router("/catalog/view", &controllers.CatalogController{}, "get:View")
@@ -79,7 +90,7 @@ func init() {
 	beego.Router("/topic/topic_many_add", &controllers.TopicController{}, "post:Topic_many_add")
 	//一对一模式添加文章
 	beego.Router("/topic/topic_one_add", &controllers.TopicController{}, "post:Topic_one_add")
-	beego.Router("/topic/topic_one_addbaidu", &controllers.TopicController{}, "post:Topic_one_addbaidu")
+	beego.Router("/topic/topic_one_addbaidu", &controllers.TopicController{}, "*:Topic_one_addbaidu")
 
 	//删除文章中的附件delete必须用get，为什么？
 	beego.Router("/attachment/delete", &controllers.TopicController{}, "get:DeleteAttachment")

@@ -160,6 +160,12 @@ func (c *MainController) Post() {
 		c.Data["json"] = categories
 		c.ServeJson()
 	}
+	// 你自己判断比如
+	// if isMobile {
+	// 	c.ServeJson()
+	// } else {
+	// 	c.TplNames = "xxx"
+	// }
 
 	// js, err := simplejson.NewJson(b)
 	// if err != nil {

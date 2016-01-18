@@ -10,6 +10,12 @@ import (
 	"strings"
 )
 
+type Uploadimage struct {
+	url     string
+	message string
+	success int
+}
+
 type CategoryController struct {
 	beego.Controller
 }
@@ -478,6 +484,87 @@ func (c *CategoryController) Post() {
 	c.Data["Uname"] = ck.Value
 	id1 := strconv.FormatInt(id, 10)
 	c.Redirect("/category?op=view&id="+id1, 301)
+	return //???
+}
+
+func (c *CategoryController) Uploadimagesct() {
+
+	name := "111"    //c.Input().Get("name")
+	number := "222"  //c.Input().Get("number")
+	content := "333" //c.Input().Get("test-editormd-html-code")
+	path := "c"      //c.Input().Get("tempString")
+
+	diskdirectory := ".\\attachment\\" + "test" + "\\"
+	url := "/attachment/" + "test" + "/"
+	//保存上传的图片
+	//获取上传的文件，直接可以获取表单名称对应的文件名，不用另外提取
+	_, h, err := c.GetFile("editormd-image-file") //editormd-image-file
+	// beego.Info(h)
+	if err != nil {
+		beego.Error(err)
+	}
+	// var attachment string
+	// var path string
+	var filesize int64
+	var route string
+	if h != nil {
+		//保存附件
+		path1 := ".\\attachment\\" + "test" + "\\" + h.Filename
+		err = c.SaveToFile("editormd-image-file", path1) //editormd-image-file  .Join("attachment", attachment)) //存文件    WaterMark(path)    //给文件加水印
+		if err != nil {
+			beego.Error(err)
+		}
+
+		if strings.Contains(strings.ToLower(h.Filename), ".jpg") { //ToLower转成小写
+			// 随机名称
+			// to := path + random_name() + ".jpg"
+			origin := path1 //path + file.Name()
+			fmt.Println("正在处理" + origin + ">>>" + origin)
+			cmd_resize(origin, 2048, 0, origin)
+			//				defer os.Remove(origin)//删除原文件
+		}
+		filesize, _ = FileSize(path1)
+		filesize = filesize / 1000.0
+		route = "/attachment/" + "test" + "/" + h.Filename
+	} else {
+		img := CreateRandomAvatar([]byte(number + name))
+		fi, _ := os.Create("./attachment/" + "test" + "/u1.png")
+		png.Encode(fi, img)
+		fi.Close()
+		route = "/attachment/" + "test" + "/u1.png"
+	}
+
+	uname := "4"
+
+	//存入数据库
+	_, err = models.AddCategory(name, number, content, path, route, uname, diskdirectory, url)
+	if err != nil {
+		beego.Error(err)
+	} else {
+		// f := Uploadimage{
+		// 	url:     route,
+		// 	success: 1,
+		// 	message: "ok",
+		// }
+		// beego.Info(f)2016/01/17 01:40:03 [category.go:549] [I] {/attachment/test/u1.png ok 1}
+		c.Data["json"] = map[string]interface{}{"success": 1, "message": "111", "url": route}
+		// c.Data["json"] = map[string]interface{}{"state": "SUCCESS", "title": "111", "original": "demo.jpg", "url": route}
+		// c.Data["json"] = f
+		c.ServeJson()
+		// beego.Info(c.Data["json"])
+		// 2016/01/17 01:42:00 [category.go:554] [I] map[success:1 message:111 url:/attachm
+		// ent/test/u1.png]
+		// 		{
+		//     "state": "SUCCESS",
+		//     "url": "upload/demo.jpg",
+		//     "title": "demo.jpg",
+		//     "original": "demo.jpg"
+		//      }
+	}
+
+	// c.Data["Uname"] = ck.Value
+	// id1 := strconv.FormatInt(id, 10)
+	// c.Redirect("/category?op=view&id="+id1, 301)
 	return //???
 }
 

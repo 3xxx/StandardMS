@@ -277,11 +277,7 @@
                     //dialogMaskBgColor : "#000", // 设置透明遮罩层的背景颜色，全局通用，默认为 #fff
                     // imageUpload : true,
                     // imageFormats : ["jpg", "jpeg", "gif", "png", "bmp", "webp"],
-                    // imageUploadURL : "./php/upload.php?test=dfdf",
-                    
-
-
-  
+                    // imageUploadURL : "./php/upload.php?test=dfdf",  
             var testEditor;
             $(function() {
                 // $.get("./test.md", function(md) {
@@ -291,7 +287,7 @@
                         path   : "/static/editor.md/lib/",
                         imageUpload : true,
                         imageFormats : ["jpg", "jpeg", "gif", "png", "bmp", "webp"],
-                        imageUploadURL : "/category",//这里需要好好写一个上传的控制器。
+                        imageUploadURL : "/category/uploadimages",//这里需要好好写一个上传的控制器。
                         // appendMarkdown : md,
                         saveHTMLToTextarea : true
                      /*
@@ -367,6 +363,36 @@
 // document.getElementById("tempString").value = bb;
 </script>
 
+
+
+<!--         <script type="text/javascript">
+            $(function() {                
+                var testEditor = editormd("test-editormd", {
+                    width: "90%",
+                    height: 640,
+                    markdown : "",
+                    path : '../lib/',
+                    //dialogLockScreen : false,   // 设置弹出层对话框不锁屏，全局通用，默认为 true
+                    //dialogShowMask : false,     // 设置弹出层对话框显示透明遮罩层，全局通用，默认为 true
+                    //dialogDraggable : false,    // 设置弹出层对话框不可拖动，全局通用，默认为 true
+                    //dialogMaskOpacity : 0.4,    // 设置透明遮罩层的透明度，全局通用，默认值为 0.1
+                    //dialogMaskBgColor : "#000", // 设置透明遮罩层的背景颜色，全局通用，默认为 #fff
+                    imageUpload : true,
+                    imageFormats : ["jpg", "jpeg", "gif", "png", "bmp", "webp"],
+                    imageUploadURL : "./php/upload.php?test=dfdf",
+                    
+                    /*
+                     上传的后台只需要返回一个 JSON 数据，结构如下：
+                     {
+                        success : 0 | 1,           // 0 表示上传失败，1 表示上传成功
+                        message : "提示的信息，上传成功或上传失败及错误信息等。",
+                        url     : "图片地址"        // 上传成功时才返回
+                     }
+                     */
+                });
+            });
+        </script>
+ -->
 <!--  // var valus = document.getElementsByName("aaa");
   // if(a.length!=0)
   // {
