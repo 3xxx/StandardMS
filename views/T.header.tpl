@@ -162,12 +162,12 @@ oKw2RNYWWzhM8ZDpmvKwdz8pIgD5UlYiAHlSViIAqRABEASPEQEQBI8RARAEjxEBEASPEQEQBI8R
 ARAEjxEBEASP+X87oVIPorbKnwAAAABJRU5ErkJggg==" type="image/x-icon" />
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
 <link rel="stylesheet" type="text/css" href="/static/css/bootstrap.min.css"  />
-<link rel="stylesheet" href="/static/editor.md/css/editormd.css" />
+<!-- <link rel="stylesheet" href="/static/editor.md/css/editormd.css" /> -->
 <script type="text/javascript" src="/static/js/jquery-2.1.3.min.js"></script>
 <script type="text/javascript" src="/static/js/bootstrap.min.js"></script>
 <!-- <script type="text/javascript" src="/static/js/jquery-latest.js"></script>2015-12-23日注释掉，是否有影响？？对ajax有影响--> 
 <script type="text/javascript" src="/static/js/jquery.tablesorter.js"></script> 
-<script src="/static/editor.md/editormd.min.js"></script>
+<!-- <script src="/static/editor.md/editormd.min.js"></script> -->
 <!-- <script src="/static/editor.md/lib/marked.min.js"></script>
 <script src="/static/editor.md/lib/prettify.min.js"></script>
 <script src="/static/editor.md/lib/raphael.min.js"></script>

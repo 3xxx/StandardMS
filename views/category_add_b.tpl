@@ -1,6 +1,11 @@
 <!DOCTYPE html>
 {{template "header"}}
 <title>自定义项目&目录 - 水利设计CMS系统</title>
+    <script type="text/javascript" charset="utf-8" src="/static/ueditor/ueditor.config.js"></script>
+    <script type="text/javascript" charset="utf-8" src="/static/ueditor/ueditor.all.min.js"> </script>
+    <!--建议手动加在语言，避免在ie下有时因为加载语言失败导致编辑器加载失败-->
+    <!--这里加载的语言文件会覆盖你在配置项目里添加的语言类型，比如你在配置项目里配置的是英文，这里加载的中文，那最后就是中文-->
+    <script type="text/javascript" charset="utf-8" src="/static/ueditor/lang/zh-cn/zh-cn.js"></script>
 </head>
 
 <body>
@@ -13,22 +18,25 @@
   <form method="post" action="/category/userdefinedpost" enctype="multipart/form-data">
  <!--  <form method="post" action="/topic/addtopic1" enctype="multipart/form-data"> -->
     <div class="form-group">
-      <label>项目名称</label>
-      <input id="name" class="form-control"  placeholder="Enter ProjectName" name="name"></div>
+      <label>项目编号：</label>
+      <input id="number" class="form-control"  placeholder="Enter ProjectNumber" name="number"></div>    
 
     <div class="form-group">
-      <label>项目编号</label>
-      <input id="number" class="form-control"  placeholder="Enter ProjectNumber" name="number"></div>
-
+      <label>项目名称：</label>
+      <input id="name" class="form-control"  placeholder="Enter ProjectName" name="name"></div>
     <!-- <div class="form-group"> -->
       <label>项目简介:</label>
-    <div class="form-group" id="test-editormd">
-      <textarea style="display:none;" name="test-editormd-html-code"></textarea>
-    </div>
-      
-      <div class="input-group">
-      <label>选择效果图：<input type="file" name="image" id="image" /></label>
+      <div>
+    <!-- <h1>项目简介:</h1> -->
+       <script id="editor" type="text/plain" style="height:500px;"></script><!-- width:1024px; -->
       </div>
+<!--     <div class="form-group" id="test-editormd">
+      <textarea style="display:none;" name="test-editormd-html-code"></textarea>
+    </div> -->
+      
+<!--       <div class="input-group">
+      <label>选择效果图：<input type="file" name="image" id="image" /></label>
+      </div> -->
 <hr>
     
 
@@ -145,101 +153,32 @@
    }//type=\"file\"
    s1.appendChild(vTable);
   }  
-  // function check_file(){
-  //    var n=0;
-  //  var flist = document.all.file;
-  //  if(flist.length != undefined){
-  //   for(i=0;i<flist.length;i++){
-  //    if(flist[i].value != undefined){
-  //     alert(flist[i].value);
-  //    } 
-  //   }
-  //  }else{
-  //   alert(flist.value);
-  //  }
-  // }
-  var testEditor;
-            $(function() {
-                // $.get("./test.md", function(md) {
-                    testEditor = editormd("test-editormd", {
-                        width  : "100%",
-                        height : 640,
-                        path   : "/static/editor.md/lib/",
-                        imageUpload : true,
-                        imageFormats : ["jpg", "jpeg", "gif", "png", "bmp", "webp"],
-                        imageUploadURL : "/category",//这里需要好好写一个上传的控制器。
-                        // appendMarkdown : md,
-                        saveHTMLToTextarea : true
-                     /*
-                     上传的后台只需要返回一个 JSON 数据，结构如下：
-                     {
-                        success : 0 | 1,           // 0 表示上传失败，1 表示上传成功
-                        message : "提示的信息，上传成功或上传失败及错误信息等。",
-                        url     : "图片地址"        // 上传成功时才返回
-                     }
-                     */
-                    });
-                // });
+//实例化编辑器
+    //议使用工厂方法getEditor创建和引用编辑器实例，如果在某个闭包下引用该编辑器，直接调用UE.getEditor('editor')就能拿到相关的实例
+    var ue = UE.getEditor('editor');
 
-                //testEditor.getMarkdown();       // 获取 Markdown 源码
-                //testEditor.getHTML();           // 获取 Textarea 保存的 HTML 源码
-                //testEditor.getPreviewedHTML();  // 获取预览窗口里的 HTML，在开启 watch 且没有开启 saveHTMLToTextarea 时使用
-            });
-
-                $("#goto-line-btn").bind("click", function(){
-                    testEditor.gotoLine(90);
-                });
-                
-                $("#show-btn").bind('click', function(){
-                    testEditor.show();
-                });
-                
-                $("#hide-btn").bind('click', function(){
-                    testEditor.hide();
-                });
-                
-                $("#get-md-btn").bind('click', function(){
-                    alert(testEditor.getMarkdown());
-                });
-                
-                $("#get-html-btn").bind('click', function() {
-                    alert(testEditor.getHTML());
-                });                
-                
-                $("#watch-btn").bind('click', function() {
-                    testEditor.watch();
-                });                 
-                
-                $("#unwatch-btn").bind('click', function() {
-                    testEditor.unwatch();
-                });              
-                
-                $("#preview-btn").bind('click', function() {
-                    testEditor.previewing();
-                });
-                
-                $("#fullscreen-btn").bind('click', function() {
-                    testEditor.fullscreen();
-                });
-                
-                $("#show-toolbar-btn").bind('click', function() {
-                    testEditor.showToolbar();
-                });
-                
-                $("#close-toolbar-btn").bind('click', function() {
-                    testEditor.hideToolbar();
-                });
-                
-                $("#toc-menu-btn").click(function(){
-                    testEditor.config({
-                        tocDropdown   : true,
-                        tocTitle      : "目录 Table of Contents",
-                    });
-                });
-                
-                $("#toc-default-btn").click(function() {
-                    testEditor.config("tocDropdown", false);
-                });
+    /* 1.传入函数,命令里执行该函数得到参数表,添加到已有参数表里 */
+ 
+ue.ready(function () {
+ue.addListener('focus', function () {//startUpload   beforeExecCommand是在插入图片之前触发
+     var name = $('#name').val();
+      //  if (name.length==0){
+      //   alert("请输入项目名称");
+      //   return false;
+      // }    
+     var number = $('#number').val();
+      //  if (name==""){
+      //   alert("请输入项目编号");
+      //   return false;
+      // }    
+      // alert(name)
+    ue.execCommand('serverparam', {
+        "number":number,
+        'name': name,
+    });
+});
+});
+    
  </script>
 </body>
 </html>

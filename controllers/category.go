@@ -74,7 +74,7 @@ func (c *CategoryController) Get() {
 						for _, t := range array {
 							switch t {
 							case "dwg", "doc", "xls", "pdf", "jpg", "tif", "diary": //成果分类
-								err := os.MkdirAll(".\\attachment\\"+number+" "+name+"\\"+v+"\\"+w+"\\"+t, 0777) //..代表本当前exe文件目录的上级，.表示当前目录，没有.表示盘的根目录
+								err := os.MkdirAll(".\\attachment\\"+number+""+name+"\\"+v+"\\"+w+"\\"+t, 0777) //..代表本当前exe文件目录的上级，.表示当前目录，没有.表示盘的根目录
 								if err != nil {
 									beego.Error(err)
 								}
@@ -354,7 +354,7 @@ func (c *CategoryController) Post() {
 
 	name := c.Input().Get("name")
 	number := c.Input().Get("number")
-	content := c.Input().Get("test-editormd-html-code")
+	content := c.Input().Get("editorValue")
 	// image := c.Input().Get("image")
 	path := c.Input().Get("tempString")
 	// if len(name) == 0 {
@@ -425,51 +425,51 @@ func (c *CategoryController) Post() {
 	// 		beego.Error(err)
 	// 	}
 	// }
-	diskdirectory := ".\\attachment\\" + number + name + "\\"
-	url := "/attachment/" + number + name + "/"
+	// diskdirectory := ".\\attachment\\" + number + name + "\\"
+	// url := "/attachment/" + number + name + "/"
 	//保存上传的图片
 	//获取上传的文件，直接可以获取表单名称对应的文件名，不用另外提取
-	_, h, err := c.GetFile("image")
+	// _, h, err := c.GetFile("image")
 	// beego.Info(h)
-	if err != nil {
-		beego.Error(err)
-	}
+	// if err != nil {
+	// 	beego.Error(err)
+	// }
 	// var attachment string
 	// var path string
-	var filesize int64
-	var route string
-	if h != nil {
-		//保存附件
-		// attachment = h.Filename
-		// beego.Info(attachment)
-		path1 := ".\\attachment\\" + number + name + "\\" + h.Filename
-		err = c.SaveToFile("image", path1) //.Join("attachment", attachment)) //存文件    WaterMark(path)    //给文件加水印
-		if err != nil {
-			beego.Error(err)
-		}
-		//如果扩展名为jpg
-		// if strings.ToLower(path.Ext(h.Filename)) == ".jpg" {
+	// var filesize int64
+	// var route string
+	// if h != nil {
+	// 	//保存附件
+	// 	// attachment = h.Filename
+	// 	// beego.Info(attachment)
+	// 	path1 := ".\\attachment\\" + number + name + "\\" + h.Filename
+	// 	err = c.SaveToFile("image", path1) //.Join("attachment", attachment)) //存文件    WaterMark(path)    //给文件加水印
+	// 	if err != nil {
+	// 		beego.Error(err)
+	// 	}
+	// 	//如果扩展名为jpg
+	// 	// if strings.ToLower(path.Ext(h.Filename)) == ".jpg" {
 
-		// }
-		//如果包含jpg，则进行压缩
-		if strings.Contains(strings.ToLower(h.Filename), ".jpg") { //ToLower转成小写
-			// 随机名称
-			// to := path + random_name() + ".jpg"
-			origin := path1 //path + file.Name()
-			fmt.Println("正在处理" + origin + ">>>" + origin)
-			cmd_resize(origin, 2048, 0, origin)
-			//				defer os.Remove(origin)//删除原文件
-		}
-		filesize, _ = FileSize(path1)
-		filesize = filesize / 1000.0
-		route = "/attachment/" + number + name + "/" + h.Filename
-	} else {
-		img := CreateRandomAvatar([]byte(number + name))
-		fi, _ := os.Create("./attachment/" + number + name + "/u1.png")
-		png.Encode(fi, img)
-		fi.Close()
-		route = "/attachment/" + number + name + "/u1.png"
-	}
+	// 	// }
+	// 	//如果包含jpg，则进行压缩
+	// 	if strings.Contains(strings.ToLower(h.Filename), ".jpg") { //ToLower转成小写
+	// 		// 随机名称
+	// 		// to := path + random_name() + ".jpg"
+	// 		origin := path1 //path + file.Name()
+	// 		fmt.Println("正在处理" + origin + ">>>" + origin)
+	// 		cmd_resize(origin, 2048, 0, origin)
+	// 		//				defer os.Remove(origin)//删除原文件
+	// 	}
+	// 	filesize, _ = FileSize(path1)
+	// 	filesize = filesize / 1000.0
+	// 	route = "/attachment/" + number + name + "/" + h.Filename
+	// } else {//如果没有图片就自动生成一个
+	// 	img := CreateRandomAvatar([]byte(number + name))
+	// 	fi, _ := os.Create("./attachment/" + number + name + "/u1.png")
+	// 	png.Encode(fi, img)
+	// 	fi.Close()
+	// 	route = "/attachment/" + number + name + "/u1.png"
+	// }
 	ck, err := c.Ctx.Request.Cookie("uname")
 	if err != nil {
 		beego.Error(err)
@@ -477,7 +477,7 @@ func (c *CategoryController) Post() {
 	uname := ck.Value
 
 	//存入数据库
-	id, err := models.AddCategory(name, number, content, path, route, uname, diskdirectory, url)
+	id, err := models.AddCategory(name, number, content, path, "", uname, "", "")
 	if err != nil {
 		beego.Error(err)
 	}
@@ -588,7 +588,7 @@ func (c *CategoryController) UserdefinedPost() {
 	c.Data["IsCategory"] = true
 	name := c.Input().Get("name")
 	number := c.Input().Get("number")
-	content := c.Input().Get("test-editormd-html-code")
+	content := c.Input().Get("editorValue") //editorValue  test-editormd-html-code
 	// image := c.Input().Get("image")
 	// path1 := c.Input().Get("category2")
 	// beego.Info(path1) //只能取到一个值 [I] 2-1
@@ -1251,7 +1251,7 @@ func (c *CategoryController) ModifyCategory() {
 	name := c.Input().Get("name")
 	number := c.Input().Get("number")
 	// content := c.Input().Get("content")
-	content := c.Input().Get("test-editormd-html-code")
+	content := c.Input().Get("editorValue") //test-editormd-html-code
 	// image := c.Input().Get("image")
 	path := c.Input().Get("tempString")
 
@@ -1263,48 +1263,48 @@ func (c *CategoryController) ModifyCategory() {
 
 	//保存上传的图片
 	//获取上传的文件，直接可以获取表单名称对应的文件名，不用另外提取
-	_, h, err := c.GetFile("image")
-	// beego.Info(h)
+	// _, h, err := c.GetFile("image")
+	// // beego.Info(h)
+	// if err != nil {
+	// 	beego.Error(err)
+	// }
+	// // var attachment string
+	// // var path string
+	// var filesize int64
+	// var route string
+	// if h != nil {
+	// 	//保存附件
+	// 	// attachment = h.Filename
+	// 	// beego.Info(attachment)
+	// 	path1 := ".\\attachment\\" + number + name + "\\" + h.Filename
+	// 	err = c.SaveToFile("image", path1) //.Join("attachment", attachment)) //存文件    WaterMark(path)    //给文件加水印
+	// 	if err != nil {
+	// 		beego.Error(err)
+	// 	}
+	// 	//如果包含jpg，则进行压缩
+	// 	if strings.Contains(strings.ToLower(h.Filename), ".jpg") {
+	// 		// 随机名称
+	// 		// to := path + random_name() + ".jpg"
+	// 		origin := path1 //path + file.Name()
+	// 		fmt.Println("正在处理" + origin + ">>>" + origin)
+	// 		cmd_resize(origin, 2048, 0, origin)
+	// 		//				defer os.Remove(origin)//删除原文件
+	// 	}
+	// 	filesize, _ = FileSize(path1)
+	// 	filesize = filesize / 1000.0
+	// 	route = "/attachment/" + number + name + "/" + h.Filename
+	//存入数据库ModifyCategory(cid, name, number, content, path, route, uname string)
+	err = models.ModifyCategory(cid, name, number, content, path, "", uname)
 	if err != nil {
 		beego.Error(err)
 	}
-	// var attachment string
-	// var path string
-	var filesize int64
-	var route string
-	if h != nil {
-		//保存附件
-		// attachment = h.Filename
-		// beego.Info(attachment)
-		path1 := ".\\attachment\\" + number + name + "\\" + h.Filename
-		err = c.SaveToFile("image", path1) //.Join("attachment", attachment)) //存文件    WaterMark(path)    //给文件加水印
-		if err != nil {
-			beego.Error(err)
-		}
-		//如果包含jpg，则进行压缩
-		if strings.Contains(strings.ToLower(h.Filename), ".jpg") {
-			// 随机名称
-			// to := path + random_name() + ".jpg"
-			origin := path1 //path + file.Name()
-			fmt.Println("正在处理" + origin + ">>>" + origin)
-			cmd_resize(origin, 2048, 0, origin)
-			//				defer os.Remove(origin)//删除原文件
-		}
-		filesize, _ = FileSize(path1)
-		filesize = filesize / 1000.0
-		route = "/attachment/" + number + name + "/" + h.Filename
-		//存入数据库ModifyCategory(cid, name, number, content, path, route, uname string)
-		err = models.ModifyCategory(cid, name, number, content, path, route, uname)
-		if err != nil {
-			beego.Error(err)
-		}
-	} else {
-		//如果没有更新图片，则图片地址不存入
-		err = models.ModifyCategory(cid, name, number, content, path, "", uname)
-		if err != nil {
-			beego.Error(err)
-		}
-	}
+	// } else {
+	// 	//如果没有更新图片，则图片地址不存入
+	// 	err = models.ModifyCategory(cid, name, number, content, path, "", uname)
+	// 	if err != nil {
+	// 		beego.Error(err)
+	// 	}
+	// }
 	c.Data["Uname"] = ck.Value
 	c.Redirect("/category", 301)
 	return

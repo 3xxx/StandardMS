@@ -8013,22 +8013,6 @@ var fillCharReg = new RegExp(domUtils.fillChar, 'g');
                 return '';
             }
         }
-
-UE.Editor.prototype._bkGetActionUrl = UE.Editor.prototype.getActionUrl;
-UE.Editor.prototype.getActionUrl = function(action) {
-    if (action == 'uploadimage' || action == 'uploadscrawl' || action == 'uploadimage') {
-        return 'http://127.0.0.1/category/uploadimages';
-    } else if (action == 'uploadvideo') {
-        return '/category/uploadimages';
-    } else {
-        return this._bkGetActionUrl.call(this, action);
-    }
-}
-
-
-
-
-
     };
     utils.inherits(Editor, EventBase);
 })();
@@ -24470,6 +24454,9 @@ UE.plugin.register('simpleupload', function (){
                 var loadingId = 'loading_' + (+new Date()).toString(36);
                 var params = utils.serializeParam(me.queryCommandValue('serverparam')) || '';
 
+
+
+
                 var imageActionUrl = me.getActionUrl(me.getOpt('imageActionName'));
                 var allowFiles = me.getOpt('imageAllowFiles');
 
@@ -24527,7 +24514,20 @@ UE.plugin.register('simpleupload', function (){
                 }
 
                 domUtils.on(iframe, 'load', callback);
-                form.action = utils.formatUrl(imageActionUrl + (imageActionUrl.indexOf('?') == -1 ? '?':'&') + params);
+
+/* 添加额外的GET参数 */
+                var params = utils.serializeParam(me.queryCommandValue('serverparam')) || '';
+
+                form.action = utils.formatUrl(imageActionUrl + (imageActionUrl.indexOf('?') == -1 ? '?':'&')  + params);
+
+                                        /* 添加额外的GET参数 */
+                        // var params = utils.serializeParam(editor.queryCommandValue('serverparam')) || '',
+                        //     url = utils.formatUrl(actionUrl + (actionUrl.indexOf('?') == -1 ? '?':'&') + 'encode=utf-8&' + params);
+                        // uploader.option('server', url);
+                        // setState('uploading', files);
+                        // break;
+
+
                 form.submit();
             });
 

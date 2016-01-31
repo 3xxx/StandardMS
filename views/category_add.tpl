@@ -1,7 +1,12 @@
 <!DOCTYPE html>
 {{template "header"}}
 <title>项目&目录 - 水利设计CMS系统</title>
-
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+    <script type="text/javascript" charset="utf-8" src="/static/ueditor/ueditor.config.js"></script>
+    <script type="text/javascript" charset="utf-8" src="/static/ueditor/ueditor.all.js"> </script>
+    <!--建议手动加在语言，避免在ie下有时因为加载语言失败导致编辑器加载失败-->
+    <!--这里加载的语言文件会覆盖你在配置项目里添加的语言类型，比如你在配置项目里配置的是英文，这里加载的中文，那最后就是中文-->
+    <script type="text/javascript" charset="utf-8" src="/static/ueditor/lang/zh-cn/zh-cn.js"></script>
 </head>
 
 <body>
@@ -28,24 +33,25 @@
   <form method="post" action="/category" enctype="multipart/form-data">
  <!--  <form method="post" action="/topic/addtopic1" enctype="multipart/form-data"> -->
     <div class="form-group">
-      <label>项目名称</label>
-      <input id="name" class="form-control"  placeholder="Enter ProjectName" name="name"></div>
-
+      <label>项目编号：</label>
+      <input id="number" class="form-control"  placeholder="Enter ProjectNumber:上传图片之前必须先填写项目编号和项目名称" name="number"></div> 
     <div class="form-group">
-      <label>项目编号</label>
-      <input id="number" class="form-control"  placeholder="Enter ProjectNumber" name="number"></div>
-
+      <label>项目名称：</label>
+      <input id="name" class="form-control"  placeholder="Enter ProjectName:上传图片之前必须先填写项目编号和项目名称" name="name"></div>
     <label>项目简介:</label>
-
-    <div class="form-group" id="test-editormd">
+<div>
+    <!-- <h1>项目简介:</h1> -->
+    <script id="editor" type="text/plain" style="height:500px;"></script><!-- width:1024px; -->
+</div>
+<!--     <div class="form-group" id="test-editormd">
       <textarea style="display:none;" name="test-editormd-html-code"></textarea>
-    </div>
+    </div> -->
 
-      <div class="input-group">
+<!--       <div class="input-group">
       <label>选择效果图：<input type="file" name="image" id="image" /></label>
       <p> <font size="4" color="#A52A2A">全部选中将向数据库中写入7*7*6=294行记录，耗时较长，请选中1~2个体验即可。</font>
       </p>
-    </div>
+    </div> -->
 <hr>
     <!-- <input type="hidden" name="op" value="add"> 这句应该没什么用了，因为controller里用post函数了-->
 
@@ -237,174 +243,160 @@
     }
    }
    
-//秦改进了原代码，原代码循环所有的checkbox，实际有用的还是最后一个
-// for(var i=0;i<n;i++)
-// {
-// if(a[i].checked)
-// allchecked = true;
-// else
-// allchecked = false;
-// }
 
-    // var editor, editor_edit;
-    // $(function() {
-    //   $('#submit').attr('disabled', true);
+    //实例化编辑器
+    //议使用工厂方法getEditor创建和引用编辑器实例，如果在某个闭包下引用该编辑器，直接调用UE.getEditor('editor')就能拿到相关的实例
+    var ue = UE.getEditor('editor');
 
-    //   editor = createEditorMd("editormd", "#submit");
+    /* 1.传入函数,命令里执行该函数得到参数表,添加到已有参数表里 */
+ 
+ue.ready(function () {
+ue.addListener('focus', function () {//startUpload   beforeExecCommand是在插入图片之前触发
+     var name = $('#name').val();
+      //  if (name.length==0){
+      //   alert("请输入项目名称");
+      //   return false;
+      // }    
+     var number = $('#number').val();
+      //  if (name==""){
+      //   alert("请输入项目编号");
+      //   return false;
+      // }    
+      // alert(name)
+    ue.execCommand('serverparam', {
+        "number":number,
+        'name': name,
+    });
+});
+});
 
-    //   $('.edit-comment').click(function () {
-    //     var commentId = $(this).attr('comment-id');
-    //     $.getJSON("/comment/" + commentId + ".json", function (data) {
-    //       $('#edit-comment-form').attr('action', '/comment/' + commentId + '/edit');
-    //       $('#myModal').on('shown.bs.modal', function (e) {
-    //         if (editor_edit) {
-    //           editor_edit.setMarkdown(data.markdown);
-    //         } else {
-    //           editor_edit = createEditorMd("editormd-edit", "#edit-submit", data.markdown);
-    //         }
-    //       });
+// ue.ready(function () {
 
-    //       $('#myModal').modal({});
-    //     });
-    //   });
+// ue.addListener('focus', function () {//startUpload   beforeExecCommand是在插入图片之前触发
+
+     // var name = $('#name').val();
+      // alert(name)
+    // ue.execCommand('serverparam', {
+    //     'key': "1"
     // });
-                    // markdown : "",
-                    // path : '../lib/',
-                    //dialogLockScreen : false,   // 设置弹出层对话框不锁屏，全局通用，默认为 true
-                    //dialogShowMask : false,     // 设置弹出层对话框显示透明遮罩层，全局通用，默认为 true
-                    //dialogDraggable : false,    // 设置弹出层对话框不可拖动，全局通用，默认为 true
-                    //dialogMaskOpacity : 0.4,    // 设置透明遮罩层的透明度，全局通用，默认值为 0.1
-                    //dialogMaskBgColor : "#000", // 设置透明遮罩层的背景颜色，全局通用，默认为 #fff
-                    // imageUpload : true,
-                    // imageFormats : ["jpg", "jpeg", "gif", "png", "bmp", "webp"],
-                    // imageUploadURL : "./php/upload.php?test=dfdf",  
-            var testEditor;
-            $(function() {
-                // $.get("./test.md", function(md) {
-                    testEditor = editormd("test-editormd", {
-                        width  : "100%",
-                        height : 640,
-                        path   : "/static/editor.md/lib/",
-                        imageUpload : true,
-                        imageFormats : ["jpg", "jpeg", "gif", "png", "bmp", "webp"],
-                        imageUploadURL : "/category/uploadimages",//这里需要好好写一个上传的控制器。
-                        // appendMarkdown : md,
-                        saveHTMLToTextarea : true
-                     /*
-                     上传的后台只需要返回一个 JSON 数据，结构如下：
-                     {
-                        success : 0 | 1,           // 0 表示上传失败，1 表示上传成功
-                        message : "提示的信息，上传成功或上传失败及错误信息等。",
-                        url     : "图片地址"        // 上传成功时才返回
-                     }
-                     */
-                    });
-                // });
 
-                //testEditor.getMarkdown();       // 获取 Markdown 源码
-                //testEditor.getHTML();           // 获取 Textarea 保存的 HTML 源码
-                //testEditor.getPreviewedHTML();  // 获取预览窗口里的 HTML，在开启 watch 且没有开启 saveHTMLToTextarea 时使用
-            });
 
-                $("#goto-line-btn").bind("click", function(){
-                    testEditor.gotoLine(90);
-                });
-                
-                $("#show-btn").bind('click', function(){
-                    testEditor.show();
-                });
-                
-                $("#hide-btn").bind('click', function(){
-                    testEditor.hide();
-                });
-                
-                $("#get-md-btn").bind('click', function(){
-                    alert(testEditor.getMarkdown());
-                });
-                
-                $("#get-html-btn").bind('click', function() {
-                    alert(testEditor.getHTML());
-                });                
-                
-                $("#watch-btn").bind('click', function() {
-                    testEditor.watch();
-                });                 
-                
-                $("#unwatch-btn").bind('click', function() {
-                    testEditor.unwatch();
-                });              
-                
-                $("#preview-btn").bind('click', function() {
-                    testEditor.previewing();
-                });
-                
-                $("#fullscreen-btn").bind('click', function() {
-                    testEditor.fullscreen();
-                });
-                
-                $("#show-toolbar-btn").bind('click', function() {
-                    testEditor.showToolbar();
-                });
-                
-                $("#close-toolbar-btn").bind('click', function() {
-                    testEditor.hideToolbar();
-                });
-                
-                $("#toc-menu-btn").click(function(){
-                    testEditor.config({
-                        tocDropdown   : true,
-                        tocTitle      : "目录 Table of Contents",
-                    });
-                });
-                
-                $("#toc-default-btn").click(function() {
-                    testEditor.config("tocDropdown", false);
-                });
-// document.getElementById("tempString").value = bb;
+// });
+// });
+
+//     ue.addListener('beforeinsertimage',function() {
+      
+
+//     });
+// });
+    // function isFocus(e){
+    //     alert(UE.getEditor('editor').isFocus());
+    //     UE.dom.domUtils.preventDefault(e)
+    // }
+    // function setblur(e){
+    //     UE.getEditor('editor').blur();
+    //     UE.dom.domUtils.preventDefault(e)
+    // }
+    // function insertHtml() {
+    //     var value = prompt('插入html代码', '');
+    //     UE.getEditor('editor').execCommand('insertHtml', value)
+    // }
+    // function createEditor() {
+    //     enableBtn();
+    //     UE.getEditor('editor');
+    // }
+    // function getAllHtml() {
+    //     alert(UE.getEditor('editor').getAllHtml())
+    // }
+    // function getContent() {
+    //     var arr = [];
+    //     arr.push("使用editor.getContent()方法可以获得编辑器的内容");
+    //     arr.push("内容为：");
+    //     arr.push(UE.getEditor('editor').getContent());
+    //     alert(arr.join("\n"));
+    // }
+    // function getPlainTxt() {
+    //     var arr = [];
+    //     arr.push("使用editor.getPlainTxt()方法可以获得编辑器的带格式的纯文本内容");
+    //     arr.push("内容为：");
+    //     arr.push(UE.getEditor('editor').getPlainTxt());
+    //     alert(arr.join('\n'))
+    // }
+    // function setContent(isAppendTo) {
+    //     var arr = [];
+    //     arr.push("使用editor.setContent('欢迎使用ueditor')方法可以设置编辑器的内容");
+    //     UE.getEditor('editor').setContent('欢迎使用ueditor', isAppendTo);
+    //     alert(arr.join("\n"));
+    // }
+    // function setDisabled() {
+    //     UE.getEditor('editor').setDisabled('fullscreen');
+    //     disableBtn("enable");
+    // }
+
+    // function setEnabled() {
+    //     UE.getEditor('editor').setEnabled();
+    //     enableBtn();
+    // }
+
+    // function getText() {
+    //     //当你点击按钮时编辑区域已经失去了焦点，如果直接用getText将不会得到内容，所以要在选回来，然后取得内容
+    //     var range = UE.getEditor('editor').selection.getRange();
+    //     range.select();
+    //     var txt = UE.getEditor('editor').selection.getText();
+    //     alert(txt)
+    // }
+
+    // function getContentTxt() {
+    //     var arr = [];
+    //     arr.push("使用editor.getContentTxt()方法可以获得编辑器的纯文本内容");
+    //     arr.push("编辑器的纯文本内容为：");
+    //     arr.push(UE.getEditor('editor').getContentTxt());
+    //     alert(arr.join("\n"));
+    // }
+    // function hasContent() {
+    //     var arr = [];
+    //     arr.push("使用editor.hasContents()方法判断编辑器里是否有内容");
+    //     arr.push("判断结果为：");
+    //     arr.push(UE.getEditor('editor').hasContents());
+    //     alert(arr.join("\n"));
+    // }
+    // function setFocus() {
+    //     UE.getEditor('editor').focus();
+    // }
+    // function deleteEditor() {
+    //     disableBtn();
+    //     UE.getEditor('editor').destroy();
+    // }
+    // function disableBtn(str) {
+    //     var div = document.getElementById('btns');
+    //     var btns = UE.dom.domUtils.getElementsByTagName(div, "button");
+    //     for (var i = 0, btn; btn = btns[i++];) {
+    //         if (btn.id == str) {
+    //             UE.dom.domUtils.removeAttributes(btn, ["disabled"]);
+    //         } else {
+    //             btn.setAttribute("disabled", "true");
+    //         }
+    //     }
+    // }
+    // function enableBtn() {
+    //     var div = document.getElementById('btns');
+    //     var btns = UE.dom.domUtils.getElementsByTagName(div, "button");
+    //     for (var i = 0, btn; btn = btns[i++];) {
+    //         UE.dom.domUtils.removeAttributes(btn, ["disabled"]);
+    //     }
+    // }
+
+    // function getLocalData () {
+    //     alert(UE.getEditor('editor').execCommand( "getlocaldata" ));
+    // }
+
+    // function clearLocalData () {
+    //     UE.getEditor('editor').execCommand( "clearlocaldata" );
+    //     alert("已清空草稿箱")
+    // }
+
 </script>
 
-
-
-<!--         <script type="text/javascript">
-            $(function() {                
-                var testEditor = editormd("test-editormd", {
-                    width: "90%",
-                    height: 640,
-                    markdown : "",
-                    path : '../lib/',
-                    //dialogLockScreen : false,   // 设置弹出层对话框不锁屏，全局通用，默认为 true
-                    //dialogShowMask : false,     // 设置弹出层对话框显示透明遮罩层，全局通用，默认为 true
-                    //dialogDraggable : false,    // 设置弹出层对话框不可拖动，全局通用，默认为 true
-                    //dialogMaskOpacity : 0.4,    // 设置透明遮罩层的透明度，全局通用，默认值为 0.1
-                    //dialogMaskBgColor : "#000", // 设置透明遮罩层的背景颜色，全局通用，默认为 #fff
-                    imageUpload : true,
-                    imageFormats : ["jpg", "jpeg", "gif", "png", "bmp", "webp"],
-                    imageUploadURL : "./php/upload.php?test=dfdf",
-                    
-                    /*
-                     上传的后台只需要返回一个 JSON 数据，结构如下：
-                     {
-                        success : 0 | 1,           // 0 表示上传失败，1 表示上传成功
-                        message : "提示的信息，上传成功或上传失败及错误信息等。",
-                        url     : "图片地址"        // 上传成功时才返回
-                     }
-                     */
-                });
-            });
-        </script>
- -->
-<!--  // var valus = document.getElementsByName("aaa");
-  // if(a.length!=0)
-  // {
-  // var str = ""；
-  // for(var i=0;i<a.length;i++)  
-  // {
-  // if(a[i].checked)
-  // {
-  // str+= a[i].value;
-// }
-// }
-// } -->
 
 </body>
 </html>

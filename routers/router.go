@@ -8,8 +8,8 @@ import (
 
 func init() {
 	beego.Router("/category/uploadimages", &controllers.CategoryController{}, "*:Uploadimagesct")
-	beego.Router("/controller", &controllers.UeditorController{}, "get:ControllerUE")
-	beego.Router("/controller", &controllers.UeditorController{}, "post:UploadImage")
+	beego.Router("/controller", &controllers.UeditorController{}, "*:ControllerUE")
+	// beego.Router("/controller", &controllers.UeditorController{}, "post:UploadImage")
 	//除了<form里用了post，其他都要默认用get或*代替！！！！！
 	beego.Router("/todo", &controllers.TaskController{}) //MainController{}
 	beego.Router("/todo/task", &controllers.TaskController{}, "get:ListTasks;post:NewTask")
@@ -52,8 +52,8 @@ func init() {
 
 	// beego.Router("/", &controllers.MainController{})
 	// beego.SetStaticPath("/ueditor", "ueditor")
-	beego.Router("/ue", &controllers.UEController{})
-	beego.AutoRouter(&controllers.UEController{})
+	// beego.Router("/ue", &controllers.UEController{})
+	// beego.AutoRouter(&controllers.UEController{})
 
 	beego.Router("/catalog/import_xls_catalog", &controllers.CatalogController{}, "post:Import_Xls_Catalog")
 	beego.Router("/catalog/add", &controllers.CatalogController{}, "get:Get")

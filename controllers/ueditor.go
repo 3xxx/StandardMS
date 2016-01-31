@@ -8,11 +8,13 @@ import (
 	"github.com/astaxie/beego"
 	// "image/png"
 	"io"
-	// "log"
+	"log"
 	"net/http"
 	"os"
 	"path"
 	// "quick/models"
+	"io/ioutil"
+	"regexp"
 	"strings"
 )
 
@@ -47,44 +49,259 @@ type UploadimageUE struct {
 // }
 
 func (c *UeditorController) ControllerUE() {
-	// var configJson []byte // 当客户端请求 /ueditor/go/controller?action=config 返回的json内容
-	// file, err := os.Open("conf/config.json")
-	// if err != nil {
-	// 	log.Fatal(err)
-	// 	os.Exit(1)
-	// }
-	// defer file.Close()
-	// buf := bytes.NewBuffer(nil)
-	// buf.ReadFrom(file)
-	// configJson = buf.Bytes()
-	// title := c.Input().Get("action")
 	op := c.Input().Get("action")
 	switch op {
 	case "config": //这里还是要优化成conf/config.json
-		b := []byte(`{
-              "imageActionName": "uploadimage", 
-              "imageFieldName": "upfile", 
-              "imageMaxSize": 2048000, 
-              "imageAllowFiles": [".png", ".jpg", ".jpeg", ".gif", ".bmp"], 
-              "imageCompressEnable": true,
-              "imageCompressBorder": 1600, 
-              "imageInsertAlign": "none", 
-              "imageUrlPrefix": "", 
-              "imagePathFormat": "/static/upload/{yyyy}{mm}{dd}/{time}{rand:6}"
-        }`)
-		var r interface{}
-		json.Unmarshal(b, &r)
-		// c.Data["json"] = map[string]interface{}{
-		//    "imageUrl": "http://127.0.0.1/controller",
-		//    "imagePath": "/attachment/test",
-		//    "imageFieldName": "upfile",
-		//    "imageMaxSize": 2048000,
-		// "imageAllowFiles": [".png", ".jpg", ".jpeg", ".gif", ".bmp"]                                  //上传状态，成功时返回SUCCESS,其他任何值将原样返回至图片上传框中
+
+		// $CONFIG = json_decode(preg_replace("/\/\*[\s\S]+?\*\//", "", file_get_contents("config.json")), true);
+		// $action = $_GET['action'];
+
+		// switch ($action) {
+		//     case 'config':
+		//         $result =  json_encode($CONFIG);
+
+		// var configJson []byte // 当客户端请求/controller?action=config 返回的json内容
+		file, err := os.Open("conf/config.json")
+		if err != nil {
+			log.Fatal(err)
+			os.Exit(1)
+		}
+		defer file.Close()
+		// fi, err := os.Open("d:/config.json")
+		// if err != nil {
+		// 	panic(err)
 		// }
+		// defer fi.Close()
+		fd, err := ioutil.ReadAll(file)
+		src := string(fd)
+		re, _ := regexp.Compile("\\/\\*[\\S\\s]+?\\*\\/") //参考php的$CONFIG = json_decode(preg_replace("/\/\*[\s\S]+?\*\//", "", file_get_contents("config.json")), true);
+		//将php中的正则移植到go中，需要将/ \/\*[\s\S]+?\*\/  /去掉前后的/，然后将\改成2个\\
+		//参考//去除所有尖括号内的HTML代码，并换成换行符
+		// re, _ = regexp.Compile("\\<[\\S\\s]+?\\>")
+		// src = re.ReplaceAllString(src, "\n")
+		//当把<和>换成/*和*\时，斜杠/和*之间加双斜杠\\才行。
+		src = re.ReplaceAllString(src, "")
+		tt := []byte(src)
+
+		// buf := bytes.NewBuffer(nil)
+		// buf.ReadFrom(file)
+		// configJson = buf.Bytes()
+		// beego.Info(configJson)
+		// w.Write(configJson)
+		var r interface{}
+		json.Unmarshal(tt, &r) //这个byte要解码
 		c.Data["json"] = r
 		c.ServeJson()
-	case "uploadimage": //为什么这个没用？？？
-		file, header, err := c.GetFile("upfile") // r.FormFile("upfile")
+
+		//下面这段是测试用的
+		// b := []byte(`{
+		//             "imageActionName": "uploadimage",
+		//             "imageFieldName": "upfile",
+		//             "imageMaxSize": 2048000,
+		//             "imageAllowFiles": [".png", ".jpg", ".jpeg", ".gif", ".bmp"],
+		//             "imageCompressEnable": true,
+		//             "imageCompressBorder": 1600,
+		//             "imageInsertAlign": "none",
+		//             "imageUrlPrefix": "",
+		//             "imagePathFormat": "/static/upload/{yyyy}{mm}{dd}/{time}{rand:6}"
+		//       }`)
+		// var r interface{}
+		// json.Unmarshal(b, &r)
+		// c.Data["json"] = r
+		// c.ServeJson()
+	case "uploadimage", "uploadscrawl", "uploadfile", "uploadvideo":
+		// file, header, err := c.GetFile("upfile") // r.FormFile("upfile")
+		// if err != nil {
+		// 	panic(err)
+		// }
+		// defer file.Close()
+		// filename := strings.Replace(uuid.NewUUID().String(), "-", "", -1) + path.Ext(header.Filename)
+
+		number := c.Input().Get("number")
+
+		name := c.Input().Get("name")
+		err := os.MkdirAll(".\\attachment\\"+number+name, 0777) //..代表本当前exe文件目录的上级，.表示当前目录，没有.表示盘的根目录
+		if err != nil {
+			beego.Error(err)
+		}
+		// err = os.MkdirAll(path.Join("static", "upload"), 0775)
+		// if err != nil {
+		// 	panic(err)
+		// }
+		// outFile, err := os.Create(path.Join("static", "upload", filename))
+		// if err != nil {
+		// 	panic(err)
+		// }
+
+		// diskdirectory := ".\\attachment\\" + number + name + "\\"
+		// url := "/attachment/" + number + name + "/"
+
+		//保存上传的图片
+		//获取上传的文件，直接可以获取表单名称对应的文件名，不用另外提取
+		_, h, err := c.GetFile("upfile")
+		// beego.Info(h)
+		if err != nil {
+			beego.Error(err)
+		}
+		// var attachment string
+		// var path string
+		var filesize int64
+		// var route string
+		//保存附件
+		// attachment = h.Filename
+		// beego.Info(attachment)
+		path1 := ".\\attachment\\" + number + name + "\\" + h.Filename
+		err = c.SaveToFile("upfile", path1) //.Join("attachment", attachment)) //存文件    WaterMark(path)    //给文件加水印
+		if err != nil {
+			beego.Error(err)
+		}
+		//如果扩展名为jpg
+		// if strings.ToLower(path.Ext(h.Filename)) == ".jpg" {
+		// }
+		//如果包含jpg，则进行压缩——压缩导致UEditor里显示尺寸过大。
+		// if strings.Contains(strings.ToLower(h.Filename), ".jpg") { //ToLower转成小写
+		// 	// 随机名称
+		// 	// to := path + random_name() + ".jpg"
+		// 	origin := path1 //path + file.Name()
+		// 	fmt.Println("正在处理" + origin + ">>>" + origin)
+		// 	cmd_resize(origin, 2048, 0, origin)
+		// 	//defer os.Remove(origin)//删除原文件
+		// }
+		filesize, _ = FileSize(path1)
+		filesize = filesize / 1000.0
+		// route = "/attachment/" + number + name + "/" + h.Filename
+
+		// outFile, err := os.Create(path.Join(".\\attachment\\"+number+name+"\\", filename))
+		// if err != nil {
+		// 	beego.Error(err)
+		// }
+		// defer outFile.Close()
+		// io.Copy(outFile, file)
+
+		// c.Data["json"] = map[string]interface{}{"state": "SUCCESS", "url": "/static/upload/" + filename, "title": filename, "original": filename}
+		c.Data["json"] = map[string]interface{}{"state": "SUCCESS", "url": "/attachment/" + number + name + "/" + h.Filename, "title": h.Filename, "original": h.Filename}
+
+		c.ServeJson()
+		// 		{
+		//     "state": "SUCCESS",
+		//     "url": "upload/demo.jpg",
+		//     "title": "demo.jpg",
+		//     "original": "demo.jpg"
+		// }
+
+	case "listimage":
+		type List struct {
+			Url string `json:"url"`
+			// Source string
+			// State  string
+		}
+
+		type Listimage struct {
+			State string `json:"state"` //这些第一个字母要大写，否则不出结果
+			List  []List `json:"list"`
+			Start int    `json:"start"`
+			Total int    `json:"total"`
+			// Name        string
+			// Age         int
+			// Slices      []string //slice
+			// Mapstring   map[string]string
+			// StructArray []List            //结构体的切片型
+			// MapStruct   map[string][]List //map:key类型是string或struct，value类型是切片，切片的类型是string或struct
+			//	Desks  List
+		}
+
+		// var m map[string]string = make(map[string]string)
+		// m["Go"] = "No.1"
+		// m["Java"] = "No.2"
+		// m["C"] = "No.3"
+		// fmt.Println(m)
+
+		list := []List{
+			{"/static/upload/1.jpg"},
+			{"/static/upload/2.jpg"},
+			// {"upload/1.jpg", "http://a.com/1.jpg", "SUCCESS"},
+			// {"upload/2.jpg", "http://b.com/2.jpg", "SUCCESS"},
+		}
+		// var mm map[string][]List = make(map[string][]List)
+		// mm["Go"] = list
+		// mm["Java"] = list
+		// fmt.Println(mm)
+
+		listimage := Listimage{"SUCCESS", list, 1, 21}
+		// beego.Info(listimage){SUCCESS [{/static/upload/1.jpg} {/static/upload/2.jpg}] 1 21}
+		// fmt.Println(listimage)
+		// b, _ := json.Marshal(listimage)
+		// mystruct := { ... }
+		// c.Data["jsonp"] = listimage
+		// beego.Info(string(b)){"State":"SUCCESS","List":[{"Url":"/static/upload/1.jpg"},{"Url":"/static/upload/2.jpg"}],"Start":1,"Total":21}
+		// c.ServeJsonp()
+		c.Data["json"] = listimage
+		c.ServeJson()
+		// c.Data["json"] = map[string]interface{}{"State":"SUCCESS","List":[{"Url":"/static/upload/1.jpg"},{"Url":"/static/upload/2.jpg"}],"Start":1,"Total":21}
+
+		// 需要支持callback参数,返回jsonp格式
+		// {
+		//     "state": "SUCCESS",
+		//     "list": [{
+		//         "url": "upload/1.jpg"
+		//     }, {
+		//         "url": "upload/2.jpg"
+		//     }, ],
+		//     "start": 20,
+		//     "total": 100
+		// }
+	case "catchimage":
+
+		type List struct {
+			Url    string `json:"url"`
+			Source string `json:"source"`
+			State  string `json:"state"`
+		}
+
+		type Catchimage struct {
+			State string `json:"state"` //这些第一个字母要大写，否则不出结果
+			List  []List `json:"list"`
+			// Start int
+			// Total int
+			// Name        string
+			// Age         int
+			// Slices      []string //slice
+			// Mapstring   map[string]string
+			// StructArray []List            //结构体的切片型
+			// MapStruct   map[string][]List //map:key类型是string或struct，value类型是切片，切片的类型是string或struct
+			//	Desks  List
+		}
+
+		// var m map[string]string = make(map[string]string)
+		// m["Go"] = "No.1"
+		// m["Java"] = "No.2"
+		// m["C"] = "No.3"
+		// fmt.Println(m)
+
+		list := []List{
+			{"/static/upload/1.jpg", "https://pic2.zhimg.com/7c4a389acaa008a6d1fe5a0083c86975_b.png", "SUCCESS"},
+			{"/static/upload/2.jpg", "https://pic2.zhimg.com/7c4a389acaa008a6d1fe5a0083c86975_b.png", "SUCCESS"},
+			// {"upload/1.jpg", "http://a.com/1.jpg", "SUCCESS"},
+			// {"upload/2.jpg", "http://b.com/2.jpg", "SUCCESS"},
+		}
+		// var mm map[string][]List = make(map[string][]List)
+		// mm["Go"] = list
+		// mm["Java"] = list
+		// fmt.Println(mm)
+
+		catchimage := Catchimage{"SUCCESS", list}
+		// beego.Info(catchimage){SUCCESS [{/static/upload/1.jpg} {/static/upload/2.jpg}] 1 21}
+		// fmt.Println(catchimage)
+		// b, _ := json.Marshal(catchimage)
+		// mystruct := { ... }
+		// c.Data["jsonp"] = catchimage
+		// beego.Info(string(b)){"State":"SUCCESS","List":[{"Url":"/static/upload/1.jpg"},{"Url":"/static/upload/2.jpg"}],"Start":1,"Total":21}
+		// c.ServeJsonp()
+		c.Data["json"] = catchimage
+		c.ServeJson()
+
+		file, header, err := c.GetFile("source") // r.FormFile("upfile")
+		beego.Info(header.Filename)
 		if err != nil {
 			panic(err)
 		}
@@ -100,15 +317,21 @@ func (c *UeditorController) ControllerUE() {
 		}
 		defer outFile.Close()
 		io.Copy(outFile, file)
-		c.Data["json"] = map[string]interface{}{"state": "SUCCESS", "url": "/static/upload/", "title": "111", "original": "demo.jpg"}
-		c.ServeJson()
+		// 需要支持callback参数,返回jsonp格式
+		// list项的state属性和最外面的state格式一致
+		// {
+		//     "state": "SUCCESS",
+		//     "list": [{
+		//         "url": "upload/1.jpg",
+		//         "source": "http://b.com/2.jpg",
+		//         "state": "SUCCESS"
+		//     }, {
+		//         "url": "upload/2.jpg",
+		//         "source": "http://b.com/2.jpg",
+		//         "state": "SUCCESS"
+		//     }, ]
+		// }
 
-		// *     "state" => "",          //上传状态，上传成功时必须返回"SUCCESS"
-		// *     "url" => "",            //返回的地址
-		// *     "title" => "",          //新文件名
-		// *     "original" => "",       //原始文件名
-		// *     "type" => ""            //文件类型
-		// *     "size" => "",           //文件大小
 		// f := &UploadimageUE{
 		// 	state:    "SUCCESS",
 		// 	url:      fmt.Sprintf("/static/upload/%s", filename),
@@ -283,7 +506,8 @@ func UploadImage(w http.ResponseWriter, r *http.Request) { //这个没用
 	w.Write(b)
 }
 
-func (c *UeditorController) UploadImage() { //为什么用的是这个方法呢？
+func (c *UeditorController) UploadImage() { //对应这个路由 beego.Router("/controller", &controllers.UeditorController{}, "post:UploadImage")
+
 	file, header, err := c.GetFile("upfile") // r.FormFile("upfile")
 	if err != nil {
 		panic(err)

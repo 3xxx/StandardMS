@@ -99,7 +99,16 @@ dt.nav-tabs.nav-stacked > li {
      color: #fff;
  }*/
 </style>
-
+        <script src="/static/editor.md/lib/marked.min.js"></script>
+        <script src="/static/editor.md/lib/prettify.min.js"></script>
+      
+        <script src="/static/editor.md/lib/raphael.min.js"></script>
+        <script src="/static/editor.md/lib/underscore.min.js"></script>
+        <script src="/static/editor.md/lib/sequence-diagram.min.js"></script>
+        <script src="/static/editor.md/lib/flowchart.min.js"></script>
+        <script src="/static/editor.md/lib/jquery.flowchart.min.js"></script>
+        <script src="/static/editor.md/editormd.min.js"></script> 
+        <link rel="stylesheet" href="/static/editor.md/css/editormd.css" /> 
 
 </head>
 
@@ -115,8 +124,7 @@ dt.nav-tabs.nav-stacked > li {
   </h1>
 
 
-<!-- 2015-12-28修改掉项目简介为侧边栏中显示       -->
-<!-- <div class="panel panel-default">
+<!--2015-12-28修改掉项目简介为侧边栏中显示      <div class="panel panel-default">
       <div class="panel-heading">
          <h4 class="panel-title">
             <a data-toggle="collapse" data-parent="#accordion" 
@@ -130,7 +138,7 @@ dt.nav-tabs.nav-stacked > li {
           <textarea id="append-test" style="display:none;">{{.Category.Content}}</textarea>
          </div>
       </div>
-   </div>  -->
+   </div> -->
 </div>
 
 
@@ -173,15 +181,15 @@ dt.nav-tabs.nav-stacked > li {
     </div> -->
       <div class="col-lg-2">
       <body>
-                                <!-- <dt> -->
-                                <!-- <ul class="nav nav-tabs nav-stacked"> -->
-                                <li>
-                                 <a href="/category/view?id=1026" target='main'>
-                                   <i class="glyphicon glyphicon-grain">项目简介</i>
-                                 </a>
-                               </li>
-                             <!-- </ul> -->
-                           <!-- </dt> -->
+            <!-- <dt> -->
+            <!-- <ul class="nav nav-tabs nav-stacked"> -->
+            <li>
+             <a href="/category/view?id=1026" target='main'>
+               <i class="glyphicon glyphicon-grain">项目简介</i>
+             </a>
+           </li>
+         <!-- </ul> -->
+       <!-- </dt> -->
         {{range $k,$v :=.Categoryjieduan}}
         <dl>
           <dt id="main-nav" class="nav nav-tabs nav-stacked">
@@ -261,25 +269,20 @@ dt.nav-tabs.nav-stacked > li {
 </div>
 
 
-        <script src="/static/editor.md/lib/marked.min.js"></script>
-        <script src="/static/editor.md/lib/prettify.min.js"></script>
-        
-        <script src="/static/editor.md/lib/raphael.min.js"></script>
-        <script src="/static/editor.md/lib/underscore.min.js"></script>
-        <script src="/static/editor.md/lib/sequence-diagram.min.js"></script>
-        <script src="/static/editor.md/lib/flowchart.min.js"></script>
-        <script src="/static/editor.md/lib/jquery.flowchart.min.js"></script>
+
 <script type="text/javascript">
-            $(function() {
+             $(function() {
                 var testEditormdView, testEditormdView2;
-                // $.get("test.md", function(markdown) {
-                    testEditormdView = editormd.markdownToHTML("test-editormd-view", {
-                        // markdown        : markdown ,//+ "\r\n" + $("#append-test").text(),
+                
+                $.get("test.md", function(markdown) {
+                    
+            testEditormdView = editormd.markdownToHTML("test-editormd-view", {
+                        markdown        : markdown ,//+ "\r\n" + $("#append-test").text(),
                         //htmlDecode      : true,       // 开启 HTML 标签解析，为了安全性，默认不开启
                         htmlDecode      : "style,script,iframe",  // you can filter tags decode
                         //toc             : false,
                         tocm            : true,    // Using [TOCM]
-                        //tocContainer    : "#custom-toc-container", // 自定义 ToC 容器层
+                        tocContainer    : "#custom-toc-container", // 自定义 ToC 容器层
                         //gfm             : false,
                         //tocDropdown     : true,
                         // markdownSourceCode : true, // 是否保留 Markdown 源码，即是否删除保存源码的 Textarea 标签
@@ -296,7 +299,7 @@ dt.nav-tabs.nav-stacked > li {
                     //console.log(testEditormdView.getMarkdown());
                     
                     //alert(testEditormdView.getMarkdown());
-                // });
+                });
                     
                 testEditormdView2 = editormd.markdownToHTML("test-editormd-view2", {
                     htmlDecode      : "style,script,iframe",  // you can filter tags decode

@@ -1,6 +1,14 @@
 <!DOCTYPE html>
 {{template "header"}}
 <title>项目&目录 - 水利设计CMS系统</title>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+    <script type="text/javascript" charset="utf-8" src="/static/ueditor/ueditor.config.js"></script>
+    <script type="text/javascript" charset="utf-8" src="/static/ueditor/ueditor.all.js"> </script>
+    <!--建议手动加在语言，避免在ie下有时因为加载语言失败导致编辑器加载失败-->
+    <!--这里加载的语言文件会覆盖你在配置项目里添加的语言类型，比如你在配置项目里配置的是英文，这里加载的中文，那最后就是中文-->
+    <script type="text/javascript" charset="utf-8" src="/static/ueditor/lang/zh-cn/zh-cn.js"></script>
+    <script src="/static/ueditor/ueditor.parse.js"></script>
+
 </head>
 
 <body>
@@ -20,10 +28,22 @@
       <input id="number" class="form-control"  placeholder="Enter ProjectNumber" name="number" value="{{.Category.Number}}"></div>
 
     <label>项目简介:</label>
-
-    <div class="form-group" id="test-editormd">
+    
+    
+<!--     <div id="content" class="content" name="content">
+    {{.Category.Content}}
+    <p>sdsdf</p></div> -->
+    <script type="text/plain" id="content" name="content">  
+//从数据库中取出的内容打印到此处 
+{{.Category.Content}} 
+</script>
+<div id="content">
+    <!-- <h1>项目简介:</h1> -->
+    <script id="editor" type="text/plain" style="height:500px;"></script><!-- width:1024px; -->
+</div>
+<!--     <div class="form-group" id="test-editormd">
       <textarea style="display:none;" name="test-editormd-html-code">{{.Category.Content}}</textarea>
-    </div>
+    </div> -->
 
       <div class="input-group">
       <label>选择效果图：<input type="file" name="image" id="image" />{{.Filename}}</label><br/>
@@ -146,6 +166,38 @@
 </div>
 
 <script type="text/javascript">
+
+    //实例化编辑器
+    //议使用工厂方法getEditor创建和引用编辑器实例，如果在某个闭包下引用该编辑器，直接调用UE.getEditor('editor')就能拿到相关的实例
+    var ue = UE.getEditor('editor');
+
+ setTimeout(function(){ uParse('#content', {
+ 'highlightJsUrl':'{/static/ueditor/third-party/SyntaxHighlighter/shCore.js',
+ 'highlightCssUrl':'/static/ueditor/third-party/SyntaxHighlighter/shCoreDefault.css'})
+}, 300);   
+ue.addListener("ready", function () {
+uParse('.content', {
+    rootPath: '/static/ueditor/'
+});
+});
+
+$(function(){
+        var content =$('#content').val();
+        //判断ueditor 编辑器是否创建成功
+        ue.addListener("ready", function () {
+        // editor准备好之后才可以使用
+        ue.setContent({{.Category.Content}});
+ 
+        });
+    });
+// ue.ready(function () {
+//     function setContent(isAppendTo) {
+//         var arr = [];
+//         // arr.push("使用editor.setContent('欢迎使用ueditor')方法可以设置编辑器的内容");
+//         UE.getEditor('editor').setContent({{.Category.Content}} , isAppendTo);
+//         // alert(arr.join("\n"));
+//     };
+// });
 // document.getElementById()返回对拥有指定 id 的第一个对象的引用。
 // document.getElementsByName()返回带有指定名称的对象集合。
 // document.getElementsByTagName()返回带有指定标签名的对象集合。
@@ -223,35 +275,7 @@
 // else
 // allchecked = false;
 // }
-            var testEditor;
-            $(function() {
-                // $.get("./test.md", function(md) {
-                    testEditor = editormd("test-editormd", {
-                        width  : "100%",
-                        height : 640,
-                        path   : "/static/editor.md/lib/",
-                        imageUpload : true,
-                        imageFormats : ["jpg", "jpeg", "gif", "png", "bmp", "webp"],
-                        imageUploadURL : "/category",//这里需要好好写一个上传的控制器。
-                        // appendMarkdown : md,
-                        saveHTMLToTextarea : true
-                     /*
-                     上传的后台只需要返回一个 JSON 数据，结构如下：
-                     {
-                        success : 0 | 1,           // 0 表示上传失败，1 表示上传成功
-                        message : "提示的信息，上传成功或上传失败及错误信息等。",
-                        url     : "图片地址"        // 上传成功时才返回
-                     }
-                     */
-                    });
-                // });
 
-                //testEditor.getMarkdown();       // 获取 Markdown 源码
-                //testEditor.getHTML();           // 获取 Textarea 保存的 HTML 源码
-                //testEditor.getPreviewedHTML();  // 获取预览窗口里的 HTML，在开启 watch 且没有开启 saveHTMLToTextarea 时使用
-            });
-
-// document.getElementById("tempString").value = bb;
 </script>
 
 <!--  // var valus = document.getElementsByName("aaa");
