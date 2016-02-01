@@ -32,7 +32,7 @@
     <form class="navbar-form navbar-left" role="search" method="get" action="/search">
       <!--这里添加method和action就对了-->
       <div class="form-group">
-        <input id="tuming" type="text" class="form-control" placeholder="Search" name="tuming"></div>
+        <input id="tuming" type="text" class="form-control"  class="search-query span2" placeholder="Search" name="tuming"></div>
       <button type="submit" class="btn btn-default">Submit</button>
     </form>
 

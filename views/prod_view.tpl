@@ -92,6 +92,24 @@ h3 {line-height: 150%;
       <button type="submit" class="btn btn-default">提交</button>
       -->
     </form>
+    
+<!-- <html>
+  <head>
+    <title>test</title> -->
+    <script type="text/javascript">
+  function fun1(){
+    var form1 = window.document.getElementById("form1");//获取form1对象
+    form1.submit(); 
+  };
+  </script>
+    </head>
+    <body>
+    <form id="form1" action="edor.jsp" method="get" >
+      <input type="button" onclick="fun1();" value="sss" />    
+    </form>
+    </body>
+<!-- </html> -->
+
 
   <!-- </div>   -->
       <!-- <button class="btn btn-primary" id="export">导出excel</button>  -->

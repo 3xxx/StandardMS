@@ -134,16 +134,17 @@ h1[id] {
           </li>
         </h3>
         
-  <!-- <div id="content" class="content">
-  {{.Content}}
-  </div> -->
-    <div id="editormd-{{$index}}" name="test-editormd-view2" class="content"><!-- class="markdown-body editormd-html-preview" -->
-       <textarea id="{{$index}}" style="display:none;">{{.Content}}</textarea><!-- append-test -->
-    </div>
+  <div class="content">
+  {{str2html .Content}}
+  <!-- 项目简介如何截取html呢？ -->
+  </div>
+   <!--  <div id="editormd-{{$index}}" name="test-editormd-view2" class="content">class="markdown-body editormd-html-preview"
+       <textarea id="{{$index}}" style="display:none;">{{.Content}}</textarea> append-test
+    </div> --> 
   <!-- {{substr .Content 0 500}} 因为是存成html格式的内容，所以，剪断后，html就不完整了-->
   <br />
   <!-- <img style="-webkit-user-select: none; cursor: zoom-in;" src="{{.Route}}" width="50%" align="middle"> -->
-<script type="text/javascript">
+<!-- <script type="text/javascript">
             $(function() {
                 var testEditormdView2;//testEditormdView, 
             //     $.get("test.md", function(markdown) {
@@ -173,7 +174,7 @@ h1[id] {
                     sequenceDiagram : true,  // 默认不解析
                 });
             });
-          </script>
+          </script> -->
 
   {{end}}
 {{end}}

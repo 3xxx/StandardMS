@@ -251,7 +251,19 @@
     /* 1.传入函数,命令里执行该函数得到参数表,添加到已有参数表里 */
  
 ue.ready(function () {
-ue.addListener('focus', function () {//startUpload   beforeExecCommand是在插入图片之前触发
+// // 文件上传  UEditor中调用webupload事件不行。
+// jQuery(function() {
+//     // 当有文件添加进来的时候
+//     uploader.on( 'fileQueued', function( file ) {
+//     var name = $('#name').val();
+//       uploader.option('formData', {
+//         'categoryid':name,
+//       });
+// });
+
+// });
+
+ue.addListener('focus', function () {//startUpload start-upload startUpload beforeExecCommand是在插入图片之前触发
      var name = $('#name').val();
       //  if (name.length==0){
       //   alert("请输入项目名称");
