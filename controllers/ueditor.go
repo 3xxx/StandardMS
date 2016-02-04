@@ -13,9 +13,12 @@ import (
 	"os"
 	"path"
 	// "quick/models"
+	"encoding/base64"
 	"io/ioutil"
 	"regexp"
+	"strconv"
 	"strings"
+	"time"
 )
 
 type UeditorController struct {
@@ -50,6 +53,7 @@ type UploadimageUE struct {
 
 func (c *UeditorController) ControllerUE() {
 	op := c.Input().Get("action")
+	// key := c.Input().Get("key") //这里进行判断各个页面，如果是addtopic，如果是addcategory
 	switch op {
 	case "config": //这里还是要优化成conf/config.json
 
@@ -109,7 +113,7 @@ func (c *UeditorController) ControllerUE() {
 		// json.Unmarshal(b, &r)
 		// c.Data["json"] = r
 		// c.ServeJson()
-	case "uploadimage", "uploadscrawl", "uploadfile", "uploadvideo":
+	case "uploadimage", "uploadfile", "uploadvideo":
 		// file, header, err := c.GetFile("upfile") // r.FormFile("upfile")
 		// if err != nil {
 		// 	panic(err)
@@ -188,7 +192,34 @@ func (c *UeditorController) ControllerUE() {
 		//     "title": "demo.jpg",
 		//     "original": "demo.jpg"
 		// }
+	case "uploadscrawl":
+		number := c.Input().Get("number")
 
+		name := c.Input().Get("name")
+		err := os.MkdirAll(".\\attachment\\"+number+name, 0777) //..代表本当前exe文件目录的上级，.表示当前目录，没有.表示盘的根目录
+		if err != nil {
+			beego.Error(err)
+		}
+		path1 := ".\\attachment\\" + number + name + "\\"
+		//保存上传的图片
+		//upfile为base64格式文件，转成图片保存
+		ww := c.Input().Get("upfile")
+		ddd, _ := base64.StdEncoding.DecodeString(ww)           //成图片文件并把文件写入到buffer
+		newname := strconv.FormatInt(time.Now().Unix(), 10)     // + "_" + filename
+		err = ioutil.WriteFile(path1+newname+".jpg", ddd, 0666) //buffer输出到jpg文件中（不做处理，直接写到文件）
+		if err != nil {
+			beego.Error(err)
+		}
+		var filesize int64
+		filesize, _ = FileSize(path1)
+		filesize = filesize / 1000.0
+		c.Data["json"] = map[string]interface{}{
+			"state":    "SUCCESS",
+			"url":      "/attachment/" + number + name + "/" + newname + ".jpg",
+			"title":    newname + ".jpg",
+			"original": newname + ".jpg",
+		}
+		c.ServeJson()
 	case "listimage":
 		type List struct {
 			Url string `json:"url"`

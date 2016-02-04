@@ -131,8 +131,8 @@ func (c *TopicController) Add() { //参考下面的 modify,这个add是topic/add
 	// fmt.Printf("Default")
 	case "6": //用百度的插件上传
 		c.TplNames = "topic_one_addbaidu.html"
-		// default:
-		// fmt.Printf("Default")
+	case "7": //用自动识别图号上传
+		c.TplNames = "topic_one_addstandard.html"
 	}
 	//取得成果类型id的专业parentid以及阶段parentid以及项目parentid才行
 	categoryproj, err := models.GetCategoryProj(id)
@@ -445,6 +445,75 @@ func (c *TopicController) Topic_one_add() { //一对一模式
 	}
 	c.TplNames = "topic_one_add.tpl" //不加这句上传出错，虽然可以成功上传
 	// c.Redirect("/topic", 302)
+}
+
+func (c *TopicController) Topic_one_addstandard() { //一对一上传，自动识别
+	//获取文件名——解析出 项目编号、阶段、专业、类型、扩展名 和成果名称，查询数据库是否有此项目
+	//没有项目则建立？？
+	//ueditor中的附件如何处理呢？
+	// category1, err := models.GetCategory(categoryid)
+	// if err != nil {
+	// 	beego.Error(err)
+	// 	// c.Redirect("/", 302)//这里注释掉，否则在图纸页面无法进入添加页面，因为传入的id为空，导致err发生
+	// 	return
+	// }
+	// //获取上传的文件
+	// _, h, err := c.GetFile("file")
+	// if err != nil {
+	// 	beego.Error(err)
+	// }
+	// var attachment string
+	// var path string
+	// var filesize int64
+	// if h != nil {
+	// 	//保存附件
+	// 	attachment = h.Filename
+	// 	path = category1.DiskDirectory + h.Filename
+	//                                          // 关闭上传的文件，不然的话会出现临时文件不能清除的情况
+	// 	err = c.SaveToFile("file", path) //.Join("attachment", attachment)) //存文件    WaterMark(path)    //给文件加水印
+	// 	if err != nil {
+	// 		beego.Error(err)
+	// 	}
+	// 	filesize, _ = FileSize(path)
+	// 	filesize = filesize / 1000.0
+	// }
+	// if title == "" || tnumber == "" {
+	// 	//将附件的编号和名称写入数据库
+	// 	filename1, filename2 := SubStrings(attachment)
+	// 	//当2个文件都取不到filename1的时候，数据库里的tnumber的唯一性检查出错。
+	// 	if filename1 == "" {
+	// 		filename1 = filename2 //如果编号为空，则用文件名代替，否则多个编号为空导致存入数据库唯一性检查错误
+	// 	}
+	// 	tnumber = filename1
+	// 	title = filename2
+	// }
+	// ck, err := c.Ctx.Request.Cookie("uname")
+	// if err != nil {
+	// 	beego.Error(err)
+	// }
+	// uname := ck.Value
+	// route := category1.Url + h.Filename
+	// var topicid int64
+	// if len(tid) == 0 {
+	// 	topicid, err = models.AddTopicOne(title, tnumber, category, categoryid, uname, content, attachment)
+	// 	if err != nil {
+	// 		beego.Error(err)
+	// 	}
+	// 	cid := strconv.FormatInt(topicid, 10)
+	// 	filesize := strconv.FormatInt(filesize, 10)
+	// 	err = models.AddAttachment(attachment, filesize, path, route, cid, uname)
+	// 	if err != nil {
+	// 		beego.Error(err)
+	// 	}
+	// } else {
+	// 	err = models.ModifyTopic(tid, title, tnumber, category, categoryid, content)
+	// }
+	// if err != nil {
+	// 	beego.Error(err)
+	// } else {
+	// 	c.Data["json"] = map[string]interface{}{"state": "SUCCESS", "title": "111", "original": "demo.jpg", "url": route}
+	// 	c.ServeJson()
+	// }
 }
 
 func (c *TopicController) Topic_one_addbaidu() { //一对一模式

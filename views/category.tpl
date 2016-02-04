@@ -13,7 +13,7 @@
     <a href="/category/add" class="btn btn-default">添加项目&目录</a>
     <a href="/category/add_b" class="btn btn-default">添加自定义目录</a>
     <a href="/category/add_b" class="btn btn-default">添加标准成果</a>
-    <button id="directNextpage" class="btn btn-default" onclick="parent.location.href='/topic/add">C+(1to1)</button>
+    <button class="btn btn-default" onclick="parent.location.href='/topic/add?mid=7'">快捷上传</button>
       <table class="table table-striped">
        <thead>
          <tr>
