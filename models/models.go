@@ -8,6 +8,7 @@ import (
 	// "fmt"
 	// "os"
 	// "path"
+	"github.com/astaxie/beego"
 	"strconv"
 	"strings"
 	"time"
@@ -991,6 +992,28 @@ func GetCategory(id string) (*Category, error) {
 	return category, err
 }
 
+//由分类number（项目编号）取得分类本身
+func GetCategoryTitle(number string) (*Category, error) {
+	o := orm.NewOrm()
+	// Num, err := strconv.ParseInt(number, 10, 64)
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// o := orm.NewOrm()
+	category := new(Category)
+	qs := o.QueryTable("category")
+	err := qs.Filter("number", number).One(category, "Title")
+	if err == orm.ErrMultiRows {
+		// 多条的时候报错
+		beego.Info("Returned Multi Rows Not One")
+	}
+	if err == orm.ErrNoRows {
+		// 没有找到记录
+		beego.Info("Not row found")
+	}
+	return category, err
+}
+
 //由成果类型id取出父一级的专业
 func GetCategorySpec(id string) (*Category, error) {
 	o := orm.NewOrm()
@@ -1125,6 +1148,33 @@ func GetCategoryJieduan(id string) ([]*Category, error) {
 	return cates, err
 }
 
+//由项目编号、阶段、专业、成果类型取出成果类型Id
+func GetCategoryleixing(pronumber, projieduan, proleixing, prozhuanye string) (Id int64, err error) {
+	o := orm.NewOrm()
+	// cates := make([]*Category, 0)
+	cate := Category{Number: pronumber}
+	err = o.Read(&cate, "Number") //查询字段Number
+	//由阶段parentid和projieduan名查出阶段id
+	// jieduan:=Category{Number: cate.}
+	var jieduan Category
+	err = o.QueryTable("category").Filter("name", projieduan).Filter("parentid", cate.Id).One(&jieduan, "Id")
+	if err == orm.ErrMultiRows {
+		// 多条的时候报错
+		beego.Info("Returned Multi Rows Not One")
+	}
+	if err == orm.ErrNoRows {
+		// 没有找到记录
+		beego.Info("Not row found")
+	}
+	//由阶段id和专业名称，查出专业id
+	var zhuanye Category
+	err = o.QueryTable("category").Filter("name", prozhuanye).Filter("parentid", jieduan.Id).One(&zhuanye, "Id")
+	//由专业id和类型名称，查出类型id
+	var leixing Category
+	err = o.QueryTable("category").Filter("name", proleixing).Filter("parentid", zhuanye.Id).One(&leixing, "Id")
+
+	return leixing.Id, err
+}
 func GetTopic(tid string) (*Topic, []*Attachment, error) {
 	tidNum, err := strconv.ParseInt(tid, 10, 64)
 	if err != nil {

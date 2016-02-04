@@ -451,31 +451,39 @@ func (c *TopicController) Topic_one_addstandard() { //一对一上传，自动�
 	//获取文件名——解析出 项目编号、阶段、专业、类型、扩展名 和成果名称，查询数据库是否有此项目
 	//没有项目则建立？？
 	//ueditor中的附件如何处理呢？
-	// category1, err := models.GetCategory(categoryid)
-	// if err != nil {
-	// 	beego.Error(err)
-	// 	// c.Redirect("/", 302)//这里注释掉，否则在图纸页面无法进入添加页面，因为传入的id为空，导致err发生
-	// 	return
-	// }
-	// //获取上传的文件
-	// _, h, err := c.GetFile("file")
-	// if err != nil {
-	// 	beego.Error(err)
-	// }
+	content := c.Input().Get("content")
+	//获取上传的文件
+	_, h, err := c.GetFile("upfile")
+	if err != nil {
+		beego.Error(err)
+	}
+	//Suffix
+	_, number, name, pronumber, projieduan, proleixing, prozhuanye := Record(h.Filename)
+	//由项目号查出项目名称
+	category, err := models.GetCategoryTitle(pronumber)
+	if err != nil {
+		beego.Error(err)
+		// c.Redirect("/", 302)//这里注释掉，否则在图纸页面无法进入添加页面，因为传入的id为空，导致err发生
+		return
+	}
+	//由项目编号、阶段、专业、成果类型查出成果类型Id.
+	Id, err := models.GetCategoryleixing(pronumber, projieduan, proleixing, prozhuanye)
+	proleixingid := strconv.FormatInt(Id, 10)
 	// var attachment string
 	// var path string
 	// var filesize int64
 	// if h != nil {
-	// 	//保存附件
-	// 	attachment = h.Filename
-	// 	path = category1.DiskDirectory + h.Filename
-	//                                          // 关闭上传的文件，不然的话会出现临时文件不能清除的情况
-	// 	err = c.SaveToFile("file", path) //.Join("attachment", attachment)) //存文件    WaterMark(path)    //给文件加水印
-	// 	if err != nil {
-	// 		beego.Error(err)
-	// 	}
-	// 	filesize, _ = FileSize(path)
-	// 	filesize = filesize / 1000.0
+	//保存附件
+	attachment := h.Filename
+	// ".\\attachment\\" + categoryproj.Number + categoryproj.Title + "\\" + categoryphase.Title + "\\" + categoryspec.Title + "\\" + category + "\\"
+	filepath := ".\\attachment\\" + pronumber + category.Title + "\\" + projieduan + "\\" + prozhuanye + "\\" + proleixing + "\\" + h.Filename
+	// 关闭上传的文件，不然的话会出现临时文件不能清除的情况
+	err = c.SaveToFile("upfile", filepath) //.Join("attachment", attachment)) //存文件    WaterMark(path)    //给文件加水印
+	if err != nil {
+		beego.Error(err)
+	}
+	filesize, _ := FileSize(filepath)
+	filesize = filesize / 1000.0
 	// }
 	// if title == "" || tnumber == "" {
 	// 	//将附件的编号和名称写入数据库
@@ -487,33 +495,33 @@ func (c *TopicController) Topic_one_addstandard() { //一对一上传，自动�
 	// 	tnumber = filename1
 	// 	title = filename2
 	// }
-	// ck, err := c.Ctx.Request.Cookie("uname")
-	// if err != nil {
-	// 	beego.Error(err)
-	// }
-	// uname := ck.Value
-	// route := category1.Url + h.Filename
-	// var topicid int64
+	ck, err := c.Ctx.Request.Cookie("uname")
+	if err != nil {
+		beego.Error(err)
+	}
+	uname := ck.Value
+	route := "/attachment/" + pronumber + category.Title + "/" + projieduan + "/" + prozhuanye + "/" + proleixing + "/" + h.Filename
+	var topicid int64
 	// if len(tid) == 0 {
-	// 	topicid, err = models.AddTopicOne(title, tnumber, category, categoryid, uname, content, attachment)
-	// 	if err != nil {
-	// 		beego.Error(err)
-	// 	}
-	// 	cid := strconv.FormatInt(topicid, 10)
-	// 	filesize := strconv.FormatInt(filesize, 10)
-	// 	err = models.AddAttachment(attachment, filesize, path, route, cid, uname)
-	// 	if err != nil {
-	// 		beego.Error(err)
-	// 	}
+	topicid, err = models.AddTopicOne(name, number, proleixing, proleixingid, uname, content, attachment)
+	if err != nil {
+		beego.Error(err)
+	}
+	cid := strconv.FormatInt(topicid, 10)
+	filesize1 := strconv.FormatInt(filesize, 10)
+	err = models.AddAttachment(attachment, filesize1, filepath, route, cid, uname)
+	if err != nil {
+		beego.Error(err)
+	}
 	// } else {
 	// 	err = models.ModifyTopic(tid, title, tnumber, category, categoryid, content)
 	// }
-	// if err != nil {
-	// 	beego.Error(err)
-	// } else {
-	// 	c.Data["json"] = map[string]interface{}{"state": "SUCCESS", "title": "111", "original": "demo.jpg", "url": route}
-	// 	c.ServeJson()
-	// }
+	if err != nil {
+		beego.Error(err)
+	} else {
+		c.Data["json"] = map[string]interface{}{"state": "SUCCESS", "title": "111", "original": "demo.jpg", "url": route}
+		c.ServeJson()
+	}
 }
 
 func (c *TopicController) Topic_one_addbaidu() { //一对一模式
