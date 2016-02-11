@@ -56,116 +56,135 @@
     <!-- <input type="hidden" name="op" value="add"> 这句应该没什么用了，因为controller里用post函数了-->
 
     <div class="col-md-4">
-      <label>阶段</label>
+      <label>设计阶段</label>
       <div class="checkbox">
         <label>
-          <input type="checkbox" id="jd" name="checkbox" value="ghj">规划阶段</label>
+          <input type="checkbox" id="jd" name="checkbox" value="A">规划</label>
       </div>
       <div class="checkbox">
         <label>
-          <input type="checkbox" id="jd" name="checkbox" value="xj">项目建议书阶段</label>
+          <input type="checkbox" id="jd" name="checkbox" value="B">项目建议书</label>
       </div>
       <div class="checkbox">
         <label>
-          <input type="checkbox" id="jd" name="checkbox" value="ky">可行性研究阶段</label>
+          <input type="checkbox" id="jd" name="checkbox" value="C">可行性研究</label>
       </div>
       <div class="checkbox">
         <label>
-          <input type="checkbox" id="jd" name="checkbox" value="cs">初步设计阶段</label>
+          <input type="checkbox" id="jd" name="checkbox" value="D">初步设计</label>
       </div>
       <div class="checkbox">
         <label>
-          <input type="checkbox" id="jd" name="checkbox" value="zb">招标阶段</label>
+          <input type="checkbox" id="jd" name="checkbox" value="E">招标设计</label>
       </div>
       <div class="checkbox">
         <label>
-          <input type="checkbox" id="jd" name="checkbox" value="sgt">施工图阶段</label>
+          <input type="checkbox" id="jd" name="checkbox" value="F">施工图设计</label>
       </div>
       <div class="checkbox">
         <label>
-          <input type="checkbox" id="jd" name="checkbox" value="jgt">竣工图阶段</label>
+          <input type="checkbox" id="jd" name="checkbox" value="G">竣工图</label>
       </div>
-
-    </div>
-
-    <div class="col-md-4">
-      <label>专业</label>
-      <div class="checkbox">
+     <div class="checkbox">
         <label>
-          <input type="checkbox" id="zy" name="checkbox" value="gh">规划专业</label>
-      </div>
-      <div class="checkbox">
-        <label>
-          <input type="checkbox" id="zy" name="checkbox" value="sg">水工专业</label>
-      </div>
-      <div class="checkbox">
-        <label>
-          <input type="checkbox" id="zy" name="checkbox" value="jd">机电专业</label>
-      </div>
-      <div class="checkbox">
-        <label>
-          <input type="checkbox" id="zy" name="checkbox" value="shg">施工专业</label>
-      </div>
-      <div class="checkbox">
-        <label>
-          <input type="checkbox" id="zy" name="checkbox" value="dz">地质专业</label>
-      </div>
-      <div class="checkbox">
-        <label>
-          <input type="checkbox" id="zy" name="checkbox" value="ys">预算专业</label>
-      </div>
-      <div class="checkbox">
-        <label>
-          <input type="checkbox" id="zy" name="checkbox" value="zh">资环专业</label>
+          <input type="checkbox" id="jd" name="checkbox" value="L">专题</label>
       </div>
 
     </div>
 
+<div class="col-md-4">
+      <label>文件类型</label>
+      <div class="checkbox">
+        <label>
+          <input type="checkbox" id="lx" name="checkbox" value="FB">技术报告</label>
+      </div>
+      <div class="checkbox">
+        <label>
+          <input type="checkbox" id="lx" name="checkbox" value="FD">设计大纲</label>
+      </div>
+      <div class="checkbox">
+        <label>
+          <input type="checkbox" id="lx" name="checkbox" value="FG">设计/修改通知单</label>
+      </div>
+      <div class="checkbox">
+        <label>
+          <input type="checkbox" id="lx" name="checkbox" value="FT">工程图纸</label>
+      </div>
+      <div class="checkbox">
+        <label>
+          <input type="checkbox" id="lx" name="checkbox" value="FJ">计算书</label>
+      </div>
+      <div class="checkbox">
+        <label>
+          <input type="checkbox" id="lx" name="checkbox" value="FP">PDF</label>
+      </div>
+      <div class="checkbox">
+        <label>
+          <input type="checkbox" id="lx" name="checkbox" value="Fdiary">设代日记</label>
+      </div>
+
+
+    </div>
+
+
     <div class="col-md-4">
-      <label>成果类型</label>
+      <label>专业分类</label>
       <div class="checkbox">
         <label>
-          <input type="checkbox" id="lx" name="checkbox" value="dwg">DWG</label>
+          <input type="checkbox" id="zy" name="checkbox" value="1">综合</label>
       </div>
       <div class="checkbox">
         <label>
-          <input type="checkbox" id="lx" name="checkbox" value="doc">doc/docx</label>
+          <input type="checkbox" id="zy" name="checkbox" value="2">规划(含水文、经济评价)</label>
       </div>
       <div class="checkbox">
         <label>
-          <input type="checkbox" id="lx" name="checkbox" value="xls">xls/xlsx</label>
+          <input type="checkbox" id="zy" name="checkbox" value="3">测量</label>
       </div>
       <div class="checkbox">
         <label>
-          <input type="checkbox" id="lx" name="checkbox" value="pdf">pdf</label>
+          <input type="checkbox" id="zy" name="checkbox" value="4">地质(含钻探)</label>
       </div>
       <div class="checkbox">
         <label>
-          <input type="checkbox" id="lx" name="checkbox" value="jpg">jpg</label>
+          <input type="checkbox" id="zy" name="checkbox" value="5">水工(含公路、安全监测)</label>
+      </div>
+      <div class="checkbox">
+      <label>
+          <input type="checkbox" id="zy" name="checkbox" value="6">建筑</label>
+      </div>
+      <div class="checkbox">
+      <label>
+          <input type="checkbox" id="zy" name="checkbox" value="7">机电</label>
+      </div>
+      <div class="checkbox">
+      <label>
+          <input type="checkbox" id="zy" name="checkbox" value="8">征地、水保、环评</label>
       </div>
       <div class="checkbox">
         <label>
-          <input type="checkbox" id="lx" name="checkbox" value="tif">tif</label>
+          <input type="checkbox" id="zy" name="checkbox" value="9">施工、工程造价</label>
       </div>
-      <div class="checkbox">
-        <label>
-          <input type="checkbox" id="lx" name="checkbox" value="diary">设代日记</label>
-      </div>
+ 
       <div class="checkbox">
         <label>
           <input type="checkbox"  id="lx" name="checkall" onclick="CheckAll();">全选</label>
       </div>
 
     </div>
+
+    
     <input type="hidden" id="tempString" name="tempString"/>
     <!-- <button type="submit" class="btn btn-default" onclick="return checkInput();">添加</button>
   -->            
   <!-- <input type="submit" class="btn btn-primary" value="回复" id="submit" disabled="disabled"> -->
-  <button type="submit" class="btn btn-default" onclick="return checkInput();">添加</button>
-
+  <button type="submit" class="btn btn-primary" onclick="return checkInput();">添加</button>
   <!--必须加return才能不跳转-->
 </form>
+<br />
+<br />
 </div>
+
 
 <script type="text/javascript">
 // document.getElementById()返回对拥有指定 id 的第一个对象的引用。

@@ -24,9 +24,9 @@
 <!--       <li {{if .IsCategoryb}}class="active"{{end}}>
         <a href="/category_b">项目B</a>
       </li> -->
-<!--       <li {{if .IsTopic}}class="active"{{end}}>
+      <li {{if .IsTopic}}class="active"{{end}}>
         <a href="/topic">成果</a>
-      </li> -->
+      </li>
     </ul>
 
     <form class="navbar-form navbar-left" role="search" method="get" action="/search">

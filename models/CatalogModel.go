@@ -1,21 +1,10 @@
 package models
 
 import (
-	//"database/sql"
-	//"github.com/astaxie/beedb"
-	//_ "github.com/ziutek/mymysql/godrv"
-	//"time"
-	// "fmt"
-	// "os"
-	// "path"
-	"strconv"
-	// "strings"
-	"time"
-	//"github.com/Unknwon/com
-	// "errors"
 	"github.com/astaxie/beego/orm"
-	// "github.com/astaxie/beego/validation"
 	_ "github.com/mattn/go-sqlite3"
+	"strconv"
+	"time"
 )
 
 type Catalog struct {
@@ -41,11 +30,11 @@ type Catalog struct {
 	TopicId     int64
 }
 
-// func init() {
-// 	orm.RegisterModel(new(Catalog)) //, new(Article)
-// 	// orm.RegisterDriver("sqlite", orm.DR_Sqlite)
-// 	// orm.RegisterDataBase("default", "sqlite3", "database/orm_test.db", 10)
-// }
+func init() {
+	orm.RegisterModel(new(Catalog)) //, new(Article)
+	// orm.RegisterDriver("sqlite", orm.DR_Sqlite)
+	// orm.RegisterDataBase("default", "sqlite3", "database/orm_test.db", 10)
+}
 
 func SaveCatalog(catalog Catalog) (cid int64, err error) {
 	orm := orm.NewOrm()
@@ -126,4 +115,131 @@ func GetAllCatalogs(cid string) (catalogs []*Catalog, err error) {
 		}
 	}
 	return catalogs, err
+}
+
+func AddCatalog(name, tnumber string) (id int64, err error) {
+	// cid, err := strconv.ParseInt(categoryid, 10, 64)
+	o := orm.NewOrm()
+	catalog := &Catalog{
+		Name:    name,
+		Tnumber: tnumber,
+		// Category:   category,
+		// CategoryId: cid,
+		// Content:    content,
+		// Attachment: attachment,
+		// Author:     uname,
+		// Created:    time.Now(),
+		// Updated:    time.Now(),
+		// ReplyTime:  time.Now(),
+	}
+	//	qs := o.QueryTable("category") //不知道主键就用这个过滤操作
+	//	err := qs.Filter("title", name).One(cate)
+	//	if err == nil {
+	//		return err
+	//	}
+	id, err = o.Insert(catalog)
+	if err != nil {
+		return id, err //如果文章编号相同，则唯一性检查错误，返回id吗？
+	}
+	if id == 0 {
+		var catalog Catalog
+		err = o.QueryTable("catalog").Filter("tnumber", tnumber).One(&catalog, "Id")
+		id = catalog.Id
+	}
+
+	return id, err
+}
+
+func ModifyCatalog(tid, title, tnumber string) error {
+	tidNum, err := strconv.ParseInt(tid, 10, 64)
+	_, err = strconv.ParseInt(title, 10, 64)
+	if err != nil {
+		return err
+	}
+
+	// var oldAttach string //oldCate,
+	// var oldCatalog string
+	o := orm.NewOrm()
+	catalog := &Catalog{Id: tidNum}
+	if o.Read(catalog) == nil {
+		// oldAttach = topic.Attachment
+
+		catalog.Name = title
+		catalog.Tnumber = tnumber
+
+		// topic.Attachment = attachment
+		// catalog.Updated = time.Now()
+		_, err = o.Update(catalog)
+		if err != nil {
+			return err
+		}
+	}
+	return err
+}
+
+func DeletCatalog(tid string) error { //应该在controllers中显示警告
+	tidNum, err := strconv.ParseInt(tid, 10, 64)
+	if err != nil {
+		return err
+	}
+
+	var oldCateId int64
+	o := orm.NewOrm()
+	// Read 默认通过查询主键赋值，可以使用指定的字段进行查询：
+	// user := User{Name: "slene"}
+	// err = o.Read(&user, "Name")
+
+	topic := Topic{Id: tidNum}
+	if o.Read(&topic) == nil {
+		oldCateId = topic.CategoryId
+		_, err = o.Delete(&topic)
+		if err != nil {
+			return err
+		}
+	}
+
+	attachment := Attachment{TopicId: tidNum}
+	if o.Read(&attachment, "TopicId") == nil {
+		// oldCate = topic.Category
+		_, err = o.Delete(&attachment)
+		if err != nil {
+			return err
+		}
+	}
+
+	if oldCateId > 0 {
+		cate := new(Category)
+		qs := o.QueryTable("category")
+		err = qs.Filter("id", oldCateId).One(cate)
+		if err == nil {
+			cate.TopicCount--
+			_, err = o.Update(cate)
+		}
+	}
+	_, err = o.Delete(&topic) //这句为何重复？
+	return err
+}
+func GetCatalog(tid string) (*Catalog, error) {
+	tidNum, err := strconv.ParseInt(tid, 10, 64)
+	if err != nil {
+		return nil, err
+	}
+	o := orm.NewOrm()
+	catalog := new(Catalog)
+	qs := o.QueryTable("catalog")
+	err = qs.Filter("id", tidNum).One(catalog)
+	if err != nil {
+		return nil, err
+	}
+	// catalog.Views++
+	// _, err = o.Update(topic)
+
+	// attachments := make([]*Attachment, 0)
+	// attachment := new(Attachment)
+	// qs = o.QueryTable("attachment")
+	// _, err = qs.Filter("topicId", tidNum).OrderBy("FileName").All(&attachments)
+	// if err != nil {
+	// 	return nil, err
+	// }
+	return catalog, err
 }

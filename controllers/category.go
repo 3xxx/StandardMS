@@ -3,6 +3,7 @@ package controllers
 import (
 	"fmt"
 	"github.com/astaxie/beego"
+	"github.com/astaxie/beego/utils/pagination"
 	"image/png"
 	"os"
 	"quick/models"
@@ -208,7 +209,7 @@ func (c *CategoryController) Get() {
 		category, _ := models.GetCategory(id) //由分类id取出本身（项目名称等）
 		topics, err := models.GetAllTopics(category.Title, false)
 		categorychengguo, _ := models.GetCategoryChengguo(id)
-		categoryzhuanye, _ := models.GetCategoryZhuanye(id)
+		categoryzhuanye, _ := models.GetCategoryLeixing(id)
 		categoryjieduan, _ := models.GetCategoryJieduan(id)
 		// if err != nil {
 		// 	beego.Error(err)
@@ -252,7 +253,7 @@ func (c *CategoryController) Get() {
 		category, _ := models.GetCategory(id) //由成果id取出成果
 		c.TplNames = "category_view_b.html"
 		categorychengguo, _ := models.GetCategoryChengguo(id)
-		categoryzhuanye, _ := models.GetCategoryZhuanye(id)
+		categoryzhuanye, _ := models.GetCategoryLeixing(id)
 		categoryjieduan, _ := models.GetCategoryJieduan(id)
 		// if err != nil {
 		// 	beego.Error(err)
@@ -294,8 +295,29 @@ func (c *CategoryController) Get() {
 		if err != nil {
 			beego.Error(err)
 		}
-		c.Data["Category"] = categories
+		count := len(categories)
+		count1 := strconv.Itoa(count)
+		count2, err := strconv.ParseInt(count1, 10, 64)
+		if err != nil {
+			beego.Error(err)
+		}
+		// c.Data["Category"] = categories
 		c.Data["Length"] = len(categories)
+
+		// sets this.Data["paginator"] with the current offset (from the url query param)
+		categoriesPerPage := 20
+		paginator := pagination.SetPaginator(c.Ctx, categoriesPerPage, count2)
+		// beego.Info(c.Ctx)
+		// beego.Info(paginator.Offset())   0
+		// p := pagination.NewPaginator(c.Ctx.Request, 10, 9)
+		// beego.Info(p.Offset())   0
+		// fetch the next 20 posts
+		categories, err = models.ListCategoriesByOffsetAndLimit(paginator.Offset(), categoriesPerPage)
+		if err != nil {
+			beego.Error(err)
+		}
+		c.Data["Category"] = categories
+		c.Data["paginator"] = paginator
 	}
 	var err error
 	if err != nil {
@@ -328,7 +350,7 @@ func (c *CategoryController) Get_b() { //项目B显示控制
 	}
 }
 
-func (c *CategoryController) Post() {
+func (c *CategoryController) Post() { //添加项目
 	//也可以先c.Input().Get("category2")再切割strings.Split(category2, ",")
 	// category2 := c.GetStrings("category2")
 	// category3 := c.GetStrings("category3")
@@ -393,13 +415,13 @@ func (c *CategoryController) Post() {
 	// }
 	for _, v := range array {
 		switch v {
-		case "ghj", "xj", "ky", "cs", "zb", "sgt", "jgt": //阶段//查到所有阶段
+		case "A", "B", "C", "D", "E", "F", "G", "L": //阶段
 			for _, w := range array {
 				switch w {
-				case "gh", "sg", "jd", "shg", "dz", "ys", "zh": //专业
+				case "FB", "FD", "FG", "FT", "FJ", "FP", "Fdiary": //文件类型
 					for _, t := range array {
 						switch t {
-						case "dwg", "doc", "xls", "pdf", "jpg", "tif", "diary": //成果分类
+						case "1", "2", "3", "4", "5", "6", "7", "8", "9": //专业
 							err := os.MkdirAll(".\\attachment\\"+number+name+"\\"+v+"\\"+w+"\\"+t, 0777) //..代表本当前exe文件目录的上级，.表示当前目录，没有.表示盘的根目录
 							if err != nil {
 								beego.Error(err)
@@ -487,8 +509,8 @@ func (c *CategoryController) Post() {
 	return //???
 }
 
+//这个是测试用的
 func (c *CategoryController) Uploadimagesct() {
-
 	name := "111"    //c.Input().Get("name")
 	number := "222"  //c.Input().Get("number")
 	content := "333" //c.Input().Get("test-editormd-html-code")
@@ -920,7 +942,7 @@ func (c *CategoryController) View() {
 	categorycelan, _ := models.GetCategory(cid) //由分类id取出本身（项目名称等）
 	// topics, err := models.GetAllTopics(category.Title, false)
 	categorychengguo, _ := models.GetCategoryChengguo(cid)
-	categoryzhuanye, _ := models.GetCategoryZhuanye(cid)
+	categoryzhuanye, _ := models.GetCategoryLeixing(cid)
 	categoryjieduan, _ := models.GetCategoryJieduan(cid)
 	// if err != nil {
 	// 	beego.Error(err)
@@ -1147,7 +1169,7 @@ func (c *CategoryController) Modify() {
 		c.Redirect("/", 302)
 		return
 	}
-	categoryzhuanye, err := models.GetCategoryZhuanye(cid)
+	categoryzhuanye, err := models.GetCategoryLeixing(cid)
 	if err != nil {
 		beego.Error(err)
 		c.Redirect("/", 302)
@@ -1179,56 +1201,63 @@ func (c *CategoryController) Modify() {
 
 	for _, v := range categoryjieduan {
 		switch v.Title {
-		case "ghj":
-			c.Data["Ghj"] = true
-		case "xj":
-			c.Data["Xj"] = true
-		case "ky":
-			c.Data["Ky"] = true
-		case "cs":
-			c.Data["Cs"] = true
-		case "zb":
-			c.Data["Zb"] = true
-		case "sgt":
-			c.Data["Sgt"] = true
-		case "jgt":
-			c.Data["Jgt"] = true
+		case "A":
+			c.Data["A"] = true
+		case "B":
+			c.Data["B"] = true
+		case "C":
+			c.Data["C"] = true
+		case "D":
+			c.Data["D"] = true
+		case "E":
+			c.Data["E"] = true
+		case "F":
+			c.Data["F"] = true
+		case "G":
+			c.Data["G"] = true
+		case "L":
+			c.Data["L"] = true
+		}
+	}
+
+	for _, x := range categorychengguo {
+		switch x.Title {
+		case "FB":
+			c.Data["FB"] = true
+		case "FD":
+			c.Data["FD"] = true
+		case "FG":
+			c.Data["FG"] = true
+		case "FT":
+			c.Data["FT"] = true
+		case "FJ":
+			c.Data["FJ"] = true
+		case "FP":
+			c.Data["FP"] = true
+		case "Fdiary":
+			c.Data["Fdiary"] = true
 		}
 	}
 	for _, w := range categoryzhuanye {
 		switch w.Title {
-		case "gh":
-			c.Data["Gh"] = true
-		case "sg":
-			c.Data["Sg"] = true
-		case "jd":
-			c.Data["Jd"] = true
-		case "shg":
-			c.Data["Shg"] = true
-		case "dz":
-			c.Data["Dz"] = true
-		case "ys":
-			c.Data["Ys"] = true
-		case "zh":
-			c.Data["Zh"] = true
-		}
-	}
-	for _, x := range categorychengguo {
-		switch x.Title {
-		case "dwg":
-			c.Data["Dwg"] = true
-		case "doc":
-			c.Data["Doc"] = true
-		case "xls":
-			c.Data["Xls"] = true
-		case "pdf":
-			c.Data["Pdf"] = true
-		case "jpg":
-			c.Data["Jpg"] = true
-		case "Tif":
-			c.Data["Tif"] = true
-		case "diary":
-			c.Data["Diary"] = true
+		case "1":
+			c.Data["1"] = true
+		case "2":
+			c.Data["2"] = true
+		case "3":
+			c.Data["3"] = true
+		case "4":
+			c.Data["4"] = true
+		case "5":
+			c.Data["5"] = true
+		case "6":
+			c.Data["6"] = true
+		case "7":
+			c.Data["7"] = true
+		case "8":
+			c.Data["8"] = true
+		case "9":
+			c.Data["9"] = true
 		}
 	}
 	// c.Data["Id"] = cid

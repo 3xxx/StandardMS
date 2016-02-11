@@ -82,7 +82,7 @@ h1[id] {
 <div class="container-fill">
   <!-- <div class="row">
   -->
-  <div class="col-xs-3" id="myScrollspy">
+  <div class="col-xs-2" id="myScrollspy">
     <ul class="nav nav-tabs nav-stacked" data-spy="affix" data-offset-top="50">
       <li class="active">
         <a href="#section-1"> <i class="glyphicon glyphicon-plane"></i>
@@ -115,7 +115,7 @@ h1[id] {
     </ul>
   </div>
 
-  <div class="col-lg-9" role="main">
+  <div class="col-lg-10" role="main">
     <div class="bs-docs-section">
       <div class="page-header">
       <!-- <h2>{{.Website}}</h2> -->
@@ -130,7 +130,7 @@ h1[id] {
   {{if lt $index 20}}
         <h3>
           <li>
-            <a href="/category?op=view&id={{.Id}}">{{.Title}}</a>
+            <a href="/category?op=view&id={{.Id}}">{{.Number}}{{.Title}}</a>
           </li>
         </h3>
         

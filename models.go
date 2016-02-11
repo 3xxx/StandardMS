@@ -892,6 +892,8 @@ func GetAllTopics(cate string, isDesc bool) ([]*Topic, error) {
 	}
 	return topics, err
 }
+
+//取出分页的文章
 func ListPostsByOffsetAndLimit(set, postsPerPage int) ([]*Topic, error) {
 	o := orm.NewOrm()
 	topics := make([]*Topic, 0)

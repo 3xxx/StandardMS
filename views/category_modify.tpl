@@ -32,24 +32,17 @@
      <!-- 用str2html不转义，就可以用uparse解析了 -->
     <!-- {{str2html .Category.Content}}</div> -->
 
-    <script type="text/plain" id="content" name="content">  
-//从数据库中取出的内容打印到此处 
-{{.Category.Content}} 
-</script>
 <div id="content">
-    <!-- <h1>项目简介:</h1> -->
-    <script id="editor" type="text/plain" style="height:500px;"></script><!-- width:1024px; -->
+    <script id="editor" type="text/plain" style="height:500px;"></script>
 </div>
 <!--     <div class="form-group" id="test-editormd">
       <textarea style="display:none;" name="test-editormd-html-code">{{.Category.Content}}</textarea>
     </div> -->
 
-      <div class="input-group">
+<!--       <div class="input-group">
       <label>选择效果图：<input type="file" name="image" id="image" />{{.Filename}}</label><br/>
-      
       <img style="-webkit-user-select: none; cursor: zoom-in;" src="{{.Category.Route}}" width="200">
-
-    </div>
+    </div> -->
 <hr>
     <!-- <input type="hidden" name="op" value="modify"> -->
 
@@ -185,7 +178,7 @@ $(function(){
         //判断ueditor 编辑器是否创建成功
         ue.addListener("ready", function () {
         // editor准备好之后才可以使用
-        ue.setContent({{.Category.Content}});
+        ue.setContent({{str2html .Category.Content}});
         });
     });
 // ue.ready(function () {

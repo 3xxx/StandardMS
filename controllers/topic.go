@@ -9,7 +9,7 @@ import (
 	"path"
 	"path/filepath"
 	"quick/models"
-	"regexp"
+	// "regexp"
 	"strconv"
 	"strings"
 )
@@ -135,21 +135,38 @@ func (c *TopicController) Add() { //参考下面的 modify,这个add是topic/add
 		c.TplNames = "topic_one_addstandard.html"
 	}
 	//取得成果类型id的专业parentid以及阶段parentid以及项目parentid才行
-	categoryproj, err := models.GetCategoryProj(id)
-	categoryphase, err := models.GetCategoryPhase(id)
-	categoryspec, err := models.GetCategorySpec(id)
-	category, err := models.GetCategory(id)
+	if id != "" {
+		categoryproj, err := models.GetCategoryProj(id)
+		if err != nil {
+			beego.Error(err)
+			// c.Redirect("/", 302)//这里注释掉，否则在图纸页面无法进入添加页面，因为传入的id为空，导致err发生
+			return
+		}
+		categoryphase, err := models.GetCategoryPhase(id)
+		if err != nil {
+			beego.Error(err)
+			// c.Redirect("/", 302)//这里注释掉，否则在图纸页面无法进入添加页面，因为传入的id为空，导致err发生
+			return
+		}
+		categoryspec, err := models.GetCategorySpec(id)
+		if err != nil {
+			beego.Error(err)
+			// c.Redirect("/", 302)//这里注释掉，否则在图纸页面无法进入添加页面，因为传入的id为空，导致err发生
+			return
+		}
+		category, err := models.GetCategory(id)
+		if err != nil {
+			beego.Error(err)
+			// c.Redirect("/", 302)//这里注释掉，否则在图纸页面无法进入添加页面，因为传入的id为空，导致err发生
+			return
+		}
 
-	if err != nil {
-		beego.Error(err)
-		// c.Redirect("/", 302)//这里注释掉，否则在图纸页面无法进入添加页面，因为传入的id为空，导致err发生
-		return
+		c.Data["CategoryProj"] = categoryproj
+		c.Data["CategoryPhase"] = categoryphase
+		c.Data["CategorySpec"] = categoryspec
+		c.Data["Category"] = category
+		c.Data["Id"] = id
 	}
-	c.Data["CategoryProj"] = categoryproj
-	c.Data["CategoryPhase"] = categoryphase
-	c.Data["CategorySpec"] = categoryspec
-	c.Data["Category"] = category
-	c.Data["Id"] = id
 }
 
 func (c *TopicController) Post() { //这个post属于topic_modify.html提交修改。
@@ -453,22 +470,29 @@ func (c *TopicController) Topic_one_addstandard() { //一对一上传，自动�
 	//ueditor中的附件如何处理呢？
 	content := c.Input().Get("content")
 	//获取上传的文件
-	_, h, err := c.GetFile("upfile")
+	_, h, err := c.GetFile("file") //ueditor用upfile
 	if err != nil {
 		beego.Error(err)
 	}
 	//Suffix
-	_, number, name, pronumber, projieduan, proleixing, prozhuanye := Record(h.Filename)
+	beego.Info(h.Filename)
+	_, FileNumber, FileName, ProNumber, ProJieduan, ProLeixing, ProZhuanye := Record(h.Filename)
+	beego.Info(FileNumber)
+	beego.Info(FileName)
+	beego.Info(ProNumber)
+	beego.Info(ProJieduan)
+	beego.Info(ProLeixing)
+	beego.Info(ProZhuanye)
 	//由项目号查出项目名称
-	category, err := models.GetCategoryTitle(pronumber)
+	category, err := models.GetCategoryTitle(ProNumber)
 	if err != nil {
 		beego.Error(err)
 		// c.Redirect("/", 302)//这里注释掉，否则在图纸页面无法进入添加页面，因为传入的id为空，导致err发生
 		return
 	}
-	//由项目编号、阶段、专业、成果类型查出成果类型Id.
-	Id, err := models.GetCategoryleixing(pronumber, projieduan, proleixing, prozhuanye)
-	proleixingid := strconv.FormatInt(Id, 10)
+	//由项目编号、阶段、文件类型、专业查出专业Id.
+	Id, err := models.GetCategoryzhuanye(ProNumber, ProJieduan, ProLeixing, ProZhuanye)
+	ProLeixingId := strconv.FormatInt(Id, 10)
 	// var attachment string
 	// var path string
 	// var filesize int64
@@ -476,9 +500,9 @@ func (c *TopicController) Topic_one_addstandard() { //一对一上传，自动�
 	//保存附件
 	attachment := h.Filename
 	// ".\\attachment\\" + categoryproj.Number + categoryproj.Title + "\\" + categoryphase.Title + "\\" + categoryspec.Title + "\\" + category + "\\"
-	filepath := ".\\attachment\\" + pronumber + category.Title + "\\" + projieduan + "\\" + prozhuanye + "\\" + proleixing + "\\" + h.Filename
+	filepath := ".\\attachment\\" + ProNumber + category.Title + "\\" + ProJieduan + "\\" + ProLeixing + "\\" + ProZhuanye + "\\" + h.Filename
 	// 关闭上传的文件，不然的话会出现临时文件不能清除的情况
-	err = c.SaveToFile("upfile", filepath) //.Join("attachment", attachment)) //存文件    WaterMark(path)    //给文件加水印
+	err = c.SaveToFile("file", filepath) //.Join("attachment", attachment)) //存文件    WaterMark(path)    //给文件加水印
 	if err != nil {
 		beego.Error(err)
 	}
@@ -500,10 +524,10 @@ func (c *TopicController) Topic_one_addstandard() { //一对一上传，自动�
 		beego.Error(err)
 	}
 	uname := ck.Value
-	route := "/attachment/" + pronumber + category.Title + "/" + projieduan + "/" + prozhuanye + "/" + proleixing + "/" + h.Filename
+	route := "/attachment/" + ProNumber + category.Title + "/" + ProJieduan + "/" + ProLeixing + "/" + ProZhuanye + "/" + h.Filename
 	var topicid int64
 	// if len(tid) == 0 {
-	topicid, err = models.AddTopicOne(name, number, proleixing, proleixingid, uname, content, attachment)
+	topicid, err = models.AddTopicOne(FileName, FileNumber, ProLeixing, ProLeixingId, uname, content, attachment)
 	if err != nil {
 		beego.Error(err)
 	}
@@ -519,7 +543,12 @@ func (c *TopicController) Topic_one_addstandard() { //一对一上传，自动�
 	if err != nil {
 		beego.Error(err)
 	} else {
-		c.Data["json"] = map[string]interface{}{"state": "SUCCESS", "title": "111", "original": "demo.jpg", "url": route}
+		c.Data["json"] = map[string]interface{}{
+			"state":    "SUCCESS",
+			"title":    "111",
+			"original": "demo.jpg",
+			"url":      route,
+		}
 		c.ServeJson()
 	}
 }
@@ -1328,75 +1357,6 @@ func (c *TopicController) DeleteAttachment() { //应该显示警告
 	}
 }
 
-func SubStrings(filenameWithSuffix string) (substr1, substr2 string) {
-	fileSuffix := path.Ext(filenameWithSuffix) //只留下后缀名
-	//	fmt.Println("fileSuffix=", fileSuffix)     //fileSuffix= .go
-	var filenameOnly string
-	var fulleFilename1 string
-	filenameOnly = strings.TrimSuffix(filenameWithSuffix, fileSuffix) //只留下文件名，无后缀
-	//	fmt.Println("filenameOnly=", filenameOnly)                        //filenameOnly= mai
-	end := UnicodeIndex(filenameOnly, " ")
-	//	fmt.Println(fulleFilename1)
-	//	rs := []rune("SL8888CT-500-88 泵站厂房布置图")
-	rl := len([]rune(filenameOnly))
-	if end == 0 {
-		// end = -1
-		//如果没有空格，则用正则表达式获取
-		re, _ := regexp.Compile("[^a-zA-Z0-9-~]") //2016-1-11日拟修改DZ122D.5-10-15~15.dwg
-		loc := re.FindStringIndex(filenameOnly)
-		// fmt.Println(str[loc[0]:loc[1]])
-		// fmt.Println(loc[0])
-		if loc != nil {
-			end = loc[0]
-			fulleFilename1 = SubString(filenameOnly, 0, end)
-			end = end - 1
-		} else {
-			fulleFilename1 = filenameOnly
-			end = -1
-		}
-	} else {
-		fulleFilename1 = SubString(filenameOnly, 0, end) //这里不能用fullfilename，因为前面赋值后当做了int类型
-	}
-	end = end + 1
-	fulleFilename2 := SubString(filenameOnly, end, rl) //这里不能用fullfilename，因为前面赋值后当做了int类型
-	//	fmt.Println(fulleFilename1)
-	return fulleFilename1, fulleFilename2
-}
-
-func UnicodeIndex(str, substr string) int {
-	// 子串在字符串的字节位置
-	result := strings.Index(str, substr)
-	if result >= 0 {
-		// 获得子串之前的字符串并转换成[]byte
-		prefix := []byte(str)[0:result]
-		// 将子串之前的字符串转换成[]rune
-		rs := []rune(string(prefix))
-		// 获得子串之前的字符串的长度，便是子串在字符串的字符位置
-		result = len(rs)
-	} else {
-		result = 0 //如果没有空格就返回0
-	}
-	return result
-}
-
-func SubString(str string, begin, length int) (substr string) {
-	// 将字符串的转换成[]rune
-	rs := []rune(str)
-	lth := len(rs)
-	// 简单的越界判断
-	if begin < 0 {
-		begin = 0
-	}
-	if begin >= lth {
-		begin = lth
-	}
-	end := begin + length
-	if end > lth {
-		end = lth
-	}
-	// 返回子串
-	return string(rs[begin:end])
-}
 func FileSize(file string) (int64, error) {
 	f, e := os.Stat(file)
 	if e != nil {
@@ -1681,8 +1641,9 @@ func (c *TopicController) ListAllPosts() {
 	if err != nil {
 		beego.Error(err)
 	}
+
 	// sets this.Data["paginator"] with the current offset (from the url query param)
-	postsPerPage := 15
+	postsPerPage := 20
 	paginator := pagination.SetPaginator(c.Ctx, postsPerPage, count2)
 	// beego.Info(c.Ctx)
 	// beego.Info(paginator.Offset())   0
