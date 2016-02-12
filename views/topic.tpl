@@ -24,7 +24,12 @@ ul.katakana {list-style-type: katakana}
 ul.hiragana-iroha {list-style-type: hiragana-iroha}
 ul.katakana-iroha {list-style-type: katakana-iroha}
 </style> -->
-
+<style>
+i#delete
+{
+color:#DC143C;
+}
+</style>
 </head>
 
 <body>
@@ -51,16 +56,19 @@ ul.katakana-iroha {list-style-type: katakana-iroha}
           <span style="cursor: pointer">成果类型</span>
         </th>
         <th>
+          <span style="cursor: pointer">作者</span>
+        </th>
+        <th>
           <span style="cursor: pointer">最后更新</span>
         </th>
-        <th>
+<!--         <th>
           <span style="cursor: pointer">浏览</span>
-        </th>
+        </th> -->
+<!--         <th>
+          <span style="cursor: pointer">评论数</span>
+        </th> -->
         <th>
-          <span style="cursor: pointer">回复数</span>
-        </th>
-        <th>
-          <span style="cursor: pointer">最后回复</span>
+          <span style="cursor: pointer">最后评论</span>
         </th>
         <th>操作</th>
       </tr>
@@ -82,15 +90,16 @@ ul.katakana-iroha {list-style-type: katakana-iroha}
           </a>
         </th>
         <th>{{.Category}}</th>
+        <th>{{.Author}}</th>
         <!-- {{.Attachment}} -->
         <th>{{dateformat .Updated "2006-01-02"}}</th>
-        <th>{{.Views}}</th>
-        <th>{{.ReplyCount}}</th>
+        <!-- <th>{{.Views}}</th> -->
+        <!-- <th>{{.ReplyCount}}</th> -->
         <th>{{dateformat .ReplyTime "2006-01-02"}}</th>
         <th>
-          <a href="/topic/view_b/{{.Id}}">下载</a>
-          <a href="/topic/modify?tid={{.Id}}">修改</a>
-          <a href="/topic/delete?tid={{.Id}}">删除</a>
+          <a href="/topic/view_b/{{.Id}}"><i class="glyphicon glyphicon-download-alt"></i>下载</a>
+          <a href="/topic/modify?tid={{.Id}}"><i class="glyphicon glyphicon-edit"></i>修改</a>
+          <a href="/topic/delete?tid={{.Id}}"><i id="delete" class="glyphicon glyphicon-remove-sign"></i>删除</a>
         </th>
       </tr>
       {{end}}

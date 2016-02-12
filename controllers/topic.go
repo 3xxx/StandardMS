@@ -469,20 +469,21 @@ func (c *TopicController) Topic_one_addstandard() { //一对一上传，自动�
 	//没有项目则建立？？
 	//ueditor中的附件如何处理呢？
 	content := c.Input().Get("content")
+	beego.Info(content)
 	//获取上传的文件
 	_, h, err := c.GetFile("file") //ueditor用upfile
 	if err != nil {
 		beego.Error(err)
 	}
 	//Suffix
-	beego.Info(h.Filename)
+	// beego.Info(h.Filename)
 	_, FileNumber, FileName, ProNumber, ProJieduan, ProLeixing, ProZhuanye := Record(h.Filename)
-	beego.Info(FileNumber)
-	beego.Info(FileName)
-	beego.Info(ProNumber)
-	beego.Info(ProJieduan)
-	beego.Info(ProLeixing)
-	beego.Info(ProZhuanye)
+	// beego.Info(FileNumber)
+	// beego.Info(FileName)
+	// beego.Info(ProNumber)
+	// beego.Info(ProJieduan)
+	// beego.Info(ProLeixing)
+	// beego.Info(ProZhuanye)
 	//由项目号查出项目名称
 	category, err := models.GetCategoryTitle(ProNumber)
 	if err != nil {
@@ -1371,8 +1372,11 @@ func (c *TopicController) ExportToExcel() {
 	//解析表单
 	c.Data["IsLogin"] = checkAccount(c.Ctx)
 	id := c.Input().Get("id")
+	// beego.Info(id)
 	path := c.Input().Get("path")
+	// beego.Info(path)
 	filename := c.Input().Get("filename")
+	// beego.Info(filename)
 	// if len(id) == 0 {
 	// 	break
 	// }
@@ -1382,7 +1386,11 @@ func (c *TopicController) ExportToExcel() {
 	// } else {
 	// 	c.TplNames = "prod_view_b.tpl"
 	// }
-	chengguo, _ := models.GetTopicsbyparentid(id, true)
+	chengguo, err := models.GetTopicsbyparentid(id, true)
+	if err != nil {
+		beego.Error(err)
+	}
+	// beego.Info(chengguo)
 	//取得成果类型id的专业parentid以及阶段parentid以及项目parentid才行
 	// categoryproj, _ := models.GetCategoryProj(id)
 	// categoryphase, _ := models.GetCategoryPhase(id)
@@ -1392,7 +1400,7 @@ func (c *TopicController) ExportToExcel() {
 	var sheet *xlsx.Sheet
 	var row *xlsx.Row
 	var cell *xlsx.Cell
-	var err error
+	// var err error
 
 	file = xlsx.NewFile()
 	sheet = file.AddSheet("Sheet1")
@@ -1444,7 +1452,7 @@ func (c *TopicController) ExportToExcel() {
 		cell.Value = Num2
 		// }
 	}
-	path = ".\\attachment\\" + path + filename + ".xlsx" //categoryproj.Number + " " + categoryproj.Title + "\\" + categoryphase.Title + "\\" + categoryspec.Title + "\\" + category + "\\" + category + ".xlsx"
+	path = path + filename + ".xlsx" //categoryproj.Number + " " + categoryproj.Title + "\\" + categoryphase.Title + "\\" + categoryspec.Title + "\\" + category + "\\" + category + ".xlsx"
 	// beego.Info(path)
 	err = file.Save(path) //(".\\attachment\\MyXLSXFile.xlsx")
 
@@ -1511,7 +1519,7 @@ func (c *TopicController) DeleteAll() {
 			beego.Error(err)
 		}
 	}
-	c.Redirect("/category/view_b?id="+cid, 302) //这里增加topic
+	c.Redirect("/category/view?id="+cid, 302) //这里增加topic
 }
 
 func (c *TopicController) DownloadAll() {

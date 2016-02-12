@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 {{template "header"}}
-<title>一对一添加标准成果 - 水利设计CMS系统</title>
+<title>一对一添加标准文件 - 水利设计CMS系统</title>
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
     <script type="text/javascript" charset="utf-8" src="/static/ueditor/ueditor.config.js"></script>
     <script type="text/javascript" charset="utf-8" src="/static/ueditor/ueditor.all.js"> </script>
@@ -49,13 +49,14 @@ h3 {line-height: 150%;
 </div>
 
 <div class="col-lg-12">
-<h3> <font size="5">超级上传</font></h3>
+<h3> <font size="5">超级上传——对于按<新>规定命名的文件，可直接上传至相应的位置。</font></h3>
 
-  <h2>添加成果</h2>
-<label>项目简介:</label>
+  <!-- <h2>添加成果</h2> -->
+  <p>文件名称需要符合正则表达式：[[:upper:]]{2}[0-9]+[[:upper:]\.0-9]+[-][0-9]+[-][0-9]+[\p{Han} \(\)\/~]</p>
+  <p>解释：[[:upper:]]{2}——2个大写字母开头；[0-9]+——多个数字；[[:upper:]\.0-9]+——大写字母、点号或数字多个；[-]——减号；[0-9]+——多个数字；[-]——减号；[0-9]+——多个数字；[\p{Han} \(\)\/~]——汉字、斜杠、括号或波浪线。</p>
+<label>文件简介:</label>
 <div>
-    <!-- <h1>项目简介:</h1> -->
-    <script id="editor" type="text/plain" style="height:500px;"></script><!-- width:1024px; -->
+    <script id="container" type="text/plain" style="height:300px;"></script><!-- width:1024px; -->
 </div>
 <hr>
 
@@ -82,7 +83,27 @@ h3 {line-height: 150%;
 
  //实例化编辑器
     //议使用工厂方法getEditor创建和引用编辑器实例，如果在某个闭包下引用该编辑器，直接调用UE.getEditor('editor')就能拿到相关的实例
-    var ue = UE.getEditor('editor');
+    // var ue = UE.getEditor('container');
+    var ue = UE.getEditor('container', {
+    // toolbars: [
+    //     ['fullscreen', 'source', 'undo', 'redo', 'bold']
+    // ],
+    toolbars: [[
+            'fullscreen', 'source', '|', 'undo', 'redo', '|',
+            'bold', 'italic', 'underline', 'fontborder', 'strikethrough', 'superscript', 'subscript', 'removeformat', 'formatmatch', 'autotypeset', 'blockquote', 'pasteplain', '|', 'forecolor', 'backcolor', 'insertorderedlist', 'insertunorderedlist', 'selectall', 'cleardoc', '|',
+            'rowspacingtop', 'rowspacingbottom', 'lineheight', '|',
+            'customstyle', 'paragraph', 'fontfamily', 'fontsize', '|',
+            'directionalityltr', 'directionalityrtl', 'indent', '|',
+            'justifyleft', 'justifycenter', 'justifyright', 'justifyjustify', '|', 'touppercase', 'tolowercase', '|',
+            'link', 'unlink', 'anchor', '|', 'imagenone', 'imageleft', 'imageright', 'imagecenter', '|',
+            'emotion', 'map', 'gmap', 'insertframe', 'insertcode', 'webapp', 'pagebreak', 'template', 'background', '|',
+            'horizontal', 'date', 'time', 'spechars', 'wordimage', '|',
+            'inserttable', 'deletetable', 'insertparagraphbeforetable', 'insertrow', 'deleterow', 'insertcol', 'deletecol', 'mergecells', 'mergeright', 'mergedown', 'splittocells', 'splittorows', 'splittocols', 'charts', '|',
+            'print', 'preview', 'searchreplace', 'help', 'drafts'
+        ]],
+    autoHeightEnabled: true,
+    autoFloatEnabled: true
+});
 /* 2.传入参数表,添加到已有参数表里 通过携带参数，实现不同的页面使用不同controllers*/
 // ueditor中进行判断参数
 // ue.ready(function() {
@@ -138,12 +159,23 @@ jQuery(function() {
             '<p class="state">等待上传...</p>' +
         '</div>' );
     });
-
+//当某个文件的分块在发送前触发，主要用来询问是否要添加附带参数，
+//大文件在开起分片上传的前提下此事件可能会触发多次。
+// uploader.on( 'fileQueued', function( file ) {
+    // do some things.
+// });
+ uploader.on( 'startUpload', function() {//uploadBeforeSend——这个居然不行？
+      var html = ue.getContent();
+      alert(html);
+      uploader.option('formData', {
+        'content':html,
+        // {'tnumber':a,'title':b,'categoryid':c,'category':d,'content':e}
+      });        
+    });
     // 文件上传过程中创建进度条实时显示。
     uploader.on( 'uploadProgress', function( file, percentage ) {
         var $li = $( '#'+file.id ),
             $percent = $li.find('.progress .progress-bar');
-
         // 避免重复创建
         if ( !$percent.length ) {
             $percent = $('<div class="progress progress-striped active">' +

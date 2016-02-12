@@ -145,13 +145,14 @@ func AddCategory(name, number, content, path, route, uname, diskdirectory, url s
 		switch v {
 		case "A", "B", "C", "D", "E", "F", "G", "L":
 			cate = &Category{
-				Title:         jieduan,
-				ParentId:      post.Id, //这里存入项目的id
-				Created:       time.Now(),
-				Updated:       time.Now(),
-				Author:        uname,
-				DiskDirectory: diskdirectory + v + "\\",
-				Url:           url + v + "/",
+				Title:    jieduan,
+				ParentId: post.Id, //这里存入项目的id
+				Created:  time.Now(),
+				Updated:  time.Now(),
+				Author:   uname,
+				// filepath := ".\\attachment\\" + ProNumber + category.Title + "\\" + ProJieduan
+				DiskDirectory: ".\\attachment\\" + number + name + "\\" + v + "\\",
+				Url:           "/attachment/" + number + name + "/" + v + "/",
 				// Style:         style,
 			}
 			_, err = o.Insert(cate)

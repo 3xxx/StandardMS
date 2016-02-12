@@ -161,7 +161,7 @@ iH6DnSZeUoINalrsGTmR4jqcr5h+vOI6Ua4QAcgeEYB8EQHIEBGAfCmrjarrrdZxHDxKcFR5XCjb
 oKw2RNYWWzhM8ZDpmvKwdz8pIgD5UlYiAHlSViIAqRABEASPEQEQBI8RARAEjxEBEASPEQEQBI8R
 ARAEjxEBEASP+X87oVIPorbKnwAAAABJRU5ErkJggg==" type="image/x-icon" />
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
-<link rel="stylesheet" type="text/css" href="/static/css/bootstrap.min.css"  />
+<link rel="stylesheet" type="text/css" href="/static/css/bootstrap.min.css"/>
 <!-- <link rel="stylesheet" href="/static/editor.md/css/editormd.css" /> -->
 <script type="text/javascript" src="/static/js/jquery-2.1.3.min.js"></script>
 <script type="text/javascript" src="/static/js/bootstrap.min.js"></script>

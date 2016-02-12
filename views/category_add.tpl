@@ -34,10 +34,10 @@
  <!--  <form method="post" action="/topic/addtopic1" enctype="multipart/form-data"> -->
     <div class="form-group">
       <label>项目编号：</label>
-      <input id="number" class="form-control"  placeholder="Enter ProjectNumber:上传图片之前必须先填写项目编号和项目名称" name="number"></div> 
+      <input id="number" class="form-control"  placeholder="例如“SL1999”。上传效果图之前必须先填写项目编号和项目名称" name="number"></div> 
     <div class="form-group">
       <label>项目名称：</label>
-      <input id="name" class="form-control"  placeholder="Enter ProjectName:上传图片之前必须先填写项目编号和项目名称" name="name"></div>
+      <input id="name" class="form-control"  placeholder="例如“珠三角水资源配置工程”。上传效果图之前必须先填写项目编号和项目名称" name="name"></div>
     <label>项目简介:</label>
 <div>
     <!-- <h1>项目简介:</h1> -->
@@ -178,7 +178,7 @@
     <!-- <button type="submit" class="btn btn-default" onclick="return checkInput();">添加</button>
   -->            
   <!-- <input type="submit" class="btn btn-primary" value="回复" id="submit" disabled="disabled"> -->
-  <button type="submit" class="btn btn-primary" onclick="return checkInput();">添加</button>
+  <button type="submit" class="btn btn-primary" onclick="return checkInput();"> 添  加 </button><p>创建过程耐心等待几十秒~三分钟……</p>
   <!--必须加return才能不跳转-->
 </form>
 <br />

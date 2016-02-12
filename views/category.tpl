@@ -16,10 +16,10 @@ color:#DC143C;
 
 <div class="col-lg-12">
   <h1>项目列表</h1>
-    <a href="/category/add" class="btn btn-default">添加项目&目录</a>
-    <a href="/category/add_b" class="btn btn-default">添加自定义目录</a>
-    <a href="/category/add_b" class="btn btn-default">添加标准成果</a>
-    <button class="btn btn-default" onclick="parent.location.href='/topic/add?mid=7'">快捷上传</button>
+    <a href="/category/add" class="btn btn-default" title="一旦添加，不可更改名称和目录！">添加项目</a>
+    <a href="/category/add_b" class="btn btn-default">添加自定义主题</a>
+    <!-- <a href="/category/add_b" class="btn btn-default">添加标准成果</a> -->
+    <button class="btn btn-success" onclick="parent.location.href='/topic/add?mid=7'" title="文件名必须符合规定：SL1999AT-100-99某某布置图.dwg">快捷上传</button>
       <table class="table table-striped">
        <thead>
          <tr>

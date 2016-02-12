@@ -7,6 +7,12 @@
   <script type="text/javascript" src="/static/js/bootstrap.min.js"></script>
   <script type="text/javascript" src="/static/js/jquery.tablesorter.js"></script>
   <link type="text/css" href="/static/css/bootstrap.min.css" rel="stylesheet" />
+<style>
+i#delete
+{
+color:#DC143C;
+}
+</style>
 </head>
 <body>
 <!-- <div class="navbar navba-default navbar-fixed-top">
@@ -22,9 +28,11 @@
       <th style="cursor: pointer">#{{.Length}}</th>
       <th style="cursor: pointer">成果编号</th>
       <th style="cursor: pointer">成果名称</th>
+      <th style="cursor: pointer">成果类型</th>
+      <th style="cursor: pointer">作者</th>
       <th style="cursor: pointer">最后更新</th>
-      <th style="cursor: pointer">浏览</th>
-      <th style="cursor: pointer">回复数</th>
+      <!-- <th style="cursor: pointer">浏览</th> -->
+      <!-- <th style="cursor: pointer">最后回复</th> -->
       <th>操作</th>
     </tr>
   </thead>
@@ -32,14 +40,21 @@
     {{range $index, $elem :=.Chengguo}}
     <tr>
       <th>{{$index}}</th>
-      <th><a href="/topic/view/{{.Id}}">{{substr .Tnumber  0 10}}</a></th>
-      <th><a href="/topic/view/{{.Id}}" title={{.Title}}>{{substr .Title 0 25}}</a></th>
+      <th><a href="/topic/view/{{.Id}}">{{substr .Tnumber  0 15}}</a></th>
+      <th><a href="/topic/view/{{.Id}}" title={{.Title}}>{{substr .Title 0 15}}</a></th>
+      <th>{{.Category}}</th>
+      <th>{{.Author}}</th>
       <th>{{dateformat .Updated "2006-01-02"}}</th>
-      <th>{{.Views}}</th>
-      <th>{{.ReplyCount}}</th>
-      <th><a href="/topic/view/{{.Id}}">下载</a>
+      <!-- <th>{{.Views}}</th> -->
+      <!-- <th>{{.ReplyCount}}</th> -->
+<!--       <th><a href="/topic/view/{{.Id}}">下载</a>
       <a href="/topic/modify?tid={{.Id}}">修改</a>
-      <a href="/topic/delete?tid={{.Id}}">删除</a></th>
+      <a href="/topic/delete?tid={{.Id}}">删除</a></th> -->
+        <th>
+          <a href="/topic/view/{{.Id}}"><i class="glyphicon glyphicon-download-alt"></i>下载</a>
+          <a href="/topic/modify?tid={{.Id}}"><i class="glyphicon glyphicon-edit"></i>修改</a>
+          <a href="/topic/delete?tid={{.Id}}"><i id="delete" class="glyphicon glyphicon-remove-sign"></i>删除</a>
+        </th>
       <!--<th>
         <a href="/topic?op=del&id={{.Id}}">删除</a>
       </th>-->

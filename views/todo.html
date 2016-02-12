@@ -1,30 +1,14 @@
  <!DOCTYPE html>
 {{template "header"}}
 <title>任务管理 - 档案共享系统</title>
-        <!-- <link rel="stylesheet" href="/static/css/protoplasm_002.css"> -->
-        <!-- <link rel="stylesheet" href="/static/css/protoplasm.css" type="text/css" > -->
-        <!-- <link rel="stylesheet" href="/static/css/datepicker.css" type="text/css" > -->
-        <!-- <link rel="stylesheet" href="/static/css/timepicker.css" type="text/css" > -->
-        <!-- <script type="text/javascript" language="javascript" src="/static/js/prototype.js"></script> -->
-        <!-- <script type="text/javascript" language="javascript" src="/static/js/protoplasm.js"></script> -->
-        <!-- <script type="text/javascript" language="javascript">   -->
-            <!-- Protoplasm.use('datepicker').transform('.datetimepicker_es', { locale: 'en_iso8601', timePicker: true, use24hrs: true });  //es_AR这里调整日期样式 -->
-        <!-- </script> -->
-        <!-- <script type="text/javascript" src="/static/js/datepicker.js"></script> -->
-        <!-- <script type="text/javascript" src="/static/js/timepicker.js"></script> -->
-<!-- Include Required Prerequisites -->
-<!-- <script type="text/javascript" src="//cdn.jsdelivr.net/jquery/1/jquery.min.js"></script> -->
 <script type="text/javascript" src="/static/js/moment.min.js"></script>
   <!-- <script type="text/javascript" src="/static/js/jquery-1.11.3.min.js"></script> -->
 <!-- 注意：这个bootstrap的dater插件，只支持jquery-1.11.3.min.js   
 其实不是，是因为thead里用了jquery的2个版本，一个是2.1一个是latest。注释掉latest即可。
 <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/bootstrap/latest/css/bootstrap.css" /> -->
- 
 <!-- Include Date Range Picker -->
 <script type="text/javascript" src="/static/js/daterangepicker.js"></script>
 <link rel="stylesheet" type="text/css" href="/static/css/daterangepicker.css" />
-
-
 
 <style type="text/css">
 div.task-detail{
@@ -97,7 +81,6 @@ function hideDetail(){
 <div class='container' >
   <h1>ToDo
   <img class='spinner' src='/static/img/spinner.gif' alt='Loading' /></h1>
-
 <div class="col-sm-12">
   <form class="form-inline" method="get" action="/todo/addtask" enctype="multipart/form-data">
     <div class="form-group">
@@ -106,7 +89,6 @@ function hideDetail(){
     <div class="form-group">
       <label for="taskNote">内容</label>
       <input type="text" class="form-control" id="taskNote" placeholder="任务描述内容" name="content" #content></div>
-
      <!-- <div class="form-group"> -->
 <!--        <input type="text" name="daterange" value="01/01/2015 - 01/31/2015" />     
        <script type="text/javascript">
@@ -115,7 +97,6 @@ $(function() {
 });
 </script> -->
      <!-- </div> -->
-
 <div class="form-group">
 <label for="taskNote">任务周期</label>
   <input type="text" class="form-control" name="datefilter" value="" placeholder="选择时间段"/>
@@ -137,7 +118,6 @@ $(function() {
 });
 </script>
 
-      
 <!--     <div class="form-group">
         <label for="taskNote">开始时间</label>
         <input  placeholder="选择时间" value="" name="starttime" class="datetimepicker_es">
@@ -189,7 +169,6 @@ $(function() {
 
 <div class="col-sm-4">
   {{range $index, $elem :=.Tasks1}}
-
   {{if lt $index 10}}
   <div class="panel panel-default">
     <div class="panel-heading" onclick="showDetail('{{.Id}}')">
@@ -211,7 +190,6 @@ $(function() {
     </div>
   </div>
   {{end}}
-
   {{end}}
 </div>
 
@@ -237,13 +215,9 @@ $(function() {
       <a href="/todo/update1?tid={{.Id}}" class="label label-primary"><span><</span></a>
     </div>
   </div>
-
   {{end}}
   {{end}}
 </div>
-
-
-
 <!--         <button type="button" class="close">
           <span (click)="remove(task)" class="ng-binding">×</span>
         </button> -->
@@ -257,8 +231,7 @@ $(function() {
     </div> 
 <!--       <div class="card-header" onclick="hideDetail()">
       <a  class="close"><span >&times;</span></a>
-        
-      </div> -->
+       </div> -->
       <div class="card-block">
       <!-- <label class="control-label" id="taskdetail"></label> -->
         <h4 class="card-title" id="card-title"></h4>
@@ -273,7 +246,6 @@ $(function() {
     </div>
  </div>
   <!-- <br> -->
-
 </div>
 
 <script type="text/javascript">
@@ -297,8 +269,6 @@ function showDetail(str){
                   $("#card-text").html("Content:"+data[0].Content);
                   // $("#card-text").append('<div>Content：' + obj1[0].Content + "</div>");
                 //控制器中用jsonserver的话就用下面这个形式，不用eval转换，如果用writestring方式，就要用eval转换。
-                                       
-                         
                         // alert(obj1[0].Title); 
                         // $.each(obj1,function(i,d){
                         // alert(obj1[0].Title);

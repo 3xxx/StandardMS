@@ -1,2 +1,0 @@
-要修改css中那个取消按钮的图片位置
-/static/js/uploadify/uploadify-cancel.png
