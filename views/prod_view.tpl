@@ -49,7 +49,7 @@ color:#DC143C;
 <!-- <div class="col-sm-5"> -->
 <!--   <button id="directNextpage" class="btn btn-default" onclick="window.open('/topic/add?id={{.Category.Id}}&mid=1')">A+(1to1)</button> -->
 <button id="directNextpage" class="btn btn-default" onclick="parent.location.href='/topic/add?id={{.Category.Id}}&mid=6'">A+(1to1)</button>
-  <button id="directNextpage" class="btn btn-default" onclick="parent.location.href='/topic/add?id={{.Category.Id}}&mid=2'">B+(1toM)</button>
+  <button id="directNextpage" class="btn btn-default" onclick="parent.location.href='/topic/add?id={{.Category.Id}}&mid=8'">B+(1toM)</button>
   
   <button id="directNextpage" class="btn btn-default" onclick="window.open('/catalog/view?id={{.Category.Id}}')">查看计划目录</button>
   <input type="button" id="print" value="打印" onclick="print()" class="btn btn-default">

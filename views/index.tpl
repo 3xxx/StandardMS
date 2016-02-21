@@ -118,8 +118,8 @@ h1[id] {
   <div class="col-lg-10" role="main">
     <div class="bs-docs-section">
       <div class="page-header">
-      <!-- <h2>{{.Website}}</h2> -->
-      <!-- <h2><a href="mailto:504284@qq.com">{{.Email}}</a></h2> -->
+      <h2>{{.Website}}</h2>
+      <h2><a href="mailto:504284@qq.com">{{.Email}}</a></h2>
         <h1 id="section-1">
           <i class="glyphicon glyphicon-star-empty"></i>
           最新项目列表

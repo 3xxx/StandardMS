@@ -5,6 +5,13 @@
 <link rel="stylesheet" href="/static/css/celanstyle.css">
 <!-- 徽章颜色 RoyalBlue-->
 <style>
+.accordion li {
+  margin-top: 0px;
+  padding: 5px 30px;
+  /*background-color: #b94152;*/
+  font-size: .9rem;
+  color: #ddd; 
+}
 .accordion h1 {
   margin-top: 0px;
   }
@@ -57,9 +64,9 @@ background-color:#6495ED;
         {{range $k,$v :=.Categoryjieduan}}
           <h1>
             <!-- <li> -->
-            <a href="#{{.Id}}" class="nav-header collapsed" data-toggle="collapse">
+            <!-- <a href="#{{.Id}}" class="nav-header collapsed" data-toggle="collapse"></a> -->
               <i class="glyphicon glyphicon-cog"></i>
-                <span class="pull-right glyphicon glyphicon-chevron-down"></span>{{.Title}} </a>
+                <span class="pull-right glyphicon glyphicon-chevron-down"></span>{{.Title}} 
             <!-- </li> -->
           </h1>
             <div>
@@ -67,18 +74,19 @@ background-color:#6495ED;
                 {{if eq $v.Id $v1.ParentId}}
             <h2>
               <!-- <li> -->
-              <a href="/category/view_3?id={{.Id}}">&nbsp;&nbsp;<i class="glyphicon glyphicon-file"></i><span class="pull-right glyphicon glyphicon-chevron-down"></span>{{.Title}}</a>
+              <!-- <a href="/category/view_3?id={{.Id}}"></a> -->
+              &nbsp;&nbsp;<i class="glyphicon glyphicon-file"></i><span class="pull-right glyphicon glyphicon-chevron-down"></span>{{.Title}}
               <!-- </li> -->
             </h2>
                       <div>
                        {{range $k2,$v2 :=$.Categorychengguo}}
                           {{if eq $v1.Id $v2.ParentId}}
-                            <h3>
-                               <!-- <li> -->
+                            <!-- <h3> -->
+                               <li>
                                  <a href="/category/view?id={{.Id}}" target='main'>&nbsp;&nbsp;&nbsp;&nbsp;<i class="glyphicon glyphicon-grain"></i>┗━{{.Title}}<span class="badge">{{.TopicCount}}</span>
                                  </a>
-                               <!-- </li> -->
-                             </h3>  
+                               </li>
+                             <!-- </h3>   -->
                              {{end}}
                           {{end}}
                       </div> 
