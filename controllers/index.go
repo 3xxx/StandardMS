@@ -18,9 +18,9 @@ func (index *IndexController) Get() {
 	username := sess.Get("username")
 	fmt.Println(username)
 	if username == nil || username == "" {
-		index.TplNames = "login.tpl"
+		index.TplName = "login.tpl"
 	} else {
-		index.TplNames = "success.tpl"
+		index.TplName = "success.tpl"
 	}
 
 }
@@ -46,9 +46,9 @@ func (index *IndexController) Post() {
 	if err == nil {
 		sess.Set("username", user.Username)
 		fmt.Println("username:", sess.Get("username"))
-		index.TplNames = "success.tpl"
+		index.TplName = "success.tpl"
 	} else {
 		fmt.Println(err)
-		index.TplNames = "error.tpl"
+		index.TplName = "error.tpl"
 	}
 }

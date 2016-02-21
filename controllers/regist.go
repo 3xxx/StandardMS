@@ -15,11 +15,11 @@ type RegistController struct {
 }
 
 func (this *RegistController) Get() {
-	this.TplNames = "regist.tpl"
+	this.TplName = "regist.tpl"
 }
 
 func (this *RegistController) RegistErr() {
-	this.TplNames = "registerr.tpl"
+	this.TplName = "registerr.tpl"
 }
 
 func (this *RegistController) CheckUname() {
@@ -58,10 +58,10 @@ func (this *RegistController) Post() {
 
 	_, err = models.AddRoleUser(4, uid)
 	if err == nil {
-		this.TplNames = "success.tpl"
+		this.TplName = "success.tpl"
 	} else {
 		fmt.Println(err)
-		this.TplNames = "registerr.tpl"
+		this.TplName = "registerr.tpl"
 	}
 }
 
@@ -78,7 +78,7 @@ func (this *RegistController) GetUname() {
 	if err == nil {
 		// this.Ctx.WriteString(string(b))
 		this.Data["json"] = uname1 //string(b)
-		this.ServeJson()
+		this.ServeJSON()
 	}
 	// 	this.Ctx.WriteString(uname1[1].Username)
 	// 	// return uname1[0].Username

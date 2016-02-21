@@ -25,12 +25,18 @@ func (this *TagController) Index() {
 		return
 	}
 	//2.取得客户端用户名
-	ck, err := this.Ctx.Request.Cookie("uname")
-	if err == nil {
-		this.Data["Uname"] = ck.Value
-	} else {
-		beego.Error(err)
+	sess, _ := globalSessions.SessionStart(this.Ctx.ResponseWriter, this.Ctx.Request)
+	defer sess.SessionRelease(this.Ctx.ResponseWriter)
+	v := sess.Get("uname")
+	if v != nil {
+		this.Data["Uname"] = v.(string)
 	}
+	// ck, err := this.Ctx.Request.Cookie("uname")
+	// if err == nil {
+	// 	this.Data["Uname"] = ck.Value
+	// } else {
+	// 	beego.Error(err)
+	// }
 	//2.取得客户端用户名
 	// ck, err := c.Ctx.Request.Cookie("uname")
 	// if err != nil {
@@ -73,29 +79,35 @@ func (this *TagController) Index() {
 	users, count := m.Getuserlist(1, 2000, "Id")
 	if this.IsAjax() {
 		this.Data["json"] = &map[string]interface{}{"total": count, "rows": &users}
-		this.ServeJson()
+		this.ServeJSON()
 		return
 	} else {
 		this.Data["Users"] = &users
-		this.TplNames = "user.tpl"
+		this.TplName = "user.tpl"
 	}
 }
 
 func (this *TagController) View() {
 	this.Data["IsLogin"] = checkAccount(this.Ctx)
 	//2.取得客户端用户名
-	ck, err := this.Ctx.Request.Cookie("uname")
-	if err != nil {
-		beego.Error(err)
-	} else {
-		this.Data["Uname"] = ck.Value
+	sess, _ := globalSessions.SessionStart(this.Ctx.ResponseWriter, this.Ctx.Request)
+	defer sess.SessionRelease(this.Ctx.ResponseWriter)
+	v := sess.Get("uname")
+	if v != nil {
+		this.Data["Uname"] = v.(string)
 	}
+	// ck, err := this.Ctx.Request.Cookie("uname")
+	// if err != nil {
+	// 	beego.Error(err)
+	// } else {
+	// 	this.Data["Uname"] = ck.Value
+	// }
 	userid, _ := strconv.ParseInt(this.Input().Get("useid"), 10, 64)
 	user := m.GetUserByUserId(userid)
 	list, _ := m.GetRoleByUserId(userid)
 	this.Data["User"] = user
 	this.Data["Role"] = list
-	this.TplNames = "admin_user_view.tpl"
+	this.TplName = "admin_user_view.tpl"
 }
 
 func (this *TagController) AddUser() {
@@ -156,7 +168,7 @@ func (this *TagController) UpdateUser() {
 			}
 		}
 	}
-	this.TplNames = "user_view.tpl"
+	this.TplName = "user_view.tpl"
 }
 
 func (this *TagController) DelUser() {
@@ -175,22 +187,28 @@ func (this *TagController) DelUser() {
 
 func (this *TagController) GetUserByUsername() {
 	// 	c.Data["IsCategory"] = true
-	// c.TplNames = "category.tpl"
+	// c.TplName = "category.tpl"
 	this.Data["IsLogin"] = checkAccount(this.Ctx)
 	//2.取得客户端用户名
-	ck, err := this.Ctx.Request.Cookie("uname")
-	if err != nil {
-		beego.Error(err)
-	} else {
-		this.Data["Uname"] = ck.Value
+	sess, _ := globalSessions.SessionStart(this.Ctx.ResponseWriter, this.Ctx.Request)
+	defer sess.SessionRelease(this.Ctx.ResponseWriter)
+	v := sess.Get("uname")
+	if v != nil {
+		this.Data["Uname"] = v.(string)
 	}
+	// ck, err := this.Ctx.Request.Cookie("uname")
+	// if err != nil {
+	// 	beego.Error(err)
+	// } else {
+	// 	this.Data["Uname"] = ck.Value
+	// }
 	username := this.Input().Get("username")
 	// beego.Info(userid)
 	user := m.GetUserByUsername(username)
-	list, _ := m.GetRoleByUsername(username)
+	list, _, _ := m.GetRoleByUsername(username)
 	this.Data["User"] = user
 	this.Data["Role"] = list
-	this.TplNames = "user_view.tpl"
+	this.TplName = "user_view.tpl"
 }
 
 //上传excel文件，导入到数据库

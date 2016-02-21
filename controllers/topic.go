@@ -25,15 +25,21 @@ type TopicController struct {
 
 func (c *TopicController) Get() { //这个给爬虫用。而为了配合pagenate，用后面的listall()
 	c.Data["IsTopic"] = true //这里修改到ListAllPosts()
-	c.TplNames = "topic.tpl"
+	c.TplName = "topic.tpl"
 	c.Data["IsLogin"] = checkAccount(c.Ctx)
 	//2.取得客户端用户名
-	ck, err := c.Ctx.Request.Cookie("uname")
-	if err == nil {
-		c.Data["Uname"] = ck.Value
-	} else {
-		beego.Error(err)
+	sess, _ := globalSessions.SessionStart(c.Ctx.ResponseWriter, c.Ctx.Request)
+	defer sess.SessionRelease(c.Ctx.ResponseWriter)
+	v := sess.Get("uname")
+	if v != nil {
+		c.Data["Uname"] = v.(string)
 	}
+	// ck, err := c.Ctx.Request.Cookie("uname")
+	// if err == nil {
+	// 	c.Data["Uname"] = ck.Value
+	// } else {
+	// 	beego.Error(err)
+	// }
 
 	// beego.Info(ck.Value)
 	// uname := ck.Value
@@ -56,14 +62,20 @@ func (c *TopicController) Get() { //这个给爬虫用。而为了配合pagenate
 func (c *TopicController) Viewbyuname() {
 	c.Data["IsLogin"] = checkAccount(c.Ctx)
 	c.Data["IsTopic"] = true
-	c.TplNames = "topic_uname.tpl"
+	c.TplName = "topic_uname.tpl"
 	//2.取得客户端用户名
-	ck, err := c.Ctx.Request.Cookie("uname")
-	if err == nil {
-		c.Data["Uname"] = ck.Value
-	} else {
-		beego.Error(err)
+	sess, _ := globalSessions.SessionStart(c.Ctx.ResponseWriter, c.Ctx.Request)
+	defer sess.SessionRelease(c.Ctx.ResponseWriter)
+	v := sess.Get("uname")
+	if v != nil {
+		c.Data["Uname"] = v.(string)
 	}
+	// ck, err := c.Ctx.Request.Cookie("uname")
+	// if err == nil {
+	// 	c.Data["Uname"] = ck.Value
+	// } else {
+	// 	beego.Error(err)
+	// }
 	uname := c.Input().Get("uname")
 	topic, _ := models.Gettopicsbyuname(uname) //由uname取出项目
 	c.Data["Topics"] = topic
@@ -81,12 +93,18 @@ func (c *TopicController) Add() { //参考下面的 modify,这个add是topic/add
 		return
 	}
 	//2.取得客户端用户名
-	ck, err := c.Ctx.Request.Cookie("uname")
-	if err == nil {
-		c.Data["Uname"] = ck.Value
-	} else {
-		beego.Error(err)
+	sess, _ := globalSessions.SessionStart(c.Ctx.ResponseWriter, c.Ctx.Request)
+	defer sess.SessionRelease(c.Ctx.ResponseWriter)
+	v := sess.Get("uname")
+	if v != nil {
+		c.Data["Uname"] = v.(string)
 	}
+	// ck, err := c.Ctx.Request.Cookie("uname")
+	// if err == nil {
+	// 	c.Data["Uname"] = ck.Value
+	// } else {
+	// 	beego.Error(err)
+	// }
 	//2.取得客户端用户名
 	// ck, err := c.Ctx.Request.Cookie("uname")
 	// if err != nil {
@@ -114,25 +132,27 @@ func (c *TopicController) Add() { //参考下面的 modify,这个add是topic/add
 	mid := c.Input().Get("mid")
 	// if mid == "1" {
 	// } else {
-	// 	c.TplNames = "topic_add2.html"
+	// 	c.TplName = "topic_add2.html"
 	// }
 	switch mid {
 	case "1":
-		c.TplNames = "topic_one_add.html"
+		c.TplName = "topic_one_add.html"
 	case "2":
-		c.TplNames = "topic_many_add.html"
+		c.TplName = "topic_many_add.html"
 	case "3": //添加设代日记
-		c.TplNames = "diary_add.html"
+		c.TplName = "diary_add.html"
 	case "4": //自定义一对一模式
-		c.TplNames = "topic_user_one_add.html"
+		c.TplName = "topic_user_one_add.html"
 	case "5": //自定义一对多模式
-		c.TplNames = "topic_user_many_add.html"
+		c.TplName = "topic_user_many_add.html"
 	// default:
 	// fmt.Printf("Default")
 	case "6": //用百度的插件上传
-		c.TplNames = "topic_one_addbaidu.html"
+		c.TplName = "topic_one_addbaidu.html"
 	case "7": //用自动识别图号上传
-		c.TplNames = "topic_one_addstandard.html"
+		c.TplName = "topic_one_addstandard.html"
+	case "8": //用自动识别图号上传
+		c.TplName = "topic_many_addbaidu.html"
 	}
 	//取得成果类型id的专业parentid以及阶段parentid以及项目parentid才行
 	if id != "" {
@@ -263,11 +283,18 @@ func (c *TopicController) AddTopic() { //这个是否作废？？
 	}
 	// var err error
 	// var tid string //这里是增加的，不知为何教程没有
-	ck, err := c.Ctx.Request.Cookie("uname")
-	if err != nil {
-		beego.Error(err)
-	}
-	uname := ck.Value
+	//获取用户名
+	sess, _ := globalSessions.SessionStart(c.Ctx.ResponseWriter, c.Ctx.Request)
+	defer sess.SessionRelease(c.Ctx.ResponseWriter)
+	v := sess.Get("uname")
+	// if v != nil {
+	uname := v.(string)
+	// }
+	// ck, err := c.Ctx.Request.Cookie("uname")
+	// if err != nil {
+	// 	beego.Error(err)
+	// }
+	// uname := ck.Value
 
 	if len(tid) == 0 {
 		_, err = models.AddTopicOne(title, tnumber, category, categoryid, content, uname, attachment)
@@ -338,11 +365,18 @@ func (c *TopicController) Topic_many_add() { //一对多模式
 	// var err error
 	// var tid string //这里是增加的，不知为何教程没有
 	// path := ".\\attachment\\" + categoryproj.Number + " " + categoryproj.Title + "\\" + categoryphase.Title + "\\" + categoryspec.Title + "\\" + category + "\\" + h.Filename
-	ck, err := c.Ctx.Request.Cookie("uname")
-	if err != nil {
-		beego.Error(err)
-	}
-	uname := ck.Value
+	//获取用户名
+	sess, _ := globalSessions.SessionStart(c.Ctx.ResponseWriter, c.Ctx.Request)
+	defer sess.SessionRelease(c.Ctx.ResponseWriter)
+	v := sess.Get("uname")
+	// if v != nil {
+	uname := v.(string)
+	// }
+	// ck, err := c.Ctx.Request.Cookie("uname")
+	// if err != nil {
+	// 	beego.Error(err)
+	// }
+	// uname := ck.Value
 
 	// route := "/attachment/" + categoryproj.Number + categoryproj.Title + "/" + categoryphase.Title + "/" + categoryspec.Title + "/" + category + "/" + h.Filename
 	route := category1.Url + h.Filename
@@ -367,7 +401,7 @@ func (c *TopicController) Topic_many_add() { //一对多模式
 	if err != nil {
 		beego.Error(err)
 	}
-	c.TplNames = "topic_many_add.tpl" //不加这句上传出错，虽然可以成功上传
+	c.TplName = "topic_many_add.tpl" //不加这句上传出错，虽然可以成功上传
 	// c.Redirect("/topic", 302)
 }
 
@@ -429,11 +463,18 @@ func (c *TopicController) Topic_one_add() { //一对一模式
 		tnumber = filename1
 		title = filename2
 	}
-	ck, err := c.Ctx.Request.Cookie("uname")
-	if err != nil {
-		beego.Error(err)
-	}
-	uname := ck.Value
+	//获取用户名
+	sess, _ := globalSessions.SessionStart(c.Ctx.ResponseWriter, c.Ctx.Request)
+	defer sess.SessionRelease(c.Ctx.ResponseWriter)
+	v := sess.Get("uname")
+	// if v != nil {
+	uname := v.(string)
+	// }
+	// ck, err := c.Ctx.Request.Cookie("uname")
+	// if err != nil {
+	// 	beego.Error(err)
+	// }
+	// uname := ck.Value
 	// var err error
 	// var tid string //这里是增加的，不知为何教程没有
 	// path := ".\\attachment\\" + categoryproj.Number + " " + categoryproj.Title + "\\" + categoryphase.Title + "\\" + categoryspec.Title + "\\" + category + "\\" + h.Filename
@@ -460,7 +501,7 @@ func (c *TopicController) Topic_one_add() { //一对一模式
 	if err != nil {
 		beego.Error(err)
 	}
-	c.TplNames = "topic_one_add.tpl" //不加这句上传出错，虽然可以成功上传
+	c.TplName = "topic_one_add.tpl" //不加这句上传出错，虽然可以成功上传
 	// c.Redirect("/topic", 302)
 }
 
@@ -520,11 +561,18 @@ func (c *TopicController) Topic_one_addstandard() { //一对一上传，自动�
 	// 	tnumber = filename1
 	// 	title = filename2
 	// }
-	ck, err := c.Ctx.Request.Cookie("uname")
-	if err != nil {
-		beego.Error(err)
-	}
-	uname := ck.Value
+	//获取用户名
+	sess, _ := globalSessions.SessionStart(c.Ctx.ResponseWriter, c.Ctx.Request)
+	defer sess.SessionRelease(c.Ctx.ResponseWriter)
+	v := sess.Get("uname")
+	// if v != nil {
+	uname := v.(string)
+	// }
+	// ck, err := c.Ctx.Request.Cookie("uname")
+	// if err != nil {
+	// 	beego.Error(err)
+	// }
+	// uname := ck.Value
 	route := "/attachment/" + ProNumber + category.Title + "/" + ProJieduan + "/" + ProLeixing + "/" + ProZhuanye + "/" + h.Filename
 	var topicid int64
 	// if len(tid) == 0 {
@@ -550,8 +598,105 @@ func (c *TopicController) Topic_one_addstandard() { //一对一上传，自动�
 			"original": "demo.jpg",
 			"url":      route,
 		}
-		c.ServeJson()
+		c.ServeJSON()
 	}
+}
+
+func (c *TopicController) Topic_many_addbaidu() { //一对多模式
+	//解析表单
+	tid := c.Input().Get("tid") //这句没用。教程里漏了这句，导致修改总是变成添加文章
+	title := c.Input().Get("title")
+	tnumber := c.Input().Get("tnumber")
+	content := c.Input().Get("content")
+	category := c.Input().Get("category")
+	categoryid := c.Input().Get("categoryid")
+
+	//获取文件保存路径，有了categoryid可以求出整个路径
+	//取得成果类型id的专业parentid以及阶段parentid以及项目parentid才行
+	// categoryproj, err := models.GetCategoryProj(categoryid)
+	// categoryphase, err := models.GetCategoryPhase(categoryid)
+	// categoryspec, err := models.GetCategorySpec(categoryid)
+	category1, err := models.GetCategory(categoryid)
+	if err != nil {
+		beego.Error(err)
+		// c.Redirect("/", 302)//这里注释掉，否则在图纸页面无法进入添加页面，因为传入的id为空，导致err发生
+		return
+	}
+	//获取上传的文件
+	_, h, err := c.GetFile("file")
+	if err != nil {
+		beego.Error(err)
+	}
+	var attachment string
+	var path string
+	var filesize int64
+	if h != nil {
+		//保存附件
+		attachment = h.Filename
+		// beego.Info(attachment)
+		// path = ".\\attachment\\" + categoryproj.Number + categoryproj.Title + "\\" + categoryphase.Title + "\\" + categoryspec.Title + "\\" + category + "\\" + h.Filename
+		path = category1.DiskDirectory + h.Filename
+		// path := c.Input().Get("url")  //存文件的路径
+		// path = path[3:]
+		// path = "./attachment" + "/" + h.Filename
+		// f.Close()                                             // 关闭上传的文件，不然的话会出现临时文件不能清除的情况
+		err = c.SaveToFile("file", path) //.Join("attachment", attachment)) //存文件    WaterMark(path)    //给文件加水印
+		if err != nil {
+			beego.Error(err)
+		}
+		filesize, _ = FileSize(path)
+		filesize = filesize / 1000.0
+	}
+	if title == "" || tnumber == "" {
+		//将附件的编号和名称写入数据库
+		filename1, filename2 := SubStrings(attachment)
+		if filename1 == "" {
+			filename1 = filename2 //如果编号为空，则用文件名代替，否则多个编号为空导致存入数据库唯一性检查错误
+		}
+		title = filename2
+		tnumber = filename1
+	}
+	// var err error
+	// var tid string //这里是增加的，不知为何教程没有
+	// path := ".\\attachment\\" + categoryproj.Number + " " + categoryproj.Title + "\\" + categoryphase.Title + "\\" + categoryspec.Title + "\\" + category + "\\" + h.Filename
+	//获取用户名
+	sess, _ := globalSessions.SessionStart(c.Ctx.ResponseWriter, c.Ctx.Request)
+	defer sess.SessionRelease(c.Ctx.ResponseWriter)
+	v := sess.Get("uname")
+	// if v != nil {
+	uname := v.(string)
+	// }
+	// ck, err := c.Ctx.Request.Cookie("uname")
+	// if err != nil {
+	// 	beego.Error(err)
+	// }
+	// uname := ck.Value
+
+	// route := "/attachment/" + categoryproj.Number + categoryproj.Title + "/" + categoryphase.Title + "/" + categoryspec.Title + "/" + category + "/" + h.Filename
+	route := category1.Url + h.Filename
+	//topicid := c.Input().Get("topicid")
+	var topicid int64
+	if len(tid) == 0 {
+		topicid, err = models.AddTopicMany(title, tnumber, category, categoryid, uname, content, attachment)
+		//这里返回topicid，并存入attachment表中
+		if err != nil { //如果发生错误，返回错误，并获取该文章的topicid
+			beego.Error(err)
+		}
+		if topicid == 0 { //这个已经不用了。
+			topicid, err = models.GetTopicIdbytnumber(tnumber)
+		}
+		cid := strconv.FormatInt(topicid, 10)
+		filesize := strconv.FormatInt(filesize, 10)
+		err = models.AddAttachment(attachment, filesize, path, route, cid, uname)
+		// beego.Info(attachment)
+	} else {
+		err = models.ModifyTopic(tid, title, tnumber, category, categoryid, content)
+	}
+	if err != nil {
+		beego.Error(err)
+	}
+	c.TplName = "topic_many_add.tpl" //不加这句上传出错，虽然可以成功上传
+	// c.Redirect("/topic", 302)
 }
 
 func (c *TopicController) Topic_one_addbaidu() { //一对一模式
@@ -611,11 +756,19 @@ func (c *TopicController) Topic_one_addbaidu() { //一对一模式
 		tnumber = filename1
 		title = filename2
 	}
-	ck, err := c.Ctx.Request.Cookie("uname")
-	if err != nil {
-		beego.Error(err)
-	}
-	uname := ck.Value
+	//获取用户名
+	sess, _ := globalSessions.SessionStart(c.Ctx.ResponseWriter, c.Ctx.Request)
+	defer sess.SessionRelease(c.Ctx.ResponseWriter)
+	v := sess.Get("uname")
+	// if v != nil {
+	uname := v.(string)
+	// }
+
+	// ck, err := c.Ctx.Request.Cookie("uname")
+	// if err != nil {
+	// 	beego.Error(err)
+	// }
+	// uname := ck.Value
 	// var err error
 	// var tid string //这里是增加的，不知为何教程没有
 	// path := ".\\attachment\\" + categoryproj.Number + " " + categoryproj.Title + "\\" + categoryphase.Title + "\\" + categoryspec.Title + "\\" + category + "\\" + h.Filename
@@ -649,9 +802,9 @@ func (c *TopicController) Topic_one_addbaidu() { //一对一模式
 		// }
 		// c.Data["json"] = f
 		c.Data["json"] = map[string]interface{}{"state": "SUCCESS", "title": "111", "original": "demo.jpg", "url": route}
-		c.ServeJson()
+		c.ServeJSON()
 	}
-	// c.TplNames = "topic_one_add.tpl" //不加这句上传出错，虽然可以成功上传
+	// c.TplName = "topic_one_add.tpl" //不加这句上传出错，虽然可以成功上传
 	// c.Redirect("/topic", 302)
 	// success : 0 | 1,           // 0 表示上传失败，1 表示上传成功
 	//    message : "提示的信息，上传成功或上传失败及错误信息等。",
@@ -715,11 +868,19 @@ func (c *TopicController) Uploadimagesmd() {
 		tnumber = filename1
 		title = filename2
 	}
-	ck, err := c.Ctx.Request.Cookie("uname")
-	if err != nil {
-		beego.Error(err)
-	}
-	uname := ck.Value
+
+	//获取用户名
+	sess, _ := globalSessions.SessionStart(c.Ctx.ResponseWriter, c.Ctx.Request)
+	defer sess.SessionRelease(c.Ctx.ResponseWriter)
+	v := sess.Get("uname")
+	// if v != nil {
+	uname := v.(string)
+	// }
+	// ck, err := c.Ctx.Request.Cookie("uname")
+	// if err != nil {
+	// 	beego.Error(err)
+	// }
+	// uname := ck.Value
 	// var err error
 	// var tid string //这里是增加的，不知为何教程没有
 	// path := ".\\attachment\\" + categoryproj.Number + " " + categoryproj.Title + "\\" + categoryphase.Title + "\\" + categoryspec.Title + "\\" + category + "\\" + h.Filename
@@ -752,9 +913,9 @@ func (c *TopicController) Uploadimagesmd() {
 			message: "ok",
 		}
 		c.Data["json"] = f
-		c.ServeJson()
+		c.ServeJSON()
 	}
-	// c.TplNames = "topic_one_add.tpl" //不加这句上传出错，虽然可以成功上传
+	// c.TplName = "topic_one_add.tpl" //不加这句上传出错，虽然可以成功上传
 	// c.Redirect("/topic", 302)
 	// success : 0 | 1,           // 0 表示上传失败，1 表示上传成功
 	//    message : "提示的信息，上传成功或上传失败及错误信息等。",
@@ -864,7 +1025,7 @@ func (c *TopicController) Diary_add() { //日记上传图片——进行压缩
 	if err != nil {
 		beego.Error(err)
 	}
-	c.TplNames = "diary_add.tpl" //不加这句上传出错，虽然可以成功上传
+	c.TplName = "diary_add.tpl" //不加这句上传出错，虽然可以成功上传
 	// c.Redirect("/topic", 302)
 }
 
@@ -883,7 +1044,7 @@ func (c *TopicController) Diary_second_add() { //二次存入设代日记中图�
 			beego.Error(err)
 		}
 	}
-	// c.TplNames = "addtopic3.tpl"
+	// c.TplName = "addtopic3.tpl"
 	c.Redirect("/topic/view_b/"+tid, 302) //这里应该是跳到当前日记
 }
 
@@ -891,26 +1052,32 @@ func (c *TopicController) View() {
 	c.Data["IsLogin"] = checkAccount(c.Ctx)
 	c.Data["IsTopic"] = true
 	//2.取得客户端用户名
-	ck, err := c.Ctx.Request.Cookie("uname")
-	if err == nil {
-		c.Data["Uname"] = ck.Value
-	} else {
-		beego.Error(err)
+	sess, _ := globalSessions.SessionStart(c.Ctx.ResponseWriter, c.Ctx.Request)
+	defer sess.SessionRelease(c.Ctx.ResponseWriter)
+	v := sess.Get("uname")
+	if v != nil {
+		c.Data["Uname"] = v.(string)
 	}
+	// ck, err := c.Ctx.Request.Cookie("uname")
+	// if err == nil {
+	// 	c.Data["Uname"] = ck.Value
+	// } else {
+	// 	beego.Error(err)
+	// }
 	//这里是通过文章的id获得文章及上级目录情况
-	topicproj, err := models.GetTopicProj(c.Ctx.Input.Params["0"])
-	topicphase, err := models.GetTopicPhase(c.Ctx.Input.Params["0"])
-	topicspec, err := models.GetTopicSpec(c.Ctx.Input.Params["0"])
-	_, topicchengguo, err := models.GetTopicChengguo(c.Ctx.Input.Params["0"])
+	topicproj, err := models.GetTopicProj(c.Ctx.Input.Param("0"))
+	topicphase, err := models.GetTopicPhase(c.Ctx.Input.Param("0"))
+	topicspec, err := models.GetTopicSpec(c.Ctx.Input.Param("0"))
+	_, topicchengguo, err := models.GetTopicChengguo(c.Ctx.Input.Param("0"))
 	if topicchengguo.Title == "diary" {
-		c.TplNames = "diary_view1.html"
+		c.TplName = "diary_view1.html"
 	} else {
-		c.TplNames = "topic_view.html"
+		c.TplName = "topic_view.html"
 	}
 
-	topic, attachment, err := models.GetTopic(c.Ctx.Input.Params["0"])
+	topic, attachment, err := models.GetTopic(c.Ctx.Input.Param("0"))
 	//articleId, _ := strconv.Atoi(manage.Ctx.Input.Param(":id"))
-	//id, _ := strconv.Atoi(manage.Ctx.Input.Params[":id"])
+	//id, _ := strconv.Atoi(manage.Ctx.Input.Param(":id"))
 	if err != nil {
 		beego.Error(err)
 		c.Redirect("/", 302)
@@ -922,9 +1089,9 @@ func (c *TopicController) View() {
 	c.Data["TopicChengguo"] = topicchengguo
 	c.Data["Topic"] = topic
 	c.Data["Attachment"] = attachment
-	c.Data["Tid"] = c.Ctx.Input.Params["0"] //教程中用的是圆括号，导致错误topic.go:52: cannot call non-function c.Controller.Ctx.Input.Params (type map[string]string)
+	c.Data["Tid"] = c.Ctx.Input.Param("0") //教程中用的是圆括号，导致错误topic.go:52: cannot call non-function c.Controller.Ctx.Input.Params (type map[string]string)
 	//教程第8章开头有修改
-	replies, err := models.GetAllReplies(c.Ctx.Input.Params["0"])
+	replies, err := models.GetAllReplies(c.Ctx.Input.Param("0"))
 	if err != nil {
 		beego.Error(err)
 		return
@@ -938,26 +1105,32 @@ func (c *TopicController) View_b() {
 	c.Data["IsLogin"] = checkAccount(c.Ctx)
 	c.Data["IsTopic"] = true
 	//2.取得客户端用户名
-	ck, err := c.Ctx.Request.Cookie("uname")
-	if err == nil {
-		c.Data["Uname"] = ck.Value
-	} else {
-		beego.Error(err)
+	sess, _ := globalSessions.SessionStart(c.Ctx.ResponseWriter, c.Ctx.Request)
+	defer sess.SessionRelease(c.Ctx.ResponseWriter)
+	v := sess.Get("uname")
+	if v != nil {
+		c.Data["Uname"] = v.(string)
 	}
+	// ck, err := c.Ctx.Request.Cookie("uname")
+	// if err == nil {
+	// 	c.Data["Uname"] = ck.Value
+	// } else {
+	// 	beego.Error(err)
+	// }
 	//这里是通过文章的id获得文章及上级目录情况
-	topicproj, err := models.GetTopicProj(c.Ctx.Input.Params["0"])
-	topicphase, err := models.GetTopicPhase(c.Ctx.Input.Params["0"])
-	topicspec, err := models.GetTopicSpec(c.Ctx.Input.Params["0"])
-	_, topicchengguo, err := models.GetTopicChengguo(c.Ctx.Input.Params["0"])
+	topicproj, err := models.GetTopicProj(c.Ctx.Input.Param("0"))
+	topicphase, err := models.GetTopicPhase(c.Ctx.Input.Param("0"))
+	topicspec, err := models.GetTopicSpec(c.Ctx.Input.Param("0"))
+	_, topicchengguo, err := models.GetTopicChengguo(c.Ctx.Input.Param("0"))
 	if topicchengguo.Title == "diary" {
-		c.TplNames = "diary_view1_b.html"
+		c.TplName = "diary_view1_b.html"
 	} else {
-		c.TplNames = "topic_view_b.html"
+		c.TplName = "topic_view_b.html"
 	}
 
-	topic, attachment, err := models.GetTopic(c.Ctx.Input.Params["0"])
+	topic, attachment, err := models.GetTopic(c.Ctx.Input.Param("0"))
 	//articleId, _ := strconv.Atoi(manage.Ctx.Input.Param(":id"))
-	//id, _ := strconv.Atoi(manage.Ctx.Input.Params[":id"])
+	//id, _ := strconv.Atoi(manage.Ctx.Input.Param(":id"))
 	if err != nil {
 		beego.Error(err)
 		c.Redirect("/", 302)
@@ -969,9 +1142,9 @@ func (c *TopicController) View_b() {
 	c.Data["TopicChengguo"] = topicchengguo
 	c.Data["Topic"] = topic
 	c.Data["Attachment"] = attachment
-	c.Data["Tid"] = c.Ctx.Input.Params["0"] //教程中用的是圆括号，导致错误topic.go:52: cannot call non-function c.Controller.Ctx.Input.Params (type map[string]string)
+	c.Data["Tid"] = c.Ctx.Input.Param("0") //教程中用的是圆括号，导致错误topic.go:52: cannot call non-function c.Controller.Ctx.Input.Params (type map[string]string)
 	//教程第8章开头有修改
-	replies, err := models.GetAllReplies(c.Ctx.Input.Params["0"])
+	replies, err := models.GetAllReplies(c.Ctx.Input.Param("0"))
 	if err != nil {
 		beego.Error(err)
 		return
@@ -985,26 +1158,32 @@ func (c *TopicController) Carousel() {
 	c.Data["IsLogin"] = checkAccount(c.Ctx)
 	c.Data["IsTopic"] = true
 	//2.取得客户端用户名
-	ck, err := c.Ctx.Request.Cookie("uname")
-	if err == nil {
-		c.Data["Uname"] = ck.Value
-	} else {
-		beego.Error(err)
+	sess, _ := globalSessions.SessionStart(c.Ctx.ResponseWriter, c.Ctx.Request)
+	defer sess.SessionRelease(c.Ctx.ResponseWriter)
+	v := sess.Get("uname")
+	if v != nil {
+		c.Data["Uname"] = v.(string)
 	}
+	// ck, err := c.Ctx.Request.Cookie("uname")
+	// if err == nil {
+	// 	c.Data["Uname"] = ck.Value
+	// } else {
+	// 	beego.Error(err)
+	// }
 	//这里是通过文章的id获得文章及上级目录情况
-	topicproj, err := models.GetTopicProj(c.Ctx.Input.Params["0"])
-	topicphase, err := models.GetTopicPhase(c.Ctx.Input.Params["0"])
-	topicspec, err := models.GetTopicSpec(c.Ctx.Input.Params["0"])
-	_, topicchengguo, err := models.GetTopicChengguo(c.Ctx.Input.Params["0"])
+	topicproj, err := models.GetTopicProj(c.Ctx.Input.Param("0"))
+	topicphase, err := models.GetTopicPhase(c.Ctx.Input.Param("0"))
+	topicspec, err := models.GetTopicSpec(c.Ctx.Input.Param("0"))
+	_, topicchengguo, err := models.GetTopicChengguo(c.Ctx.Input.Param("0"))
 	if topicchengguo.Title == "diary" {
-		c.TplNames = "carousel.html"
+		c.TplName = "carousel.html"
 	} else {
-		c.TplNames = "topic_view_b.html"
+		c.TplName = "topic_view_b.html"
 	}
 
-	topic, attachment, err := models.GetTopic(c.Ctx.Input.Params["0"])
+	topic, attachment, err := models.GetTopic(c.Ctx.Input.Param("0"))
 	//articleId, _ := strconv.Atoi(manage.Ctx.Input.Param(":id"))
-	//id, _ := strconv.Atoi(manage.Ctx.Input.Params[":id"])
+	//id, _ := strconv.Atoi(manage.Ctx.Input.Param(":id"))
 	if err != nil {
 		beego.Error(err)
 		c.Redirect("/", 302)
@@ -1016,9 +1195,9 @@ func (c *TopicController) Carousel() {
 	c.Data["TopicChengguo"] = topicchengguo
 	c.Data["Topic"] = topic
 	c.Data["Attachment"] = attachment
-	c.Data["Tid"] = c.Ctx.Input.Params["0"] //教程中用的是圆括号，导致错误topic.go:52: cannot call non-function c.Controller.Ctx.Input.Params (type map[string]string)
+	c.Data["Tid"] = c.Ctx.Input.Param("0") //教程中用的是圆括号，导致错误topic.go:52: cannot call non-function c.Controller.Ctx.Input.Params (type map[string]string)
 	//教程第8章开头有修改
-	replies, err := models.GetAllReplies(c.Ctx.Input.Params["0"])
+	replies, err := models.GetAllReplies(c.Ctx.Input.Param("0"))
 	if err != nil {
 		beego.Error(err)
 		return
@@ -1031,7 +1210,7 @@ func (c *TopicController) Carousel() {
 func (c *TopicController) ViewDiary() {
 	c.Data["IsLogin"] = checkAccount(c.Ctx)
 	c.Data["IsTopic"] = true
-	c.TplNames = "diary_view.html"
+	c.TplName = "diary_view.html"
 	//这里是通过日记的编号获取日记id,由日记id获取日记及上级目录情况
 	tid := c.Input().Get("tid")
 	topicid, _ := strconv.ParseInt(tid, 10, 64)
@@ -1048,7 +1227,7 @@ func (c *TopicController) ViewDiary() {
 	_, topicchengguo, err := models.GetTopicChengguo(cid)
 	topic, attachment, err := models.GetTopic(cid)
 	//articleId, _ := strconv.Atoi(manage.Ctx.Input.Param(":id"))
-	//id, _ := strconv.Atoi(manage.Ctx.Input.Params[":id"])
+	//id, _ := strconv.Atoi(manage.Ctx.Input.Param(":id"))
 	if err != nil {
 		beego.Error(err)
 		c.Redirect("/", 302)
@@ -1060,9 +1239,9 @@ func (c *TopicController) ViewDiary() {
 	c.Data["TopicChengguo"] = topicchengguo
 	c.Data["Topic"] = topic
 	c.Data["Attachment"] = attachment
-	c.Data["Tid"] = c.Ctx.Input.Params["0"] //教程中用的是圆括号，导致错误topic.go:52: cannot call non-function c.Controller.Ctx.Input.Params (type map[string]string)
+	c.Data["Tid"] = c.Ctx.Input.Param("0") //教程中用的是圆括号，导致错误topic.go:52: cannot call non-function c.Controller.Ctx.Input.Params (type map[string]string)
 	//教程第8章开头有修改
-	replies, err := models.GetAllReplies(c.Ctx.Input.Params["0"])
+	replies, err := models.GetAllReplies(c.Ctx.Input.Param("0"))
 	if err != nil {
 		beego.Error(err)
 		return
@@ -1074,14 +1253,14 @@ func (c *TopicController) ViewDiary() {
 func (c *TopicController) ViewDiary1() {
 	c.Data["IsLogin"] = checkAccount(c.Ctx)
 	c.Data["IsTopic"] = true
-	c.TplNames = "diary_view1.html"
-	topicproj, err := models.GetTopicProj(c.Ctx.Input.Params["0"])
-	topicphase, err := models.GetTopicPhase(c.Ctx.Input.Params["0"])
-	topicspec, err := models.GetTopicSpec(c.Ctx.Input.Params["0"])
-	_, topicchengguo, err := models.GetTopicChengguo(c.Ctx.Input.Params["0"])
-	topic, attachment, err := models.GetTopic(c.Ctx.Input.Params["0"])
+	c.TplName = "diary_view1.html"
+	topicproj, err := models.GetTopicProj(c.Ctx.Input.Param("0"))
+	topicphase, err := models.GetTopicPhase(c.Ctx.Input.Param("0"))
+	topicspec, err := models.GetTopicSpec(c.Ctx.Input.Param("0"))
+	_, topicchengguo, err := models.GetTopicChengguo(c.Ctx.Input.Param("0"))
+	topic, attachment, err := models.GetTopic(c.Ctx.Input.Param("0"))
 	//articleId, _ := strconv.Atoi(manage.Ctx.Input.Param(":id"))
-	//id, _ := strconv.Atoi(manage.Ctx.Input.Params[":id"])
+	//id, _ := strconv.Atoi(manage.Ctx.Input.Param(":id"))
 	if err != nil {
 		beego.Error(err)
 		c.Redirect("/", 302)
@@ -1093,9 +1272,9 @@ func (c *TopicController) ViewDiary1() {
 	c.Data["TopicChengguo"] = topicchengguo
 	c.Data["Topic"] = topic
 	c.Data["Attachment"] = attachment
-	c.Data["Tid"] = c.Ctx.Input.Params["0"] //教程中用的是圆括号，导致错误topic.go:52: cannot call non-function c.Controller.Ctx.Input.Params (type map[string]string)
+	c.Data["Tid"] = c.Ctx.Input.Param("0") //教程中用的是圆括号，导致错误topic.go:52: cannot call non-function c.Controller.Ctx.Input.Params (type map[string]string)
 	//教程第8章开头有修改
-	replies, err := models.GetAllReplies(c.Ctx.Input.Params["0"])
+	replies, err := models.GetAllReplies(c.Ctx.Input.Param("0"))
 	if err != nil {
 		beego.Error(err)
 		return
@@ -1123,17 +1302,23 @@ func (c *TopicController) Modify() { //这个也要登陆验证
 		return
 	}
 	//3.取得客户端用户名
-	ck, err := c.Ctx.Request.Cookie("uname")
-	if err == nil {
-		c.Data["Uname"] = ck.Value
-	} else {
-		beego.Error(err)
+	sess, _ := globalSessions.SessionStart(c.Ctx.ResponseWriter, c.Ctx.Request)
+	defer sess.SessionRelease(c.Ctx.ResponseWriter)
+	v := sess.Get("uname")
+	if v != nil {
+		c.Data["Uname"] = v.(string)
 	}
+	// ck, err := c.Ctx.Request.Cookie("uname")
+	// if err == nil {
+	// 	c.Data["Uname"] = ck.Value
+	// } else {
+	// 	beego.Error(err)
+	// }
 	// ck, err := c.Ctx.Request.Cookie("uname")
 	// if err != nil {
 	// 	beego.Error(err)
 	// }
-	uname := ck.Value
+	uname := v.(string) //ck.Value
 	//4.取出用户的权限等级
 	role, _ := checkRole(c.Ctx) //login里的
 	// beego.Info(role)
@@ -1149,7 +1334,7 @@ func (c *TopicController) Modify() { //这个也要登陆验证
 	}
 
 	c.Data["IsLogin"] = checkAccount(c.Ctx)
-	c.TplNames = "topic_modify.html"
+	c.TplName = "topic_modify.html"
 
 	c.Data["Topic"] = topic
 	c.Data["Attachment"] = attachment
@@ -1241,11 +1426,18 @@ func (c *TopicController) ModifyTopic() { //一对多模式,向文章中追加�
 	// 		topicid, err = models.GetTopicIdbytnumber(tnumber)
 	// 	}
 	// cid := strconv.FormatInt(tid, 10)
-	ck, err := c.Ctx.Request.Cookie("uname")
-	if err != nil {
-		beego.Error(err)
-	}
-	uname := ck.Value
+	//获取用户名
+	sess, _ := globalSessions.SessionStart(c.Ctx.ResponseWriter, c.Ctx.Request)
+	defer sess.SessionRelease(c.Ctx.ResponseWriter)
+	v := sess.Get("uname")
+	// if v != nil {
+	uname := v.(string)
+	// }
+	// ck, err := c.Ctx.Request.Cookie("uname")
+	// if err != nil {
+	// 	beego.Error(err)
+	// }
+	// uname := ck.Value
 
 	size := strconv.FormatInt(filesize, 10)
 	err = models.AddAttachment(attachment, size, path, route, tid, uname)
@@ -1257,7 +1449,7 @@ func (c *TopicController) ModifyTopic() { //一对多模式,向文章中追加�
 	if err != nil {
 		beego.Error(err)
 	}
-	c.TplNames = "modifytopic.tpl" //不加这句上传出错，虽然可以成功上传
+	c.TplName = "modifytopic.tpl" //不加这句上传出错，虽然可以成功上传
 	// c.Redirect("/topic", 302)
 }
 
@@ -1280,11 +1472,17 @@ func (c *TopicController) Delete() { //应该显示警告
 		return
 	}
 	//3.取得客户端用户名
-	ck, err := c.Ctx.Request.Cookie("uname")
-	if err != nil {
-		beego.Error(err)
-	}
-	uname := ck.Value
+	sess, _ := globalSessions.SessionStart(c.Ctx.ResponseWriter, c.Ctx.Request)
+	defer sess.SessionRelease(c.Ctx.ResponseWriter)
+	v := sess.Get("uname")
+	// if v != nil {
+	uname := v.(string)
+	// }
+	// ck, err := c.Ctx.Request.Cookie("uname")
+	// if err != nil {
+	// 	beego.Error(err)
+	// }
+	// uname := ck.Value
 	//4.取出用户的权限等级
 	role, _ := checkRole(c.Ctx) //login里的
 	// beego.Info(role)
@@ -1298,7 +1496,7 @@ func (c *TopicController) Delete() { //应该显示警告
 		// c.Redirect("/roleerr", 302)
 		return
 	}
-	err = models.DeletTopic(c.Input().Get("tid")) //(c.Ctx.Input.Params["0"])
+	err = models.DeletTopic(c.Input().Get("tid")) //(c.Ctx.Input.Param("0"))
 	if err != nil {
 		beego.Error(err)
 	}
@@ -1324,11 +1522,17 @@ func (c *TopicController) DeleteAttachment() { //应该显示警告
 		return
 	}
 	//3.取得客户端用户名
-	ck, err := c.Ctx.Request.Cookie("uname")
-	if err != nil {
-		beego.Error(err)
-	}
-	uname := ck.Value
+	sess, _ := globalSessions.SessionStart(c.Ctx.ResponseWriter, c.Ctx.Request)
+	defer sess.SessionRelease(c.Ctx.ResponseWriter)
+	v := sess.Get("uname")
+	// if v != nil {
+	uname := v.(string)
+	// }
+	// ck, err := c.Ctx.Request.Cookie("uname")
+	// if err != nil {
+	// 	beego.Error(err)
+	// }
+	// uname := ck.Value
 	//4.取出用户的权限等级
 	role, _ := checkRole(c.Ctx) //login里的
 	// beego.Info(role)
@@ -1342,10 +1546,10 @@ func (c *TopicController) DeleteAttachment() { //应该显示警告
 		// c.Redirect("/roleerr", 302)
 		return
 	}
-	// Tid := c.Ctx.Input.Params["0"]
+	// Tid := c.Ctx.Input.Param("0")
 	Tid := c.Input().Get("tid")
 	// beego.Info(Tid)
-	err = models.DeletAttachment(c.Input().Get("aid")) //(c.Ctx.Input.Params["0"])
+	err = models.DeletAttachment(c.Input().Get("aid")) //(c.Ctx.Input.Param("0"))
 	if err != nil {
 		beego.Error(err)
 	}
@@ -1382,9 +1586,9 @@ func (c *TopicController) ExportToExcel() {
 	// }
 	// category, _ := models.GetCategory(id)
 	// if category.Title == "diary" {
-	// 	c.TplNames = "proddiary_view_b.tpl"
+	// 	c.TplName = "proddiary_view_b.tpl"
 	// } else {
-	// 	c.TplNames = "prod_view_b.tpl"
+	// 	c.TplName = "prod_view_b.tpl"
 	// }
 	chengguo, err := models.GetTopicsbyparentid(id, true)
 	if err != nil {
@@ -1576,7 +1780,7 @@ func (c *TopicController) DownloadAll() {
 	for _, v := range array {
 		_, attachment, err := models.GetTopic(v)
 		//articleId, _ := strconv.Atoi(manage.Ctx.Input.Param(":id"))
-		//id, _ := strconv.Atoi(manage.Ctx.Input.Params[":id"])
+		//id, _ := strconv.Atoi(manage.Ctx.Input.Param(":id"))
 		if err != nil {
 			beego.Error(err)
 			c.Redirect("/", 302)
@@ -1625,15 +1829,21 @@ func (c *TopicController) DownloadAll() {
 
 func (c *TopicController) ListAllPosts() {
 	c.Data["IsTopic"] = true
-	c.TplNames = "topic.tpl"
+	c.TplName = "topic.tpl"
 	c.Data["IsLogin"] = checkAccount(c.Ctx)
 	//2.取得客户端用户名
-	ck, err := c.Ctx.Request.Cookie("uname")
-	if err == nil {
-		c.Data["Uname"] = ck.Value
-	} else {
-		beego.Error(err)
+	sess, _ := globalSessions.SessionStart(c.Ctx.ResponseWriter, c.Ctx.Request)
+	defer sess.SessionRelease(c.Ctx.ResponseWriter)
+	v := sess.Get("uname")
+	if v != nil {
+		c.Data["Uname"] = v.(string)
 	}
+	// ck, err := c.Ctx.Request.Cookie("uname")
+	// if err == nil {
+	// 	c.Data["Uname"] = ck.Value
+	// } else {
+	// 	beego.Error(err)
+	// }
 
 	// Directory:github.com/astaxie/beego/context     Pakage in Source:context
 	// func (input *BeegoInput) IP() string {}

@@ -14,7 +14,7 @@ func (c *SearchController) Get() { //search用的是get方法
 	tid := c.Input().Get("tuming")
 	c.Data["IsSearch"] = true
 	c.Data["IsLogin"] = checkAccount(c.Ctx)
-	c.TplNames = "search.tpl"
+	c.TplName = "search.tpl"
 	Searchs, err := models.SearchTopics(tid, false)
 	if err != nil {
 		beego.Error(err.Error)
@@ -40,7 +40,7 @@ func (c *SearchController) Get() { //search用的是get方法
 // 	// category := c.Input().Get("category")
 // 	c.Data["IsSearch"] = true
 // 	c.Data["IsLogin"] = checkAccount(c.Ctx)
-// 	c.TplNames = "search.tpl"
+// 	c.TplName = "search.tpl"
 // 	Searchs, err := models.SearchTopics(tid, false) //这里传入空字符串
 // 	if err != nil {
 // 		beego.Error(err.Error)

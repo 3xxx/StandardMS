@@ -14,7 +14,7 @@ package controllers
 
 // func (this *CommonController) Rsp(status bool, str string) {
 // 	this.Data["json"] = &map[string]interface{}{"status": status, "info": str}
-// 	this.ServeJson()
+// 	this.ServeJSON()
 // }
 
 // func (this *CommonController) GetTemplatetype() string {

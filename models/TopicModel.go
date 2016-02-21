@@ -62,7 +62,7 @@ type Attachment struct {
 
 func init() {
 	orm.RegisterModel(new(Topic), new(Attachment)) //, new(Article)
-	// orm.RegisterDriver("sqlite", orm.DR_Sqlite)
+	// orm.RegisterDriver("sqlite", orm.DRSqlite)
 	// orm.RegisterDataBase("default", "sqlite3", "database/orm_test.db", 10)
 }
 

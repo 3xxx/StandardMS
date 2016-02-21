@@ -322,12 +322,12 @@ func GetRoleByUserId(userid int64) (roles []*Role, count int64) { //*Topic, []*A
 
 }
 
-func GetRoleByUsername(username string) (roles []*Role, count int64) { //*Topic, []*Attachment, error
+func GetRoleByUsername(username string) (roles []*Role, count int64, err error) { //*Topic, []*Attachment, error
 	roles = make([]*Role, 0)
 	o := orm.NewOrm()
 	// role := new(Role)
-	count, _ = o.QueryTable("role").Filter("Users__User__Username", username).All(&roles)
-	return roles, count
+	count, err = o.QueryTable("role").Filter("Users__User__Username", username).All(&roles)
+	return roles, count, err
 	// 通过 post title 查询这个 post 有哪些 tag
 	// var tags []*Tag
 	// num, err := dORM.QueryTable("tag").Filter("Posts__Post__Title", "Introduce Beego ORM").All(&tags)

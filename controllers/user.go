@@ -29,7 +29,7 @@ func (this *UserController) Index() {
 	// 	sort = "Id"
 	// }
 	// 	c.Data["IsCategory"] = true
-	// c.TplNames = "category.tpl"
+	// c.TplName = "category.tpl"
 	//1.首先判断是否注册
 	if !checkAccount(this.Ctx) {
 		// port := strconv.Itoa(c.Ctx.Input.Port())//c.Ctx.Input.Site() + ":" + port +
@@ -40,12 +40,18 @@ func (this *UserController) Index() {
 		return
 	}
 	//2.取得客户端用户名
-	ck, err := this.Ctx.Request.Cookie("uname")
-	if err == nil {
-		this.Data["Uname"] = ck.Value
-	} else {
-		beego.Error(err)
+	sess, _ := globalSessions.SessionStart(this.Ctx.ResponseWriter, this.Ctx.Request)
+	defer sess.SessionRelease(this.Ctx.ResponseWriter)
+	v := sess.Get("uname")
+	if v != nil {
+		this.Data["Uname"] = v.(string)
 	}
+	// ck, err := this.Ctx.Request.Cookie("uname")
+	// if err == nil {
+	// 	this.Data["Uname"] = ck.Value
+	// } else {
+	// 	beego.Error(err)
+	// }
 	//2.取得客户端用户名
 	// ck, err := c.Ctx.Request.Cookie("uname")
 	// if err != nil {
@@ -89,34 +95,40 @@ func (this *UserController) Index() {
 	users, count := m.Getuserlist(1, 2000, "Id")
 	if this.IsAjax() {
 		this.Data["json"] = &map[string]interface{}{"total": count, "rows": &users}
-		this.ServeJson()
+		this.ServeJSON()
 		return
 	} else {
 		// tree := this.GetTree()
 		// this.Data["tree"] = &tree
 		this.Data["Users"] = &users
-		this.TplNames = "user.tpl"
+		this.TplName = "user.tpl"
 		// if this.GetTemplatetype() != "easyui" {
 		// this.Layout = this.GetTemplatetype() + "/public/layout.tpl"
 		// }
-		// this.TplNames = this.GetTemplatetype() + "/rbac/user.tpl"
+		// this.TplName = this.GetTemplatetype() + "/rbac/user.tpl"
 	}
 
 }
 
 func (this *UserController) View() {
 	// c.Data["IsCategory"] = true
-	// c.TplNames = "category.tpl"
+	// c.TplName = "category.tpl"
 	this.Data["IsLogin"] = checkAccount(this.Ctx)
 	//2.取得客户端用户名
-	ck, err := this.Ctx.Request.Cookie("uname")
-	if err != nil {
-		beego.Error(err)
-	} else {
-		this.Data["Uname"] = ck.Value
+	sess, _ := globalSessions.SessionStart(this.Ctx.ResponseWriter, this.Ctx.Request)
+	defer sess.SessionRelease(this.Ctx.ResponseWriter)
+	v := sess.Get("uname")
+	if v != nil {
+		this.Data["Uname"] = v.(string)
 	}
+	// ck, err := this.Ctx.Request.Cookie("uname")
+	// if err != nil {
+	// 	beego.Error(err)
+	// } else {
+	// 	this.Data["Uname"] = ck.Value
+	// }
 	// userid, _ := this.GetInt64("Id")
-	// id := this.Ctx.Input.Params["0"]这里为何无效？？？？这个需要routers中设置AutoRouter
+	// id := this.Ctx.Input.Param("0")这里为何无效？？？？这个需要routers中设置AutoRouter
 	// beego.Info(id)
 	// userid, _ := strconv.ParseInt(id, 10, 64)
 
@@ -143,14 +155,14 @@ func (this *UserController) View() {
 	// 	users = []orm.Params{}
 	// }
 	// this.Data["json"] = &map[string]interface{}{"total": count, "rows": &users}
-	// this.ServeJson()
+	// this.ServeJSON()
 	// return
 	// } else {
 	this.Data["User"] = user
 	this.Data["Role"] = list
 	// this.Data["Users"] = &users
-	this.TplNames = "admin_user_view.tpl"
-	// this.TplNames = this.GetTemplatetype() + "/rbac/roletouserlist.tpl"
+	this.TplName = "admin_user_view.tpl"
+	// this.TplName = this.GetTemplatetype() + "/rbac/roletouserlist.tpl"
 	// }
 }
 
@@ -242,7 +254,7 @@ func (this *UserController) UpdateUser() {
 			}
 		}
 	}
-	this.TplNames = "user_view.tpl"
+	this.TplName = "user_view.tpl"
 }
 
 func (this *UserController) DelUser() {
@@ -261,22 +273,28 @@ func (this *UserController) DelUser() {
 
 func (this *UserController) GetUserByUsername() {
 	// 	c.Data["IsCategory"] = true
-	// c.TplNames = "category.tpl"
+	// c.TplName = "category.tpl"
 	this.Data["IsLogin"] = checkAccount(this.Ctx)
 	//2.取得客户端用户名
-	ck, err := this.Ctx.Request.Cookie("uname")
-	if err != nil {
-		beego.Error(err)
-	} else {
-		this.Data["Uname"] = ck.Value
+	sess, _ := globalSessions.SessionStart(this.Ctx.ResponseWriter, this.Ctx.Request)
+	defer sess.SessionRelease(this.Ctx.ResponseWriter)
+	v := sess.Get("uname")
+	if v != nil {
+		this.Data["Uname"] = v.(string)
 	}
+	// ck, err := this.Ctx.Request.Cookie("uname")
+	// if err != nil {
+	// 	beego.Error(err)
+	// } else {
+	// 	this.Data["Uname"] = ck.Value
+	// }
 	username := this.Input().Get("username")
 	// beego.Info(userid)
 	user := m.GetUserByUsername(username)
-	list, _ := m.GetRoleByUsername(username)
+	list, _, _ := m.GetRoleByUsername(username)
 	this.Data["User"] = user
 	this.Data["Role"] = list
-	this.TplNames = "user_view.tpl"
+	this.TplName = "user_view.tpl"
 }
 
 //上传excel文件，导入到数据库

@@ -30,39 +30,46 @@ type MainController struct {
 // 	c.Data["Email"] = "your.email.address@example.com"
 // 	c.Data["EmailName"] = "Your Name"
 // 	c.Data["Id"] = c.Ctx.Input.Param(":id")
-// 	c.TplNames = "index.tpl" //"default/hello.tpl"
+// 	c.TplName = "index.tpl" //"default/hello.tpl"
 
 // }
 
 func (c *MainController) Help() {
 	c.Data["IsLogin"] = checkAccount(c.Ctx)
 	c.Data["IsHelp"] = true
-	//2.取得客户端用户名
-	ck, err := c.Ctx.Request.Cookie("uname")
-	if err != nil {
-		beego.Error(err)
-	} else {
-		c.Data["Uname"] = ck.Value
+	sess, _ := globalSessions.SessionStart(c.Ctx.ResponseWriter, c.Ctx.Request)
+	defer sess.SessionRelease(c.Ctx.ResponseWriter)
+	v := sess.Get("uname")
+	if v != nil {
+
+		// } else {
+		// }
+		//2.取得客户端用户名
+		// ck, err := c.Ctx.Request.Cookie("uname")
+		// if err != nil {
+		// beego.Error(err)
+		// } else {
+		c.Data["Uname"] = v.(string) //ck.Value
 	}
-	c.TplNames = "help.html"
+	c.TplName = "help.html"
 
 }
 func (c *MainController) Test() {
 	// c.Data["IsLogin"] = checkAccount(c.Ctx)
 	// c.Data["IsHelp"] = true
-	c.TplNames = "test.tpl"
+	c.TplName = "test.tpl"
 
 }
 func (c *MainController) Test1() {
 	// c.Data["IsLogin"] = checkAccount(c.Ctx)
 	// c.Data["IsHelp"] = true
-	c.TplNames = "test1.tpl"
+	c.TplName = "test1.tpl"
 
 }
 func (c *MainController) Test2() {
 	// c.Data["IsLogin"] = checkAccount(c.Ctx)
 	// c.Data["IsHelp"] = true
-	c.TplNames = "test2.tpl"
+	c.TplName = "test2.tpl"
 
 }
 func (c *MainController) Get() {
@@ -90,15 +97,21 @@ func (c *MainController) Get() {
 	// c.Data["Email"] = "astaxie@gmail.com"
 	beego.Info(c.Ctx.Input.IP())
 	c.Data["IsHome"] = true
-	c.TplNames = "index.tpl"
+	c.TplName = "index.tpl"
 	c.Data["IsLogin"] = checkAccount(c.Ctx) //大小写害死人！IsLogin
 	//2.取得客户端用户名
-	ck, err := c.Ctx.Request.Cookie("uname")
-	if err != nil {
-		beego.Error(err)
-	} else {
-		c.Data["Uname"] = ck.Value
+	// sess, _ = globalSessions.SessionStart(c.Ctx.ResponseWriter, c.Ctx.Request)
+	// defer sess.SessionRelease(c.Ctx.ResponseWriter)
+	v := sess.Get("uname")
+	if v != nil {
+		c.Data["Uname"] = v.(string) //ck.Value
 	}
+	// ck, err := c.Ctx.Request.Cookie("uname")
+	// if err != nil {
+	// 	beego.Error(err)
+	// } else {
+	// 	c.Data["Uname"] = ck.Value
+	// }
 	c.Data["Id"] = c.Ctx.Input.Param(":id")
 	topics, err := models.GetAllTopics(c.Input().Get("cate"), true)
 	if err != nil {
@@ -120,22 +133,44 @@ func (c *MainController) Get() {
 	// b, err := json.Marshal(categories)
 	// if err == nil {
 	// 	c.Data["json"] = categories
-	// 	c.ServeJson()
+	// 	c.ServeJSON()
 	// }
 
 }
 func (c *MainController) Post() {
 
 	c.Data["IsHome"] = true
-	c.TplNames = "index.tpl"
+	c.TplName = "index.tpl"
 	c.Data["IsLogin"] = checkAccount(c.Ctx) //大小写害死人！IsLogin
 	//2.取得客户端用户名
-	ck, err := c.Ctx.Request.Cookie("uname")
-	if err != nil {
-		beego.Error(err)
-	} else {
-		c.Data["Uname"] = ck.Value
+	// 	type Controller
+	// type Controller struct {
+	//     // context data
+	//     Ctx  *context.Context
+	//     Data map[interface{}]interface{}
+	//下面的Ctx是因为beego的Controller方法里写好了Ctx  *context.Context
+
+	// 	type Context
+
+	// type Context struct {
+	//     Input          *BeegoInput
+	//     Output         *BeegoOutput
+	//     Request        *http.Request
+	//     ResponseWriter *Response
+	//     // contains filtered or unexported fields
+	// }
+	sess, _ := globalSessions.SessionStart(c.Ctx.ResponseWriter, c.Ctx.Request)
+	defer sess.SessionRelease(c.Ctx.ResponseWriter)
+	v := sess.Get("uname")
+	if v != nil {
+		c.Data["Uname"] = v.(string) //ck.Value
 	}
+	// ck, err := c.Ctx.Request.Cookie("uname")
+	// if err != nil {
+	// 	beego.Error(err)
+	// } else {
+	// 	c.Data["Uname"] = ck.Value
+	// }
 	c.Data["Id"] = c.Ctx.Input.Param(":id")
 	topics, err := models.GetAllTopics(c.Input().Get("cate"), true)
 	if err != nil {
@@ -158,13 +193,13 @@ func (c *MainController) Post() {
 	if err == nil {
 		// c.Ctx.WriteString(string(b))
 		c.Data["json"] = categories
-		c.ServeJson()
+		c.ServeJSON()
 	}
 	// 你自己判断比如
 	// if isMobile {
-	// 	c.ServeJson()
+	// 	c.ServeJSON()
 	// } else {
-	// 	c.TplNames = "xxx"
+	// 	c.TplName = "xxx"
 	// }
 
 	// js, err := simplejson.NewJson(b)

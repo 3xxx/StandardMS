@@ -95,7 +95,7 @@ func (c *UeditorController) ControllerUE() {
 		var r interface{}
 		json.Unmarshal(tt, &r) //这个byte要解码
 		c.Data["json"] = r
-		c.ServeJson()
+		c.ServeJSON()
 
 		//下面这段是测试用的
 		// b := []byte(`{
@@ -112,7 +112,7 @@ func (c *UeditorController) ControllerUE() {
 		// var r interface{}
 		// json.Unmarshal(b, &r)
 		// c.Data["json"] = r
-		// c.ServeJson()
+		// c.ServeJSON()
 	case "uploadimage", "uploadfile", "uploadvideo":
 		// file, header, err := c.GetFile("upfile") // r.FormFile("upfile")
 		// if err != nil {
@@ -185,7 +185,7 @@ func (c *UeditorController) ControllerUE() {
 		// c.Data["json"] = map[string]interface{}{"state": "SUCCESS", "url": "/static/upload/" + filename, "title": filename, "original": filename}
 		c.Data["json"] = map[string]interface{}{"state": "SUCCESS", "url": "/attachment/" + number + name + "/" + h.Filename, "title": h.Filename, "original": h.Filename}
 
-		c.ServeJson()
+		c.ServeJSON()
 		// 		{
 		//     "state": "SUCCESS",
 		//     "url": "upload/demo.jpg",
@@ -219,7 +219,7 @@ func (c *UeditorController) ControllerUE() {
 			"title":    newname + ".jpg",
 			"original": newname + ".jpg",
 		}
-		c.ServeJson()
+		c.ServeJSON()
 	case "listimage":
 		type List struct {
 			Url string `json:"url"`
@@ -265,9 +265,9 @@ func (c *UeditorController) ControllerUE() {
 		// mystruct := { ... }
 		// c.Data["jsonp"] = listimage
 		// beego.Info(string(b)){"State":"SUCCESS","List":[{"Url":"/static/upload/1.jpg"},{"Url":"/static/upload/2.jpg"}],"Start":1,"Total":21}
-		// c.ServeJsonp()
+		// c.ServeJSONP()
 		c.Data["json"] = listimage
-		c.ServeJson()
+		c.ServeJSON()
 		// c.Data["json"] = map[string]interface{}{"State":"SUCCESS","List":[{"Url":"/static/upload/1.jpg"},{"Url":"/static/upload/2.jpg"}],"Start":1,"Total":21}
 
 		// 需要支持callback参数,返回jsonp格式
@@ -327,9 +327,9 @@ func (c *UeditorController) ControllerUE() {
 		// mystruct := { ... }
 		// c.Data["jsonp"] = catchimage
 		// beego.Info(string(b)){"State":"SUCCESS","List":[{"Url":"/static/upload/1.jpg"},{"Url":"/static/upload/2.jpg"}],"Start":1,"Total":21}
-		// c.ServeJsonp()
+		// c.ServeJSONP()
 		c.Data["json"] = catchimage
-		c.ServeJson()
+		c.ServeJSON()
 
 		file, header, err := c.GetFile("source") // r.FormFile("upfile")
 		beego.Info(header.Filename)
@@ -370,7 +370,7 @@ func (c *UeditorController) ControllerUE() {
 		// 	original: header.Filename,
 		// }
 		// c.Data["json"] = f
-		// c.ServeJson()
+		// c.ServeJSON()
 		// 	reply := &Comment{
 		// Tid:     tidNum,
 		// Name:    nickname,
@@ -489,7 +489,7 @@ func (c *UeditorController) ControllerUE() {
 // 			"original": h.Filename,                                     //原始文件名
 // 			"state":    "SUCCESS",                                      //上传状态，成功时返回SUCCESS,其他任何值将原样返回至图片上传框中
 // 		}
-// 		c.ServeJson()
+// 		c.ServeJSON()
 // 		// beego.Info(c.Data["json"])
 // 		// 2016/01/17 01:42:00 [category.go:554] [I] map[success:1 message:111 url:/attachm
 // 		// ent/test/u1.png]
@@ -556,7 +556,7 @@ func (c *UeditorController) UploadImage() { //对应这个路由 beego.Router("/
 	defer outFile.Close()
 	io.Copy(outFile, file)
 	c.Data["json"] = map[string]interface{}{"state": "SUCCESS", "url": "/static/upload/" + filename, "title": "111", "original": "demo.jpg"}
-	c.ServeJson()
+	c.ServeJSON()
 	// "state": "SUCCESS",
 	// "url": "upload/demo.jpg",
 	// "title": "demo.jpg",
@@ -573,5 +573,5 @@ func (c *UeditorController) UploadImage() { //对应这个路由 beego.Router("/
 	// 	"state":    "SUCCESS",                                      //上传状态，成功时返回SUCCESS,其他任何值将原样返回至图片上传框中
 	// }
 	// c.Data["json"] = b
-	// c.ServeJson()
+	// c.ServeJSON()
 }

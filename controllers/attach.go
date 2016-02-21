@@ -40,29 +40,38 @@ func (c *AttachController) Get() {
 		if !checkAccount(c.Ctx) {
 			// route, _ := url.QueryUnescape(c.Ctx.Request.RequestURI)
 			port := strconv.Itoa(c.Ctx.Input.Port())
-			route := c.Ctx.Input.Site() + ":" + port + c.Ctx.Input.Url()
+			route := c.Ctx.Input.Site() + ":" + port + c.Ctx.Input.URL()
 			c.Data["Url"] = route
 			c.Redirect("/login?url="+route, 302)
 			return
 		}
 		//2.取得客户端用户名
-		ck, err := c.Ctx.Request.Cookie("uname")
-		if err != nil {
-			beego.Error(err)
-		}
-		uname := ck.Value
+		sess, _ := globalSessions.SessionStart(c.Ctx.ResponseWriter, c.Ctx.Request)
+		defer sess.SessionRelease(c.Ctx.ResponseWriter)
+		v := sess.Get("uname")
+		// if v != nil {
+		uname := v.(string)
+		// }
+		// ck, err := c.Ctx.Request.Cookie("uname")
+		// if err != nil {
+		// 	beego.Error(err)
+		// }
+		// uname := ck.Value
 		// beego.Info(uname)
 		//3.取出用户的权限等级
 		role, _ := checkRole(c.Ctx) //login里的
 		// beego.Info(role)
 		//3.由路径查询数据库中的用户名
 		username, err := models.GetattatchAuthor(route)
+		if err != nil {
+			beego.Error(err)
+		}
 		// beego.Info(username)
 		//4.判断权限,如果用户访问的是doc/dwg/xls类，则需要注册和权限大于等于3.
 		rolename, _ := strconv.ParseInt(role, 10, 64)
 		if rolename > 3 && uname != username {
 			port := strconv.Itoa(c.Ctx.Input.Port())
-			route := c.Ctx.Input.Site() + ":" + port + c.Ctx.Input.Url()
+			route := c.Ctx.Input.Site() + ":" + port + c.Ctx.Input.URL()
 			c.Data["Url"] = route
 			// c.Redirect("/login?url="+route, 302)
 			c.Redirect("/roleerr?url="+route, 302)
@@ -76,33 +85,42 @@ func (c *AttachController) Get() {
 			// route, _ := url.QueryUnescape(c.Ctx.Request.RequestURI)
 			// beego.Info(route)
 			port := strconv.Itoa(c.Ctx.Input.Port())
-			route := c.Ctx.Input.Site() + ":" + port + c.Ctx.Input.Url()
+			route := c.Ctx.Input.Site() + ":" + port + c.Ctx.Input.URL()
 			// beego.Info(c.Ctx.Input.Site()) //http://localhost
 			// beego.Info(c.Ctx.Input.Port())
-			// beego.Info(c.Ctx.Input.Uri())
-			// beego.Info(c.Ctx.Input.Url()) // /attachment/DL65987 注册后用户名登陆测
+			// beego.Info(c.Ctx.Input.URI())
+			// beego.Info(c.Ctx.Input.URL()) // /attachment/DL65987 注册后用户名登陆测
 			c.Data["Url"] = route
 			c.Redirect("/login?url="+route, 302)
 			return
 		}
 		//2.取得客户端用户名
-		ck, err := c.Ctx.Request.Cookie("uname")
-		if err != nil {
-			beego.Error(err)
-		}
-		uname := ck.Value
+		sess, _ := globalSessions.SessionStart(c.Ctx.ResponseWriter, c.Ctx.Request)
+		defer sess.SessionRelease(c.Ctx.ResponseWriter)
+		v := sess.Get("uname")
+		// if v != nil {
+		uname := v.(string)
+		// }
+		// ck, err := c.Ctx.Request.Cookie("uname")
+		// if err != nil {
+		// 	beego.Error(err)
+		// }
+		// uname := ck.Value
 		// beego.Info(uname)
 		//3.取出用户的权限等级
 		role, _ := checkRole(c.Ctx) //login里的
 		// beego.Info(role)
 		//3.由路径查询数据库中的用户名
 		username, err := models.GetattatchAuthor(route)
+		if err != nil {
+			beego.Error(err)
+		}
 		// beego.Info(username)
 		//4.判断权限,如果用户访问的是pdf/jpg/diary类，则需要注册和权限4.
 		rolename, _ := strconv.ParseInt(role, 10, 64)
 		if rolename > 4 && uname != username {
 			port := strconv.Itoa(c.Ctx.Input.Port())
-			route := c.Ctx.Input.Site() + ":" + port + c.Ctx.Input.Url()
+			route := c.Ctx.Input.Site() + ":" + port + c.Ctx.Input.URL()
 			c.Data["Url"] = route
 			// c.Redirect("/login?url="+route, 302)
 			c.Redirect("/roleerr?url="+route, 302)

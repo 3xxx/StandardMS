@@ -32,17 +32,23 @@ func (c *CatalogController) Get() {
 		return
 	}
 	//2.取得客户端用户名
-	ck, err := c.Ctx.Request.Cookie("uname")
-	if err == nil {
-		c.Data["Uname"] = ck.Value
-	} else {
-		beego.Error(err)
+	sess, _ := globalSessions.SessionStart(c.Ctx.ResponseWriter, c.Ctx.Request)
+	defer sess.SessionRelease(c.Ctx.ResponseWriter)
+	v := sess.Get("uname")
+	if v != nil {
+		c.Data["Uname"] = v.(string) //uname := v.(string)
 	}
+	// ck, err := c.Ctx.Request.Cookie("uname")
+	// if err == nil {
+	//
+	// } else {
+	// 	beego.Error(err)
+	// }
 
 	c.Data["IsCatalog"] = true
 	c.Data["IsLogin"] = checkAccount(c.Ctx)
 
-	c.TplNames = "catalog.tpl"
+	c.TplName = "catalog.tpl"
 	// cid := c.Input().Get("cid")
 	catalogs, err := m.GetAllCatalogs("0") //这里传入空字符串
 	if err != nil {
@@ -58,24 +64,30 @@ func (c *CatalogController) View() {
 	//1.首先判断是否注册
 	// if !checkAccount(c.Ctx) {
 	// 	port := strconv.Itoa(c.Ctx.Input.Port())
-	// 	route := c.Ctx.Input.Site() + ":" + port + c.Ctx.Input.Url()
+	// 	route := c.Ctx.Input.Site() + ":" + port + c.Ctx.Input.URL()
 	// 	c.Data["Url"] = route
 	// 	c.Redirect("/login?url="+route, 302)
 	// 	// c.Redirect("/login", 302)
 	// 	return
 	// }
 	//2.取得客户端用户名
-	ck, err := c.Ctx.Request.Cookie("uname")
-	if err == nil {
-		c.Data["Uname"] = ck.Value
-	} else {
-		beego.Error(err)
+	sess, _ := globalSessions.SessionStart(c.Ctx.ResponseWriter, c.Ctx.Request)
+	defer sess.SessionRelease(c.Ctx.ResponseWriter)
+	v := sess.Get("uname")
+	if v != nil {
+		c.Data["Uname"] = v.(string)
 	}
+	// ck, err := c.Ctx.Request.Cookie("uname")
+	// if err == nil {
+	// 	 = ck.Value
+	// } else {
+	// 	beego.Error(err)
+	// }
 
 	c.Data["IsCatalog"] = true
 	c.Data["IsLogin"] = checkAccount(c.Ctx)
 
-	c.TplNames = "catalog_view.tpl"
+	c.TplName = "catalog_view.tpl"
 	cid := c.Input().Get("id")
 	// beego.Info(cid)
 	// cid, _ := strconv.ParseInt(c.Input().Get("id"), 10, 64)
@@ -106,7 +118,7 @@ func (c *CatalogController) Add() { //这个作废，用上面的get
 	// id := c.Input().Get("id")
 	// mid := c.Input().Get("mid")
 
-	c.TplNames = "catalog.tpl"
+	c.TplName = "catalog.tpl"
 
 	//取得成果类型id的专业parentid以及阶段parentid以及项目parentid才行
 	// c.Data["Category"] = category
@@ -203,19 +215,19 @@ func (c *CatalogController) Add() { //这个作废，用上面的get
 // 	c.Data["IsCatalog"] = true
 
 // 	//这里是通过文章的id获得文章及上级目录情况
-// 	// catalogproj, err := models.GetCatalogProj(c.Ctx.Input.Params["0"])
-// 	// catalogphase, err := models.GetCatalogPhase(c.Ctx.Input.Params["0"])
-// 	// catalogspec, err := models.GetCatalogSpec(c.Ctx.Input.Params["0"])
-// 	// _, catalogchengguo, err := models.GetCatalogChengguo(c.Ctx.Input.Params["0"])
+// 	// catalogproj, err := models.GetCatalogProj(c.Ctx.Input.Param("0"))
+// 	// catalogphase, err := models.GetCatalogPhase(c.Ctx.Input.Param("0"))
+// 	// catalogspec, err := models.GetCatalogSpec(c.Ctx.Input.Param("0"))
+// 	// _, catalogchengguo, err := models.GetCatalogChengguo(c.Ctx.Input.Param("0"))
 // 	// if catalogchengguo.Title == "diary" {
-// 	// 	c.TplNames = "diary_view1.html"
+// 	// 	c.TplName = "diary_view1.html"
 // 	// } else {
-// 	// 	c.TplNames = "catalog_view.html"
+// 	// 	c.TplName = "catalog_view.html"
 // 	// }
 
-// 	// catalog, attachment, err := models.GetCatalog(c.Ctx.Input.Params["0"])
+// 	// catalog, attachment, err := models.GetCatalog(c.Ctx.Input.Param("0"))
 // 	//articleId, _ := strconv.Atoi(manage.Ctx.Input.Param(":id"))
-// 	//id, _ := strconv.Atoi(manage.Ctx.Input.Params[":id"])
+// 	//id, _ := strconv.Atoi(manage.Ctx.Input.Param(":id"))
 // 	// if err != nil {
 // 	// 	beego.Error(err)
 // 	// 	c.Redirect("/", 302)
@@ -227,9 +239,9 @@ func (c *CatalogController) Add() { //这个作废，用上面的get
 // 	// c.Data["CatalogChengguo"] = Catalogchengguo
 // 	// c.Data["Catalog"] = catalog
 // 	// c.Data["Attachment"] = attachment
-// 	c.Data["Tid"] = c.Ctx.Input.Params["0"] //教程中用的是圆括号，导致错误Catalog.go:52: cannot call non-function c.Controller.Ctx.Input.Params (type map[string]string)
+// 	c.Data["Tid"] = c.Ctx.Input.Param("0") //教程中用的是圆括号，导致错误Catalog.go:52: cannot call non-function c.Controller.Ctx.Input.Params (type map[string]string)
 // 	//教程第8章开头有修改
-// 	replies, err := models.GetAllReplies(c.Ctx.Input.Params["0"])
+// 	replies, err := models.GetAllReplies(c.Ctx.Input.Param("0"))
 // 	if err != nil {
 // 		beego.Error(err)
 // 		return
@@ -306,7 +318,7 @@ func (c *CatalogController) Add() { //这个作废，用上面的get
 // 		c.Redirect("/login", 302)
 // 		return
 // 	}
-// 	err := models.DeletCatalog(c.Input().Get("tid")) //(c.Ctx.Input.Params["0"])
+// 	err := models.DeletCatalog(c.Input().Get("tid")) //(c.Ctx.Input.Param("0"))
 // 	if err != nil {
 // 		beego.Error(err)
 // 	}
@@ -436,6 +448,6 @@ func (c *CatalogController) Import_Xls_Catalog() {
 			// }
 		}
 	}
-	c.TplNames = "catalog.tpl"
+	c.TplName = "catalog.tpl"
 	c.Redirect("/catalog/view?id="+id1, 302)
 }

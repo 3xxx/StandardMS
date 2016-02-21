@@ -25,10 +25,10 @@ package controllers
 // 		}
 // 		nodes, count := m.GetGrouplist(page, page_size, sort)
 // 		this.Data["json"] = &map[string]interface{}{"total": count, "rows": &nodes}
-// 		this.ServeJson()
+// 		this.ServeJSON()
 // 		return
 // 	} else {
-// 		this.TplNames = this.GetTemplatetype() + "/rbac/group.tpl"
+// 		this.TplName = this.GetTemplatetype() + "/rbac/group.tpl"
 // 	}
 
 // }

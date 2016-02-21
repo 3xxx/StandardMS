@@ -193,14 +193,20 @@ func (c *CategoryController) Get() {
 	case "view":
 		c.Data["IsLogin"] = checkAccount(c.Ctx)
 		c.Data["IsCategory"] = true
-		c.TplNames = "category_view.html"
+		c.TplName = "category_view.html"
 		//2.取得客户端用户名
-		ck, err := c.Ctx.Request.Cookie("uname")
-		if err == nil {
-			c.Data["Uname"] = ck.Value
-		} else {
-			beego.Error(err)
+		sess, _ := globalSessions.SessionStart(c.Ctx.ResponseWriter, c.Ctx.Request)
+		defer sess.SessionRelease(c.Ctx.ResponseWriter)
+		v := sess.Get("uname")
+		if v != nil {
+			c.Data["Uname"] = v.(string)
 		}
+		// ck, err := c.Ctx.Request.Cookie("uname")
+		// if err == nil {
+		// 	c.Data["Uname"] = ck.Value
+		// } else {
+		// 	beego.Error(err)
+		// }
 		id := c.Input().Get("id")
 		if len(id) == 0 {
 			break
@@ -239,19 +245,25 @@ func (c *CategoryController) Get() {
 		c.Data["IsLogin"] = checkAccount(c.Ctx)
 		c.Data["IsCategoryb"] = true
 		//2.取得客户端用户名
-		ck, err := c.Ctx.Request.Cookie("uname")
-		if err == nil {
-			c.Data["Uname"] = ck.Value
-		} else {
-			beego.Error(err)
+		sess, _ := globalSessions.SessionStart(c.Ctx.ResponseWriter, c.Ctx.Request)
+		defer sess.SessionRelease(c.Ctx.ResponseWriter)
+		v := sess.Get("uname")
+		if v != nil {
+			c.Data["Uname"] = v.(string)
 		}
+		// ck, err := c.Ctx.Request.Cookie("uname")
+		// if err == nil {
+		// 	c.Data["Uname"] = ck.Value
+		// } else {
+		// 	beego.Error(err)
+		// }
 		id := c.Input().Get("id")
 		if len(id) == 0 {
 			break
 		}
 
 		category, _ := models.GetCategory(id) //由成果id取出成果
-		c.TplNames = "category_view_b.html"
+		c.TplName = "category_view_b.html"
 		categorychengguo, _ := models.GetCategoryChengguo(id)
 		categoryzhuanye, _ := models.GetCategoryLeixing(id)
 		categoryjieduan, _ := models.GetCategoryJieduan(id)
@@ -281,15 +293,21 @@ func (c *CategoryController) Get() {
 		c.Data["Categories"] = categories
 	default:
 		c.Data["IsCategory"] = true
-		c.TplNames = "category.tpl"
+		c.TplName = "category.tpl"
 		c.Data["IsLogin"] = checkAccount(c.Ctx)
 		//2.取得客户端用户名
-		ck, err := c.Ctx.Request.Cookie("uname")
-		if err == nil {
-			c.Data["Uname"] = ck.Value
-		} else {
-			beego.Error(err)
+		sess, _ := globalSessions.SessionStart(c.Ctx.ResponseWriter, c.Ctx.Request)
+		defer sess.SessionRelease(c.Ctx.ResponseWriter)
+		v := sess.Get("uname")
+		if v != nil {
+			c.Data["Uname"] = v.(string)
 		}
+		// ck, err := c.Ctx.Request.Cookie("uname")
+		// if err == nil {
+		// 	c.Data["Uname"] = ck.Value
+		// } else {
+		// 	beego.Error(err)
+		// }
 		// var err error
 		categories, err := models.GetAllCategories()
 		if err != nil {
@@ -327,15 +345,21 @@ func (c *CategoryController) Get() {
 
 func (c *CategoryController) Get_b() { //项目B显示控制
 	c.Data["IsCategoryb"] = true
-	c.TplNames = "category_b.tpl"
+	c.TplName = "category_b.tpl"
 	c.Data["IsLogin"] = checkAccount(c.Ctx)
 	//2.取得客户端用户名
-	ck, err := c.Ctx.Request.Cookie("uname")
-	if err != nil {
-		beego.Error(err)
-	} else {
-		c.Data["Uname"] = ck.Value
+	sess, _ := globalSessions.SessionStart(c.Ctx.ResponseWriter, c.Ctx.Request)
+	defer sess.SessionRelease(c.Ctx.ResponseWriter)
+	v := sess.Get("uname")
+	if v != nil {
+		c.Data["Uname"] = v.(string)
 	}
+	// ck, err := c.Ctx.Request.Cookie("uname")
+	// if err != nil {
+	// 	beego.Error(err)
+	// } else {
+	// 	c.Data["Uname"] = ck.Value
+	// }
 	// var err error
 	categories, err := models.GetAllCategories()
 	if err != nil {
@@ -572,7 +596,7 @@ func (c *CategoryController) Uploadimagesct() {
 		c.Data["json"] = map[string]interface{}{"success": 1, "message": "111", "url": route}
 		// c.Data["json"] = map[string]interface{}{"state": "SUCCESS", "title": "111", "original": "demo.jpg", "url": route}
 		// c.Data["json"] = f
-		c.ServeJson()
+		c.ServeJSON()
 		// beego.Info(c.Data["json"])
 		// 2016/01/17 01:42:00 [category.go:554] [I] map[success:1 message:111 url:/attachm
 		// ent/test/u1.png]
@@ -730,11 +754,17 @@ func (c *CategoryController) UserdefinedPost() {
 	} else {
 		route = ""
 	}
-	ck, err := c.Ctx.Request.Cookie("uname")
-	if err != nil {
-		beego.Error(err)
-	}
-	uname := ck.Value
+	sess, _ := globalSessions.SessionStart(c.Ctx.ResponseWriter, c.Ctx.Request)
+	defer sess.SessionRelease(c.Ctx.ResponseWriter)
+	v := sess.Get("uname")
+	// if v != nil {
+	uname := v.(string)
+	// }
+	// ck, err := c.Ctx.Request.Cookie("uname")
+	// if err != nil {
+	// 	beego.Error(err)
+	// }
+	// uname := ck.Value
 
 	//存入数据库
 	var id int64
@@ -750,7 +780,7 @@ func (c *CategoryController) UserdefinedPost() {
 	// if err != nil {
 	// 	beego.Error(err)
 	// }
-	c.Data["Uname"] = ck.Value
+	c.Data["Uname"] = v.(string)
 }
 
 func (c *CategoryController) Add() {
@@ -764,12 +794,18 @@ func (c *CategoryController) Add() {
 		return
 	}
 	//2.取得客户端用户名
-	ck, err := c.Ctx.Request.Cookie("uname")
-	if err == nil {
-		c.Data["Uname"] = ck.Value
-	} else {
-		beego.Error(err)
+	sess, _ := globalSessions.SessionStart(c.Ctx.ResponseWriter, c.Ctx.Request)
+	defer sess.SessionRelease(c.Ctx.ResponseWriter)
+	v := sess.Get("uname")
+	if v != nil {
+		c.Data["Uname"] = v.(string)
 	}
+	// ck, err := c.Ctx.Request.Cookie("uname")
+	// if err == nil {
+	// 	c.Data["Uname"] = ck.Value
+	// } else {
+	// 	beego.Error(err)
+	// }
 	//2.取得客户端用户名
 	// ck, err := c.Ctx.Request.Cookie("uname")
 	// if err != nil {
@@ -792,7 +828,7 @@ func (c *CategoryController) Add() {
 
 	c.Data["IsLogin"] = checkAccount(c.Ctx)
 	c.Data["IsCategory"] = true
-	c.TplNames = "category_add.tpl"
+	c.TplName = "category_add.tpl"
 	// id := c.Input().Get("id")
 	// category, err := models.GetCategory(id)
 	// if err != nil {
@@ -815,12 +851,18 @@ func (c *CategoryController) Add_b() {
 		return
 	}
 	//2.取得客户端用户名
-	ck, err := c.Ctx.Request.Cookie("uname")
-	if err == nil {
-		c.Data["Uname"] = ck.Value
-	} else {
-		beego.Error(err)
+	sess, _ := globalSessions.SessionStart(c.Ctx.ResponseWriter, c.Ctx.Request)
+	defer sess.SessionRelease(c.Ctx.ResponseWriter)
+	v := sess.Get("uname")
+	if v != nil {
+		c.Data["Uname"] = v.(string)
 	}
+	// ck, err := c.Ctx.Request.Cookie("uname")
+	// if err == nil {
+	// 	c.Data["Uname"] = ck.Value
+	// } else {
+	// 	beego.Error(err)
+	// }
 
 	//2.取得客户端用户名
 	// ck, err := c.Ctx.Request.Cookie("uname")
@@ -843,7 +885,7 @@ func (c *CategoryController) Add_b() {
 	}
 	c.Data["IsLogin"] = checkAccount(c.Ctx)
 	c.Data["IsCategory"] = true
-	c.TplNames = "category_add_b.tpl"
+	c.TplName = "category_add_b.tpl"
 	// id := c.Input().Get("id")
 	// category, err := models.GetCategory(id)
 	// if err != nil {
@@ -859,14 +901,20 @@ func (c *CategoryController) Add_b() {
 func (c *CategoryController) Viewbyuname() {
 	c.Data["IsLogin"] = checkAccount(c.Ctx)
 	c.Data["IsCategory"] = true
-	c.TplNames = "category_uname.tpl"
+	c.TplName = "category_uname.tpl"
 	//2.取得客户端用户名
-	ck, err := c.Ctx.Request.Cookie("uname")
-	if err == nil {
-		c.Data["Uname"] = ck.Value
-	} else {
-		beego.Error(err)
+	sess, _ := globalSessions.SessionStart(c.Ctx.ResponseWriter, c.Ctx.Request)
+	defer sess.SessionRelease(c.Ctx.ResponseWriter)
+	v := sess.Get("uname")
+	if v != nil {
+		c.Data["Uname"] = v.(string)
 	}
+	// ck, err := c.Ctx.Request.Cookie("uname")
+	// if err == nil {
+	// 	c.Data["Uname"] = ck.Value
+	// } else {
+	// 	beego.Error(err)
+	// }
 	uname := c.Input().Get("uname")
 	// if len(uname) == 0 {
 	// 	break
@@ -907,12 +955,18 @@ func (c *CategoryController) View() {
 	c.Data["IsLogin"] = checkAccount(c.Ctx)
 	c.Data["IsCategory"] = true
 	//2.取得客户端用户名
-	ck, err := c.Ctx.Request.Cookie("uname")
-	if err == nil {
-		c.Data["Uname"] = ck.Value
-	} else {
-		beego.Error(err)
+	sess, _ := globalSessions.SessionStart(c.Ctx.ResponseWriter, c.Ctx.Request)
+	defer sess.SessionRelease(c.Ctx.ResponseWriter)
+	v := sess.Get("uname")
+	if v != nil {
+		c.Data["Uname"] = v.(string)
 	}
+	// ck, err := c.Ctx.Request.Cookie("uname")
+	// if err == nil {
+	// 	c.Data["Uname"] = ck.Value
+	// } else {
+	// 	beego.Error(err)
+	// }
 
 	id := c.Input().Get("id")
 	// if len(id) == 0 {
@@ -920,9 +974,9 @@ func (c *CategoryController) View() {
 	// }
 	category, _ := models.GetCategory(id)
 	if category.Title == "diary" {
-		c.TplNames = "proddiary_view.tpl"
+		c.TplName = "proddiary_view.tpl"
 	} else {
-		c.TplNames = "prod_view.tpl"
+		c.TplName = "prod_view.tpl"
 	}
 	chengguo, _ := models.GetTopicsbyparentid(id, true)
 	//取得成果类型id的专业parentid以及阶段parentid以及项目parentid才行
@@ -975,12 +1029,18 @@ func (c *CategoryController) View_3() {
 	c.Data["IsLogin"] = checkAccount(c.Ctx)
 	c.Data["IsCategory"] = true
 	//2.取得客户端用户名
-	ck, err := c.Ctx.Request.Cookie("uname")
-	if err == nil {
-		c.Data["Uname"] = ck.Value
-	} else {
-		beego.Error(err)
+	sess, _ := globalSessions.SessionStart(c.Ctx.ResponseWriter, c.Ctx.Request)
+	defer sess.SessionRelease(c.Ctx.ResponseWriter)
+	v := sess.Get("uname")
+	if v != nil {
+		c.Data["Uname"] = v.(string)
 	}
+	// ck, err := c.Ctx.Request.Cookie("uname")
+	// if err == nil {
+	// 	c.Data["Uname"] = ck.Value
+	// } else {
+	// 	beego.Error(err)
+	// }
 
 	id := c.Input().Get("id")
 	// if len(id) == 0 {
@@ -988,9 +1048,9 @@ func (c *CategoryController) View_3() {
 	// }
 	category, _ := models.GetCategory(id)
 	if category.Title == "diary" {
-		c.TplNames = "proddiary_view.tpl"
+		c.TplName = "proddiary_view.tpl"
 	} else {
-		c.TplNames = "prod_3_view.tpl"
+		c.TplName = "prod_3_view.tpl"
 	}
 	chengguo, _ := models.GetTopicsbyparentid(id, true)
 	//取得成果类型id的专业parentid以及阶段parentid以及项目parentid才行
@@ -1026,21 +1086,27 @@ func (c *CategoryController) View_b() {
 	c.Data["IsLogin"] = checkAccount(c.Ctx)
 	c.Data["IsCategoryb"] = true
 	//2.取得客户端用户名
-	ck, err := c.Ctx.Request.Cookie("uname")
-	if err == nil {
-		c.Data["Uname"] = ck.Value
-	} else {
-		beego.Error(err)
+	sess, _ := globalSessions.SessionStart(c.Ctx.ResponseWriter, c.Ctx.Request)
+	defer sess.SessionRelease(c.Ctx.ResponseWriter)
+	v := sess.Get("uname")
+	if v != nil {
+		c.Data["Uname"] = v.(string)
 	}
+	// ck, err := c.Ctx.Request.Cookie("uname")
+	// if err == nil {
+	// 	c.Data["Uname"] = ck.Value
+	// } else {
+	// 	beego.Error(err)
+	// }
 	id := c.Input().Get("id")
 	// if len(id) == 0 {
 	// 	break
 	// }
 	category, _ := models.GetCategory(id)
 	if category.Title == "diary" {
-		c.TplNames = "proddiary_view_b.tpl"
+		c.TplName = "proddiary_view_b.tpl"
 	} else {
-		c.TplNames = "prod_view_b.tpl"
+		c.TplName = "prod_view_b.tpl"
 	}
 	chengguo, _ := models.GetTopicsbyparentid(id, true)
 	//取得成果类型id的专业parentid以及阶段parentid以及项目parentid才行
@@ -1075,12 +1141,18 @@ func (c *CategoryController) Category_prod_view() {
 	c.Data["IsLogin"] = checkAccount(c.Ctx)
 	c.Data["IsCategory"] = true
 	//2.取得客户端用户名
-	ck, err := c.Ctx.Request.Cookie("uname")
-	if err == nil {
-		c.Data["Uname"] = ck.Value
-	} else {
-		beego.Error(err)
+	sess, _ := globalSessions.SessionStart(c.Ctx.ResponseWriter, c.Ctx.Request)
+	defer sess.SessionRelease(c.Ctx.ResponseWriter)
+	v := sess.Get("uname")
+	if v != nil {
+		c.Data["Uname"] = v.(string)
 	}
+	// ck, err := c.Ctx.Request.Cookie("uname")
+	// if err == nil {
+	// 	c.Data["Uname"] = ck.Value
+	// } else {
+	// 	beego.Error(err)
+	// }
 	id := c.Input().Get("id")
 	// beego.Info(id)
 	title := c.Input().Get("title")
@@ -1090,7 +1162,7 @@ func (c *CategoryController) Category_prod_view() {
 	// }
 	topics, err := models.GetAllTopics(title, false)
 
-	c.TplNames = "category_prod_view.tpl"
+	c.TplName = "category_prod_view.tpl"
 
 	//由项目id获取所有成果
 	// chengguo, _ := models.GetTopicsbyparentid(id, true)
@@ -1128,7 +1200,7 @@ func (c *CategoryController) Modify() {
 	if !checkAccount(c.Ctx) {
 		// port := strconv.Itoa(c.Ctx.Input.Port())
 		route := c.Ctx.Request.URL.String() //c.Ctx.Input.Site() + ":" + port +
-		// beego.Info(c.Ctx.Input.Url())
+		// beego.Info(c.Ctx.Input.URL())
 
 		c.Data["Url"] = route
 		c.Redirect("/login?url="+route, 302)
@@ -1136,13 +1208,19 @@ func (c *CategoryController) Modify() {
 		return
 	}
 	//2.取得客户端用户名
-	ck, err := c.Ctx.Request.Cookie("uname")
-	if err == nil {
-		c.Data["Uname"] = ck.Value
-	} else {
-		beego.Error(err)
+	sess, _ := globalSessions.SessionStart(c.Ctx.ResponseWriter, c.Ctx.Request)
+	defer sess.SessionRelease(c.Ctx.ResponseWriter)
+	v := sess.Get("uname")
+	if v != nil {
+		c.Data["Uname"] = v.(string)
 	}
-	uname := ck.Value
+	// ck, err := c.Ctx.Request.Cookie("uname")
+	// if err == nil {
+	// 	c.Data["Uname"] = ck.Value
+	// } else {
+	// 	beego.Error(err)
+	// }
+	uname := v.(string) //ck.Value
 	//3.由cid查询数据库中的用户名
 	category, err := models.GetCategory(cid)
 	//4.取出用户的权限等级
@@ -1161,7 +1239,7 @@ func (c *CategoryController) Modify() {
 
 	c.Data["IsLogin"] = checkAccount(c.Ctx)
 	c.Data["IsCategoryb"] = true
-	c.TplNames = "category_modify.tpl"
+	c.TplName = "category_modify.tpl"
 
 	categorychengguo, err := models.GetCategoryChengguo(cid)
 	if err != nil {
@@ -1267,7 +1345,7 @@ func (c *CategoryController) Modify() {
 func (c *CategoryController) ModifyCategory() {
 	// if !checkAccount(c.Ctx) {
 	// 	port := strconv.Itoa(c.Ctx.Input.Port())
-	// 	route := c.Ctx.Input.Site() + ":" + port + c.Ctx.Input.Url()
+	// 	route := c.Ctx.Input.Site() + ":" + port + c.Ctx.Input.URL()
 	// 	c.Data["Url"] = route
 	// 	c.Redirect("/login?url="+route, 302)
 	// 	// c.Redirect("/login", 302)
@@ -1340,19 +1418,19 @@ func (c *CategoryController) ModifyCategory() {
 }
 
 // func (c *TopicController) View() {
-// 	c.TplNames = "topic_view.html"
-// 	topic, err := models.GetTopic(c.Ctx.Input.Params["0"])
+// 	c.TplName = "topic_view.html"
+// 	topic, err := models.GetTopic(c.Ctx.Input.Param("0"))
 // 	//articleId, _ := strconv.Atoi(manage.Ctx.Input.Param(":id"))
-// 	//id, _ := strconv.Atoi(manage.Ctx.Input.Params[":id"])
+// 	//id, _ := strconv.Atoi(manage.Ctx.Input.Param(":id"))
 // 	if err != nil {
 // 		beego.Error(err)
 // 		c.Redirect("/", 302)
 // 		return
 // 	}
 // 	c.Data["Topic"] = topic
-// 	c.Data["Tid"] = c.Ctx.Input.Params["0"] //教程中用的是圆括号，导致错误topic.go:52: cannot call non-function c.Controller.Ctx.Input.Params (type map[string]string)
+// 	c.Data["Tid"] = c.Ctx.Input.Param("0") //教程中用的是圆括号，导致错误topic.go:52: cannot call non-function c.Controller.Ctx.Input.Params (type map[string]string)
 // 	//教程第8章开头有修改
-// 	replies, err := models.GetAllReplies(c.Ctx.Input.Params["0"])
+// 	replies, err := models.GetAllReplies(c.Ctx.Input.Param("0"))
 // 	if err != nil {
 // 		beego.Error(err)
 // 		return

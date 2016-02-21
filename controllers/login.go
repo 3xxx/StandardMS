@@ -3,7 +3,7 @@ package controllers
 import (
 	"crypto/md5"
 	"encoding/hex"
-	"fmt"
+	// "fmt"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/context"
 	// "net/url"
@@ -27,10 +27,12 @@ func (c *LoginController) Get() {
 	}
 
 	c.Data["Url"] = url
-	// beego.Info(isExit)
+	beego.Info(isExit)
 	if isExit {
-		c.Ctx.SetCookie("uname", "", -1, "/")
-		c.Ctx.SetCookie("pwd", "", -1, "/")
+		// c.Ctx.SetCookie("uname", "", -1, "/")
+		// c.Ctx.SetCookie("pwd", "", -1, "/")
+		c.DelSession("uname")
+		c.DelSession("pwd")
 		c.Redirect("/", 301)
 		return
 	}
@@ -39,7 +41,7 @@ func (c *LoginController) Get() {
 	//	c.Data["Email"] = "your.email.address@example.com"
 	//	c.Data["EmailName"] = "Your Name"
 	//	c.Data["Id"] = c.Ctx.Input.Param(":id")
-	c.TplNames = "login.html"
+	c.TplName = "login.html"
 }
 
 func (c *LoginController) Loginerr() {
@@ -48,12 +50,22 @@ func (c *LoginController) Loginerr() {
 	// url := c.Ctx.Input.Site() + ":" + port + c.Ctx.Request.URL.String()
 	c.Data["Url"] = url
 	// beego.Info(url)
-	c.TplNames = "loginerr.html"
+	c.TplName = "loginerr.html"
 }
 
 func (c *LoginController) Post() {
 	// uname := c.Input().Get("uname")
 	url := c.Input().Get("returnUrl")
+
+	//（4）获取当前的请求会话，并返回当前请求会话的对象
+	sess, _ := globalSessions.SessionStart(c.Ctx.ResponseWriter, c.Ctx.Request)
+	defer sess.SessionRelease(c.Ctx.ResponseWriter)
+	//（5）根据当前请求对象，设置一个session
+	// sess.Set("mySession", "qq504284")
+	// c.Data["Website"] = "广东省水利电力勘测设计研究院■☆●施工预算分院"
+	//（6）从session中读取值
+	// c.Data["Email"] = sess.Get("mySession")
+
 	// beego.Info(url)
 	// pwd := c.Input().Get("pwd")
 	// autoLogin := c.Input().Get("autoLogin") == "on"
@@ -74,26 +86,29 @@ func (c *LoginController) Post() {
 	var user models.User
 	user.Username = c.Input().Get("uname")
 	Pwd1 := c.Input().Get("pwd")
-	autoLogin := c.Input().Get("autoLogin") == "on"
+	// autoLogin := c.Input().Get("autoLogin") == "on"
 	md5Ctx := md5.New()
 	md5Ctx.Write([]byte(Pwd1))
 	cipherStr := md5Ctx.Sum(nil)
-	fmt.Print(cipherStr)
-	fmt.Print("\n")
-	fmt.Print(hex.EncodeToString(cipherStr))
+	// fmt.Print(cipherStr)
+	// fmt.Print("\n")
+	// fmt.Print(hex.EncodeToString(cipherStr))
 
 	user.Password = hex.EncodeToString(cipherStr)
 	err := models.ValidateUser(user)
 	if err == nil {
-
 		// if beego.AppConfig.String("uname") == uname &&
 		// 	beego.AppConfig.String("pwd") == pwd {
-		maxAge := 0
-		if autoLogin {
-			maxAge = 1<<31 - 1
-		}
-		c.Ctx.SetCookie("uname", user.Username, maxAge, "/")
-		c.Ctx.SetCookie("pwd", user.Password, maxAge, "/")
+		// maxAge := 0
+		// if autoLogin {
+		// 	maxAge = 1<<31 - 1
+		// }
+		// c.Ctx.SetCookie("uname", user.Username, maxAge, "/")
+		sess.Set("uname", user.Username)
+		sess.Set("pwd", user.Password)
+		beego.Info(sess.Get("uname"))
+		// c.Ctx.SetCookie("pwd", user.Password, maxAge, "/")
+
 		//更新user表的lastlogintime
 		models.UpdateUserlastlogintime(user.Username)
 		if url != "" {
@@ -104,7 +119,7 @@ func (c *LoginController) Post() {
 		}
 	} else {
 		// port := strconv.Itoa(c.Ctx.Input.Port())
-		// route := c.Ctx.Input.Site() + ":" + port + c.Ctx.Input.Url()
+		// route := c.Ctx.Input.Site() + ":" + port + c.Ctx.Input.URL()
 		// c.Data["Url"] = route
 		// c.Redirect("/login?url="+route, 302)
 		c.Redirect("/loginerr?url="+url, 302)
@@ -130,47 +145,71 @@ func (c *LoginController) Post() {
 	// if err == nil {
 	// 	sess.Set("username", user.Username)
 	// 	fmt.Println("username:", sess.Get("username"))
-	// 	index.TplNames = "success.tpl"
+	// 	index.TplName = "success.tpl"
 	// } else {
 	// 	fmt.Println(err)
-	// 	index.TplNames = "error.tpl"
+	// 	index.TplName = "error.tpl"
 	// }
 }
 
 func checkAccount(ctx *context.Context) bool {
-	ck, err := ctx.Request.Cookie("uname")
-	if err != nil {
-		return false
-	}
 	var user models.User
-	user.Username = ck.Value
-
-	ck, err = ctx.Request.Cookie("pwd")
-	if err != nil {
+	//（4）获取当前的请求会话，并返回当前请求会话的对象
+	//但是我还是建议大家采用 SetSession、GetSession、DelSession 三个方法来操作，避免自己在操作的过程中资源没释放的问题
+	sess, _ := globalSessions.SessionStart(ctx.ResponseWriter, ctx.Request)
+	defer sess.SessionRelease(ctx.ResponseWriter)
+	v := sess.Get("uname")
+	if v == nil {
 		return false
-	}
-	user.Password = ck.Value
-	err = models.ValidateUser(user)
-	if err == nil {
-		return true
+		//     this.SetSession("asta", int(1))
+		//     this.Data["num"] = 0
 	} else {
-		return false
+		//     this.SetSession("asta", v.(int)+1)
+		//     this.Data["num"] = v.(int)
+
+		user.Username = v.(string)
+		v = sess.Get("pwd")
+		user.Password = v.(string) //ck.Value
+		err := models.ValidateUser(user)
+		if err == nil {
+			return true
+		} else {
+			return false
+		}
 	}
+	// this.TplName = "index.tpl"
+
+	// ck, err := ctx.Request.Cookie("uname")
+	// if err != nil {
+	// 	return false
+	// }
+
+	//ck.Value
+
+	// ck, err = ctx.Request.Cookie("pwd")
+	// if err != nil {
+	// 	return false
+	// }
+
 	// return beego.AppConfig.String("uname") == uname &&
 	// 	beego.AppConfig.String("pwd") == pwd
 }
 
 func checkRole(ctx *context.Context) (role string, err error) { //这里返回用户的role
-	ck, err := ctx.Request.Cookie("uname")
-	if err != nil {
-		return "", err
-	}
+	//（4）获取当前的请求会话，并返回当前请求会话的对象
+	sess, _ := globalSessions.SessionStart(ctx.ResponseWriter, ctx.Request)
+	defer sess.SessionRelease(ctx.ResponseWriter)
+	v := sess.Get("uname")
+	// ck, err := ctx.Request.Cookie("uname")
+	// if err != nil {
+	// 	return "", err
+	// }
 	var user models.User
-	user.Username = ck.Value
+	user.Username = v.(string) //ck.Value
 	var roles []*models.Role
-	roles, _ = models.GetRoleByUsername(user.Username)
+	roles, _, err = models.GetRoleByUsername(user.Username)
 	if err == nil {
-		return roles[0].Name, err //这里修改
+		return roles[0].Title, err //这里修改Name改为title就对了
 	} else {
 		return "", err
 	}

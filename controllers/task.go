@@ -14,8 +14,17 @@ type TaskController struct {
 }
 
 func (this *TaskController) Get() {
+	this.Data["IsLogin"] = checkAccount(this.Ctx)
+	// c.Data["IsCategoryb"] = true
 	this.Data["IsTask"] = true
-	this.TplNames = "todo.html"
+	//3.取得客户端用户名
+	sess, _ := globalSessions.SessionStart(this.Ctx.ResponseWriter, this.Ctx.Request)
+	defer sess.SessionRelease(this.Ctx.ResponseWriter)
+	v := sess.Get("uname")
+	if v != nil {
+		this.Data["Uname"] = v.(string)
+	}
+	this.TplName = "todo.html"
 	tasks, tasks1, tasks2, err := models.GetAllTasks() //这里传入空字符串
 	if err != nil {
 		beego.Error(err.Error)
@@ -28,7 +37,7 @@ func (this *TaskController) Get() {
 }
 
 func (this *TaskController) ShowDetails() {
-	// this.TplNames = "todo.html"
+	// this.TplName = "todo.html"
 	tid := this.Input().Get("id")
 	beego.Info(tid)
 	tasks, err := models.GetDetails(tid) //这里传入空字符串
@@ -39,7 +48,7 @@ func (this *TaskController) ShowDetails() {
 		// if err == nil {
 		// this.Ctx.WriteString(string(b))
 		this.Data["json"] = tasks //string(b)
-		this.ServeJson()
+		this.ServeJSON()
 		// }
 	}
 }
@@ -105,7 +114,7 @@ func (this *TaskController) AddTask() {
 }
 
 func (this *TaskController) Delete() {
-	err := models.DeleteTask(this.Input().Get("tid")) //(c.Ctx.Input.Params["0"])
+	err := models.DeleteTask(this.Input().Get("tid")) //(c.Ctx.Input.Param("0"))
 	if err != nil {
 		beego.Error(err)
 	}
@@ -136,7 +145,7 @@ func (this *TaskController) Update1() {
 func (this *TaskController) ListTasks() {
 	res := struct{ Tasks []*models.Task }{models.DefaultTaskList.All()}
 	this.Data["json"] = res
-	this.ServeJson()
+	this.ServeJSON()
 }
 
 // Examples:
@@ -181,7 +190,7 @@ func (this *TaskController) GetTask() {
 		return
 	}
 	this.Data["json"] = t
-	this.ServeJson()
+	this.ServeJSON()
 }
 
 // Example:
