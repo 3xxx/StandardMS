@@ -31,7 +31,7 @@ type Category struct {
 func init() {
 	orm.RegisterModel(new(Category)) //, new(Article)
 	orm.RegisterDriver("sqlite", orm.DRSqlite)
-	orm.RegisterDataBase("default", "sqlite3", "database/orm_test.db", 10)
+	orm.RegisterDataBase("default", "sqlite3", "database/hydrocms.db", 10)
 }
 
 func AddCategory(name, number, content, path, route, uname, diskdirectory, url string) (id int64, err error) {

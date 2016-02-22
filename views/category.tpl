@@ -39,7 +39,7 @@ color:#DC143C;
    
          {{range $index, $elem :=.Category}}
          <tr>
-          <th>{{$index}}</th>
+          <th> {{printf "%d" $index}}</th><!-- {{$index}} -->
           <th><a href="/category?op=view&id={{.Id}}" id="number">{{.Number}}</a></th>
          <th><a href="/category?op=view&id={{.Id}}" id="name"><i class="glyphicon glyphicon-plane"></i>{{.Title}}</a></th>
          <th> </th>

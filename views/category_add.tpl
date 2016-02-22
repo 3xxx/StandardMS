@@ -120,7 +120,7 @@
       </div>
       <div class="checkbox">
         <label>
-          <input type="checkbox" id="lx" name="checkbox" value="Fdiary">设代日记</label>
+          <input type="checkbox" id="lx" name="checkbox" value="Fdiary">文章/设代日记</label>
       </div>
 
 

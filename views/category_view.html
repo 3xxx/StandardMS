@@ -35,31 +35,15 @@ background-color:#6495ED;
     <a href="/category/modify?cid={{.Tid}}" class="btn btn-default">修改项目</a>
   </h1>
 
-
-<!--2015-12-28修改掉项目简介为侧边栏中显示      <div class="panel panel-default">
-      <div class="panel-heading">
-         <h4 class="panel-title">
-            <a data-toggle="collapse" data-parent="#accordion" 
-               href="#collapseOne">
-               隐藏/展开项目简介
-            </a>
-         </h4>
-      </div>
-      <div id="collapseOne" class="panel-collapse collapse in">
-         <div id="test-editormd-view2">
-          <textarea id="append-test" style="display:none;">{{.Category.Content}}</textarea>
-         </div>
-      </div>
-   </div> -->
 </div>
 
 <div class="col-lg-12">
   <div class="container-fluid">
       <div class="col-lg-3">
 <aside class="accordion">
-
-             <a href="/category/view?id=1026" target='main'>
-               <i class="glyphicon glyphicon-grain">项目简介</i>
+             <a href="/category/viewbrief?id={{.Tid}}" target='main'>
+             <!-- <a href="/category/view?id=1026" target='main'> -->
+               <i class="glyphicon glyphicon-eye-open">项目简介</i>
              </a>
         {{range $k,$v :=.Categoryjieduan}}
           <h1>

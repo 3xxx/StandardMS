@@ -11,7 +11,7 @@
     <script src="/static/ueditor/ueditor.parse.js"></script>
 
 
-        <script src="/static/editor.md/lib/marked.min.js"></script>
+<!--         <script src="/static/editor.md/lib/marked.min.js"></script>
         <script src="/static/editor.md/lib/prettify.min.js"></script>
       
         <script src="/static/editor.md/lib/raphael.min.js"></script>
@@ -20,7 +20,7 @@
         <script src="/static/editor.md/lib/flowchart.min.js"></script>
         <script src="/static/editor.md/lib/jquery.flowchart.min.js"></script>
         <script src="/static/editor.md/editormd.min.js"></script> 
-        <link rel="stylesheet" href="/static/editor.md/css/editormd.css" /> 
+        <link rel="stylesheet" href="/static/editor.md/css/editormd.css" />  -->
 <style>
 .page-header {
     padding-bottom: 9px;
@@ -118,8 +118,8 @@ h1[id] {
   <div class="col-lg-10" role="main">
     <div class="bs-docs-section">
       <div class="page-header">
-      <h2>{{.Website}}</h2>
-      <h2><a href="mailto:504284@qq.com">{{.Email}}</a></h2>
+      <!-- <h2>{{.Website}}</h2> -->
+      <!-- <h2><a href="mailto:504284@qq.com">{{.Email}}</a></h2> -->
         <h1 id="section-1">
           <i class="glyphicon glyphicon-star-empty"></i>
           最新项目列表
@@ -200,7 +200,11 @@ h1[id] {
 <h6 class="text-muted">
 成果由{{.Author}}上传于{{dateformat .Created "2006-01-02 T 15:04:05"}}，共有{{.Views}}次浏览，{{.ReplyCount}}个评论
 </h6>
-<p>{{.Content}}</p>
+  <!-- <div class="content"> -->
+  <!-- {{str2html .Content}} -->
+  <!-- 项目简介如何截取html呢？ -->
+  <!-- </div> -->
+<!-- <p>{{.Content}}</p> -->
 {{end}}
     {{end}}
 </ol>

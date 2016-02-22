@@ -27,9 +27,9 @@ h3 {line-height: 150%;
     <font size="5">{{.Category.Title}}</font>
   </h3>
 
-  <h2>日记列表
+  <h2>文章列表
       <!-- <a href="/topic/add?id={{.Category.Id}}&mid=3" class="btn btn-primary">写设代日记</a> onclick="parent.location.href='/topic/add?id={{.Category.Id}}&mid=3'" -->
-          <button id="directNextpage" class="btn btn-default" onclick="parent.location.href='/topic/add?id={{.Category.Id}}&mid=3'">写设代日记</button>
+          <button id="directNextpage" class="btn btn-default" onclick="parent.location.href='/topic/add?id={{.Category.Id}}&mid=3'">写文章</button>
 </h2>
 <script>
 $(document).ready(function(){
@@ -75,8 +75,11 @@ $("#export").click(function(){//这里应该用button的id来区分按钮的哪�
     {{range $index,$elem:=.Chengguo}}
     <tr>
       <th>{{$index}}</th>
-      <th><a href="/topic/view/{{.Id}}" target="_blank">{{.Tnumber}}</a></th>
-      <th><a href="/topic/view/{{.Id}}" title={{.Title}}>{{substr .Title 0 15}}</a></th>
+<!--       <th><a href="/topic/view/{{.Id}}" target="_blank">{{.Tnumber}}</a></th>
+      <th><a href="/topic/view/{{.Id}}" title={{.Title}}>{{substr .Title 0 15}}</a></th> -->
+      <th><a href="/topic/view/{{.Id}}">{{substr .Tnumber 0 15}}</a></th>
+      <th><a href="/topic/view_b/{{.Id}}" title={{.Title}} target="_blank">{{substr .Title 0 15}}</a></th>
+
       <th>{{dateformat .Updated "2006-01-02"}}</th>
       <th>{{.Views}}</th>
       <th>{{.ReplyCount}}</th>
