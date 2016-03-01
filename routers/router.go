@@ -73,6 +73,7 @@ func init() {
 	beego.Router("/category/add_b", &controllers.CategoryController{}, "get:Add_b")
 	beego.AutoRouter(&controllers.CategoryController{}) //这句代替上句也行
 	beego.Router("/category/view", &controllers.CategoryController{}, "get:View")
+	beego.Router("/category/viewbrief", &controllers.CategoryController{}, "get:ViewBrief")
 	//项目B模式显示指定成果类型里的成果
 	beego.Router("/category/view_b", &controllers.CategoryController{}, "get:View_b")
 	//iframe中的默认显示
@@ -100,7 +101,7 @@ func init() {
 
 	//http://localhost:8081/topic/add?id=717&mid=3
 	// case "3"://添加设代日记
-	// c.TplNames = "topic_add3.html"
+	// c.TplName = "topic_add3.html"
 	//'uploader':'/topic/addtopic1', 添加日记采用一对多模式
 	//第二次添加日记的图片说明
 	beego.Router("/topic/viewdiary", &controllers.TopicController{}, "get:ViewDiary") //显示附件上传后中间结果

@@ -7,6 +7,7 @@
 //后面转到goquery，也是找了好久的资料，才知道find()对于#id，class，属性/值，src等的操作。
 //最难的就是解析json返回数据是map[string]inteface{}类型，怎么也无法转成[]string.
 //耗费了一天多时间.
+
 package controllers
 
 import (
@@ -87,6 +88,43 @@ func (c *SpiderController) GetSpider() {
 		beego.Info(err)
 		log.Fatal(err)
 	}
+
+	// 我的 json 配置文件是嵌套的，类似：
+	// {
+	//     // Blog global settings
+	//     "global": {
+	//         "title": "title",               // Blog title
+	//         "subtitle": "subtitle"          // Blog subtitle
+	//     },
+
+	//     // Database settings. If you don't know what the value is, leave it empty.
+	//     "database": {
+	//         "host": "host",                 // The host name of mongoDB server, could be localhost.
+	//         "port": "port",                 // Port
+	//         "database": "database",         // Database name
+	//         "username": "username",
+	//         "password": "password"
+	//     },
+
+	//     // Admin users of the blog.
+	//     "users": [
+	//         {
+	//             "username": "username",
+	//             "email": "email",
+	//             "password": "password"
+	//         }
+	//     ]
+	// }
+
+	// if db, err := jsonconf.DIY("database"); err != nil {
+	// 	t.Fatal(err)
+	// } else if m, ok := db.(map[string]interface{}); !ok {
+	// 	t.Fatal("db not map[string]interface{}")
+	// } else {
+	// 	if m["host"].(string) != "host" {
+	// 		t.Fatal("get host err")
+	// 	}
+	// }
 
 	rootArray, err := jsonconf.DIY("rootArray")
 	if err != nil {

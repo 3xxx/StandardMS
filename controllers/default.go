@@ -87,11 +87,11 @@ func (c *MainController) Get() {
 	sess, _ := globalSessions.SessionStart(c.Ctx.ResponseWriter, c.Ctx.Request)
 	defer sess.SessionRelease(c.Ctx.ResponseWriter)
 	//（5）根据当前请求对象，设置一个session
-	sess.Set("mySession", "qq504284")
+	// sess.Set("mySession", "qq504284")
 
-	c.Data["Website"] = "广东省水利电力勘测设计研究院■☆●施工预算分院"
+	// c.Data["Website"] = "广东省水利电力勘测设计研究院■☆●施工预算分院"
 	//（6）从session中读取值
-	c.Data["Email"] = sess.Get("mySession")
+	// c.Data["Email"] = sess.Get("mySession")
 
 	// c.Data["Website"] = "127.0.0.1:8080/hello"
 	// c.Data["Email"] = "astaxie@gmail.com"

@@ -516,18 +516,26 @@ func (c *CategoryController) Post() { //添加项目
 	// 	fi.Close()
 	// 	route = "/attachment/" + number + name + "/u1.png"
 	// }
-	ck, err := c.Ctx.Request.Cookie("uname")
-	if err != nil {
-		beego.Error(err)
+	//2.取得客户端用户名
+	sess, _ := globalSessions.SessionStart(c.Ctx.ResponseWriter, c.Ctx.Request)
+	defer sess.SessionRelease(c.Ctx.ResponseWriter)
+	v := sess.Get("uname")
+	var uname string
+	if v != nil {
+		uname = v.(string)
+		c.Data["Uname"] = v.(string)
 	}
-	uname := ck.Value
+	// ck, err := c.Ctx.Request.Cookie("uname")
+	// if err != nil {
+	// 	beego.Error(err)
+	// }
+	// uname := ck.Value
 
 	//存入数据库
 	id, err := models.AddCategory(name, number, content, path, "", uname, "", "")
 	if err != nil {
 		beego.Error(err)
 	}
-	c.Data["Uname"] = ck.Value
 	id1 := strconv.FormatInt(id, 10)
 	c.Redirect("/category?op=view&id="+id1, 301)
 	return //???
@@ -972,22 +980,30 @@ func (c *CategoryController) View() {
 	// if len(id) == 0 {
 	// 	break
 	// }
-	category, _ := models.GetCategory(id)
-	if category.Title == "diary" {
+	//判断父级title是否是“文章/设代日记”
+	category, _ := models.GetCategorySpec(id)
+	if category.Title == "文章/设代日记" {
 		c.TplName = "proddiary_view.tpl"
 	} else {
 		c.TplName = "prod_view.tpl"
 	}
+	// category, _ := models.GetCategory(id)
+	// if category.Title == "diary" {
+	// 	c.TplName = "proddiary_view.tpl"
+	// } else {
+	// 	c.TplName = "prod_view.tpl"
+	// }
 	chengguo, _ := models.GetTopicsbyparentid(id, true)
 	//取得成果类型id的专业parentid以及阶段parentid以及项目parentid才行
 	categoryproj, _ := models.GetCategoryProj(id)
 	categoryphase, _ := models.GetCategoryPhase(id)
 	categoryspec, _ := models.GetCategorySpec(id)
+	category1, _ := models.GetCategory(id)
 
 	c.Data["CategoryProj"] = categoryproj
 	c.Data["CategoryPhase"] = categoryphase
 	c.Data["CategorySpec"] = categoryspec
-	c.Data["Category"] = category
+	c.Data["Category"] = category1
 	c.Data["Chengguo"] = chengguo
 	c.Data["Length"] = len(chengguo)
 
@@ -1022,6 +1038,35 @@ func (c *CategoryController) View() {
 	// }
 	// c.Data["Category"] = category
 	// c.Data["Id"] = id
+}
+
+//查看项目简介
+func (c *CategoryController) ViewBrief() {
+	c.Data["IsLogin"] = checkAccount(c.Ctx)
+	c.Data["IsCategory"] = true
+	//2.取得客户端用户名
+	sess, _ := globalSessions.SessionStart(c.Ctx.ResponseWriter, c.Ctx.Request)
+	defer sess.SessionRelease(c.Ctx.ResponseWriter)
+	v := sess.Get("uname")
+	if v != nil {
+		c.Data["Uname"] = v.(string)
+	}
+	// ck, err := c.Ctx.Request.Cookie("uname")
+	// if err == nil {
+	// 	c.Data["Uname"] = ck.Value
+	// } else {
+	// 	beego.Error(err)
+	// }
+
+	id := c.Input().Get("id")
+	category, _ := models.GetCategory(id)
+	c.Data["Category"] = category
+	// if category.Title == "diary" {
+	c.TplName = "category_view_brief.tpl"
+	// } else {
+	// 	c.TplName = "prod_view_b.tpl"
+	// }
+
 }
 
 //查看专业里或第3级目录中的成果

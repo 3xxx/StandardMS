@@ -279,7 +279,6 @@ ue.ready(function () {
 //         'categoryid':name,
 //       });
 // });
-
 // });
 
 ue.addListener('focus', function () {//startUpload start-upload startUpload beforeExecCommand是在插入图片之前触发
@@ -301,10 +300,18 @@ ue.addListener('focus', function () {//startUpload start-upload startUpload befo
 });
 });
 
+fireEvent("startUpload")
+// UE是使用webupload上传多文件。而webupload有不少好用的事件，比如startUpload……当开始上传流程时触发。
+// UE所提供的事件比较少，ready等，
+// 我想在startUpload开始上传图片前，触发这个：ue.execCommand('serverparam', function(editor)
+// 而不是在ready时触发。请问可以达到目的吗？谢谢。
+//  @Phinome
+// Phinome commented 10 days ago
+// 试试 fireEvent
+
+
 // ue.ready(function () {
-
 // ue.addListener('focus', function () {//startUpload   beforeExecCommand是在插入图片之前触发
-
      // var name = $('#name').val();
       // alert(name)
     // ue.execCommand('serverparam', {

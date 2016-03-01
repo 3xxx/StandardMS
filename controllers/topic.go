@@ -922,7 +922,54 @@ func (c *TopicController) Uploadimagesmd() {
 	//    url     : "图片地址"        // 上传成功时才返回
 }
 
-func (c *TopicController) Diary_add() { //日记上传图片——进行压缩
+func (c *TopicController) Diary_add() { //文章添加
+	//解析表单
+	// tid := c.Input().Get("tid") //这个没用到。教程里漏了这句，导致修改总是变成添加文章
+	title := c.Input().Get("title")
+	tnumber := c.Input().Get("tnumber")
+	content := c.Input().Get("editorValue") //content
+	category := c.Input().Get("category")
+	categoryid := c.Input().Get("categoryid")
+
+	//获取文件保存路径，有了categoryid可以求出整个路径
+	//取得成果类型id的专业parentid以及阶段parentid以及项目parentid才行
+	// categoryproj, err := models.GetCategoryProj(categoryid)
+	// categoryphase, err := models.GetCategoryPhase(categoryid)
+	// categoryspec, err := models.GetCategorySpec(categoryid)
+	// category1, err := models.GetCategory(categoryid)
+	// if err != nil {
+	// 	beego.Error(err)
+	// 	// c.Redirect("/", 302)//这里注释掉，否则在图纸页面无法进入添加页面，因为传入的id为空，导致err发生
+	// 	return
+	// }
+	//获取用户名
+	sess, _ := globalSessions.SessionStart(c.Ctx.ResponseWriter, c.Ctx.Request)
+	defer sess.SessionRelease(c.Ctx.ResponseWriter)
+	v := sess.Get("uname")
+	uname := v.(string)
+
+	//存入数据库
+	// id, err := models.AddCategory(name, number, content, path, "", uname, "", "")
+	// if err != nil {
+	// 	beego.Error(err)
+	// }
+	// id1 := strconv.FormatInt(id, 10)
+	// c.Redirect("/category?op=view&id="+id1, 301)
+	// return //???
+
+	// var topicid int64
+	id, err := models.AddTopicMany(title, tnumber, category, categoryid, uname, content, "")
+	if err != nil { //如果发生错误，返回错误，并获取该文章的topicid
+		beego.Error(err)
+	}
+	c.TplName = "diary_add.tpl" //不加这句上传出错，虽然可以成功上传
+	id1 := strconv.FormatInt(id, 10)
+	// c.Redirect("/category?op=view&id="+id1, 301)
+	c.Redirect("/topic/view_b/"+id1, 301)
+	return //???
+}
+
+func (c *TopicController) Diary_add_back() { //这个作废！！日记上传图片——进行压缩
 	//解析表单
 	tid := c.Input().Get("tid") //这个没用到。教程里漏了这句，导致修改总是变成添加文章
 	title := c.Input().Get("title")

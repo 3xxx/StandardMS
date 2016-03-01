@@ -1,22 +1,217 @@
 <!DOCTYPE html>
 <html>
-
 <head>
-
   <meta charset="UTF-8">
-
   <title>CSS3垂直手风琴折叠菜单DEMO演示</title>
-
   <link href="/static/Font-Awesome-4.4.0/css/font-awesome.min.css" rel="stylesheet">
   <link rel="stylesheet" href="/static/css/celanstyle.css">
-
 <script type="text/javascript" src="/static/js/jquery-2.1.3.min.js"></script>
-
  <link rel="stylesheet" href="/static/css/cebianlan.css" media="screen" type="text/css" />
-
+ <script type="text/javascript" src="/static/js/bootstrap.min.js"></script>
+ <script src="/static/js/bootstrap-treeview.js"></script>
+<link rel="stylesheet" type="text/css" href="/static/css/bootstrap.min.css"/>
 </head>
+<!-- <link href="bootstrap.css" rel="stylesheet"> -->
+<!-- Required Javascript -->
+<!-- <script src="jquery.js"></script> -->
+<!-- <link rel="stylesheet" href="/static/editor.md/css/editormd.css" /> -->
+<div id="treeview" class="col-xs-2"></div>
+<script type="text/javascript">
+$(function() {
+        var defaultData = [
+          {
+            text: 'Parent 1',
+            // icon: "glyphicon glyphicon-stop",
+            // selectedIcon: "glyphicon glyphicon-heart",
+            href: '#parent1',
+            tags: ['4'],
+            state: {
+            checked: true,
+            disabled: false,
+            expanded: false,
+            selected: true
+            },
+            tags: ['available'],
+            nodes: [
+              {
+                text: 'Child 1',
+                // icon: "glyphicon glyphicon-stop",
+                // selectedIcon: "glyphicon glyphicon-heart",                
+                href: '#child1',
+                tags: ['2'],
+                nodes: [
+                  {
+                    text: 'Grandchild 1',
+                    href: '#grandchild1',
+                    tags: ['0']
+                  },
+                  {
+                    text: 'Grandchild 2',
+                    href: '#grandchild2',
+                    tags: ['0']
+                  }
+                ]
+              },
+              {
+                text: 'Child 2',
+                href: '#child2',
+                tags: ['0']
+              }
+            ]
+          },
+          {
+            text: 'Parent 2',
+            href: '#parent2',
+            tags: ['0'],
+            nodes: [
+              {
+                text: 'Child 1',
+                href: '#child1',
+                tags: ['2'],
+                nodes: [
+                  {
+                    text: 'Grandchild 1',
+                    href: '#grandchild1',
+                    tags: ['0']
+                  },
+                  {
+                    text: 'Grandchild 2',
+                    href: '#grandchild2',
+                    tags: ['0']
+                  }
+                ]
+              },
+              {
+                text: 'Child 2',
+                href: '#child2',
+                tags: ['0']
+              }
+            ]
+          },
+          {
+            text: 'Parent 3',
+            href: '#parent3',
+             tags: ['0']
+          },
+          {
+            text: 'Parent 4',
+            href: '#parent4',
+            tags: ['0']
+          },
+          {
+            text: 'Parent 5',
+            href: '#parent5'  ,
+            tags: ['0']
+          }
+        ];
 
-<body>
+        var alternateData = [
+          {
+            text: 'Parent 1',
+            tags: ['2'],
+            nodes: [
+              {
+                text: 'Child 1',
+                tags: ['3'],
+                nodes: [
+                  {
+                    text: 'Grandchild 1',
+                    tags: ['6']
+                  },
+                  {
+                    text: 'Grandchild 2',
+                    tags: ['3']
+                  }
+                ]
+              },
+              {
+                text: 'Child 2',
+                tags: ['3']
+              }
+            ]
+          },
+          {
+            text: 'Parent 2',
+            tags: ['7']
+          },
+          {
+            text: 'Parent 3',
+            icon: 'glyphicon glyphicon-earphone',
+            href: '#demo',
+            tags: ['11']
+          },
+          {
+            text: 'Parent 4',
+            icon: 'glyphicon glyphicon-cloud-download',
+            href: '/demo.html',
+            tags: ['19'],
+            selected: true
+          },
+          {
+            text: 'Parent 5',
+            icon: 'glyphicon glyphicon-certificate',
+            color: 'pink',
+            backColor: 'red',
+            href: 'http://www.tesco.com',
+            tags: ['available','0']
+          }
+        ];
+          // $('#treeview').treeview('collapseAll', { silent: true });
+          $('#treeview').treeview({
+          data: defaultData,
+          collapseIcon:"glyphicon glyphicon-chevron-up",
+          expandIcon:"glyphicon glyphicon-chevron-down",
+          
+        });
+});
+
+
+
+
+
+// function getTree() {
+//   // Some logic to retrieve, or generate tree structure
+//   var tree = [
+//   {
+//     text: "Parent 1",
+//     nodes: [
+//       {
+//         text: "Child 1",
+//         nodes: [
+//           {
+//             text: "Grandchild 1"
+//           },
+//           {
+//             text: "Grandchild 2"
+//           }
+//         ]
+//       },
+//       {
+//         text: "Child 2"
+//       }
+//     ]
+//   },
+//   {
+//     text: "Parent 2"
+//   },
+//   {
+//     text: "Parent 3"
+//   },
+//   {
+//     text: "Parent 4"
+//   },
+//   {
+//     text: "Parent 5"
+//   }
+// ];
+//   return data;
+// }
+
+// $('#tree').treeview({data: getTree()});
+</script>
+
+
+<!-- <body>
 <div style="text-align:center;clear:both">
 
 </div>
@@ -57,8 +252,7 @@
       </ul>
     </li>
   </ul>
-
-  <script src="/static/js/cebianlan.js"></script>
+  <script src="/static/js/cebianlan.js"></script> -->
 
 
 

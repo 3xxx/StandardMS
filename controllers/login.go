@@ -28,11 +28,24 @@ func (c *LoginController) Get() {
 
 	c.Data["Url"] = url
 	beego.Info(isExit)
+	// logout user
+	// func LogoutUser(ctx *context.Context) {
+	// 	DeleteRememberCookie(ctx)
+	// 	ctx.Input.CruSession.Delete("auth_user_id")
+	// 	ctx.Input.CruSession.Flush()
+	// 	beego.GlobalSessions.SessionDestroy(ctx.ResponseWriter, ctx.Request)
+	// }
+	sess, _ := globalSessions.SessionStart(c.Ctx.ResponseWriter, c.Ctx.Request)
+	defer sess.SessionRelease(c.Ctx.ResponseWriter)
 	if isExit {
-		// c.Ctx.SetCookie("uname", "", -1, "/")
-		// c.Ctx.SetCookie("pwd", "", -1, "/")
-		c.DelSession("uname")
-		c.DelSession("pwd")
+		c.Ctx.SetCookie("uname", "", -1, "/")
+		c.Ctx.SetCookie("pwd", "", -1, "/")
+		c.DelSession("gosessionid")
+		// c.DelSession("pwd")
+		c.DestroySession()
+		// c.Ctx.Input.CruSession.Delete("gosessionid")这句与上面一句重复
+		// c.Ctx.Input.CruSession.Flush()
+		beego.GlobalSessions.SessionDestroy(c.Ctx.ResponseWriter, c.Ctx.Request)
 		c.Redirect("/", 301)
 		return
 	}
