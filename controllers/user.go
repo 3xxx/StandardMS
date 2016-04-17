@@ -355,7 +355,7 @@ func (this *UserController) ImportExcel() {
 
 	//读出excel内容写入数据库
 	// excelFileName := path                    //"/home/tealeg/foo.xlsx"
-	xlFile, err := xlsx.OpenFile(h.Filename) //excelFileName
+	xlFile, err := xlsx.OpenFile(path) //excelFileName
 	if err != nil {
 		beego.Error(err)
 	}
@@ -363,17 +363,20 @@ func (this *UserController) ImportExcel() {
 		for _, row := range sheet.Rows {
 			// for j := 2; j < 7; j += 5 {
 			j := 1
-			user.Username = row.Cells[j].String()
-			Pwd1 := row.Cells[j+1].String()
+			user.Username, _ = row.Cells[j].String()
+			Pwd1, _ := row.Cells[j+1].String()
 			md5Ctx := md5.New()
 			md5Ctx.Write([]byte(Pwd1))
 			cipherStr := md5Ctx.Sum(nil)
 			user.Password = hex.EncodeToString(cipherStr)
-			user.Email = row.Cells[j+2].String()
-			user.Nickname = row.Cells[j+3].String()
+			user.Email, _ = row.Cells[j+2].String()
+			user.Nickname, _ = row.Cells[j+3].String()
+			user.Department, _ = row.Cells[j+5].String()
+			user.Secoffice, _ = row.Cells[j+6].String()
 			user.Lastlogintime = time.Now()
 			uid, err := m.SaveUser(user)
-			roleid, _ := strconv.ParseInt(row.Cells[j+4].String(), 10, 64)
+			role, _ := row.Cells[j+4].String()
+			roleid, _ := strconv.ParseInt(role, 10, 64)
 			_, err = m.AddRoleUser(roleid, uid)
 			if err != nil {
 				beego.Error(err)

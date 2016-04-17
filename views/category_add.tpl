@@ -281,18 +281,18 @@ ue.ready(function () {
 // });
 // });
 
-ue.addListener('focus', function () {//startUpload start-upload startUpload beforeExecCommand是在插入图片之前触发
+ue.addListener('focus', function () {//startUpload start-upload beforeExecCommand是在插入图片之前触发
      var name = $('#name').val();
-      //  if (name.length==0){
-      //   alert("请输入项目名称");
-      //   return false;
-      // }    
+//       //  if (name.length==0){
+//       //   alert("请输入项目名称");
+//       //   return false;
+//       // }    
      var number = $('#number').val();
-      //  if (name==""){
-      //   alert("请输入项目编号");
-      //   return false;
-      // }    
-      // alert(name)
+//       //  if (name==""){
+//       //   alert("请输入项目编号");
+//       //   return false;
+//       // }    
+//       // alert(name)
     ue.execCommand('serverparam', {
         "number":number,
         'name': name,
@@ -300,7 +300,6 @@ ue.addListener('focus', function () {//startUpload start-upload startUpload befo
 });
 });
 
-fireEvent("startUpload")
 // UE是使用webupload上传多文件。而webupload有不少好用的事件，比如startUpload……当开始上传流程时触发。
 // UE所提供的事件比较少，ready等，
 // 我想在startUpload开始上传图片前，触发这个：ue.execCommand('serverparam', function(editor)
@@ -308,6 +307,23 @@ fireEvent("startUpload")
 //  @Phinome
 // Phinome commented 10 days ago
 // 试试 fireEvent
+// ue.fireEvent("startUpload");
+// ue.addListener( "startUpload", function () {
+//         var name = $('#name').val();
+//         var number = $('#number').val();
+//         ue.execCommand('serverparam', {
+//         "number":number,
+//         'name': name,
+//     });
+// });
+
+// ue.addListener( "selectionchange", function ( type, arg1, arg2 ) {
+//      console.log( arg1 + " " + arg2 );
+//  });
+
+ //触发selectionchange事件，会执行上面的事件监听器
+ //output: Hello World
+// ue.fireEvent("selectionchange", "Hello", "World");
 
 
 // ue.ready(function () {

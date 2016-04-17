@@ -49,39 +49,42 @@ h3 {line-height: 150%;
 </div>
 
 <div class="col-lg-12">
-<h3> <font size="5">{{.CategoryProj.Title}}</font> <font size="4"> » {{.CategoryPhase.Title}}</font>
-    <font size="4"> » {{.CategorySpec.Title}}» </font>
-    <font size="5"> {{.Category.Title}}</font>
-  </h3>
+    <h3> <font size="5">{{.CategoryProj.Title}}</font> <font size="4">» {{.CategoryPhase.Title}}</font>
+        <font size="4">» {{.CategorySpec.Title}}»</font>
+        <font size="5">{{.Category.Title}}</font>
+    </h3>
 
-  <h2>添加成果</h2>
-  <!-- <form method="post" action="/topic/topic_one_add" enctype="multipart/form-data"> -->
-  <!-- <form method="post" action="/topic/topic_many_add" enctype="multipart/form-data"> -->
+    <h2>添加成果</h2>
+    <!-- <form method="post" action="/topic/topic_one_add" enctype="multipart/form-data">
+    -->
+    <!-- <form method="post" action="/topic/topic_many_add" enctype="multipart/form-data">
+    -->
     <div class="form-group">
-      <label>成果编号:</label>
-      <input required="required" id="tnumber" type="text" class="form-control" name="tnumber" placeholder="Enter Number"></div>
+        <label>成果编号:</label>
+        <input required="required" id="tnumber" type="text" class="form-control" name="tnumber" placeholder="Enter Number"></div>
 
     <div class="form-group">
-    <label>成果名称:</label>
-    <input type="text" class="form-control" id="title" placeholder="Enter Name" name="title"></div>
+        <label>成果名称:</label>
+        <input type="text" class="form-control" id="title" placeholder="Enter Name" name="title"></div>
 
-   <div class="form-group">
-    <label>成果所属专业：</label>
-    <input readonly="readonly" id="category" type="text" class="form-control" name="category" value="{{.Category.Title}}"></div>
-  <div class="form-group">
-    <label>成果所属专业ID：</label>
-    <input readonly="readonly" id="categoryid" type="text" class="form-control"  name="categoryid" value="{{.Category.Id}}"></div>
+    <div class="form-group">
+        <label>成果所属专业：</label>
+        <input readonly="readonly" id="category" type="text" class="form-control" name="category" value="{{.Category.Title}}"></div>
+    <div class="form-group">
+        <label>成果所属专业ID：</label>
+        <input readonly="readonly" id="categoryid" type="text" class="form-control"  name="categoryid" value="{{.Category.Id}}"></div>
 
-<label>文件简介:</label>
-<div>
-    <script id="container" type="text/plain" style="height:300px;"></script><!-- width:1024px; -->
-</div>
-<!--   <div class="form-group">
+    <label>文件简介:</label>
+    <div>
+        <script id="container" type="text/plain" style="height:300px;"></script>
+        <!-- width:1024px; --> </div>
+    <!--   <div class="form-group">
     <label>成果说明:</label>
     <textarea name="content" cols="30" rows="10" class="form-control" placeholder="Enter about" ></textarea>
-  </div> -->
-  <!-- </form> -->
-
+</div>
+-->
+<!-- </form>
+-->
 <!--SWF在初始化的时候指定，在后面将展示-->
 <div id="uploader" class="wu-example">
     <!--用来存放文件信息-->
@@ -377,5 +380,5 @@ jQuery(function() {
 });
 </script>
 
-    </body>
+</body>
 </html> 

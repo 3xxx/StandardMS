@@ -1407,12 +1407,25 @@ func (c *CategoryController) ModifyCategory() {
 	// image := c.Input().Get("image")
 	path := c.Input().Get("tempString")
 
-	ck, err := c.Ctx.Request.Cookie("uname")
-	if err != nil {
-		beego.Error(err)
+	// ck, err := c.Ctx.Request.Cookie("uname")
+	// if err != nil {
+	// 	beego.Error(err)
+	// }
+	// uname := ck.Value
+	//2.取得客户端用户名
+	sess, _ := globalSessions.SessionStart(c.Ctx.ResponseWriter, c.Ctx.Request)
+	defer sess.SessionRelease(c.Ctx.ResponseWriter)
+	v := sess.Get("uname")
+	if v != nil {
+		c.Data["Uname"] = v.(string)
 	}
-	uname := ck.Value
-
+	// ck, err := c.Ctx.Request.Cookie("uname")
+	// if err == nil {
+	// 	c.Data["Uname"] = ck.Value
+	// } else {
+	// 	beego.Error(err)
+	// }
+	uname := v.(string) //ck.Value
 	//保存上传的图片
 	//获取上传的文件，直接可以获取表单名称对应的文件名，不用另外提取
 	// _, h, err := c.GetFile("image")
@@ -1446,7 +1459,7 @@ func (c *CategoryController) ModifyCategory() {
 	// 	filesize = filesize / 1000.0
 	// 	route = "/attachment/" + number + name + "/" + h.Filename
 	//存入数据库ModifyCategory(cid, name, number, content, path, route, uname string)
-	err = models.ModifyCategory(cid, name, number, content, path, "", uname)
+	err := models.ModifyCategory(cid, name, number, content, path, "", uname)
 	if err != nil {
 		beego.Error(err)
 	}
@@ -1457,7 +1470,7 @@ func (c *CategoryController) ModifyCategory() {
 	// 		beego.Error(err)
 	// 	}
 	// }
-	c.Data["Uname"] = ck.Value
+	// c.Data["Uname"] = ck.Value
 	c.Redirect("/category", 301)
 	return
 }

@@ -86,3 +86,31 @@ func main() {
 // 		ExposeHeaders: []string{"Content-Length"},
 // 		AllowCredentials: true,
 // 	}))
+
+// 请问一下 map[string]string{"a":"apple", "b":"banana"}  这个 value 是什么类型
+// package main
+
+// import (
+// 	"encoding/json"
+// 	"flag"
+// 	"fmt"
+// )
+
+// type JsonHolder struct {
+// 	Data map[string]string `json:"data"`
+// }
+
+// func main() {
+// 	var m string
+// 	flag.StringVar(&m, "m", "", "map data")
+// 	flag.Parse()
+
+// 	jsonData := fmt.Sprintf("{\"data\":%s}", m)
+// 	jsonHolder := JsonHolder{}
+// 	json.Unmarshal([]byte(jsonData), &jsonHolder)
+
+// 	mp := jsonHolder.Data
+
+// 	fmt.Printf("%#v\n", mp)
+
+// }

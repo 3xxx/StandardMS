@@ -27,6 +27,9 @@
       <li {{if .IsTopic}}class="active"{{end}}>
         <a href="/topic">成果</a>
       </li>
+      <li {{if .IsStandard}}class="active"{{end}}>
+        <a href="/standard">规范</a>
+      </li>
     </ul>
 
     <form class="navbar-form navbar-left" role="search" method="get" action="/search">

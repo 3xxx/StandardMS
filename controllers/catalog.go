@@ -391,13 +391,22 @@ func (c *CatalogController) Import_Xls_Catalog() {
 	// var err error
 	// var tid string //这里是增加的，不知为何教程没有
 	// path := ".\\attachment\\" + categoryproj.Number + " " + categoryproj.Title + "\\" + categoryphase.Title + "\\" + categoryspec.Title + "\\" + category + "\\" + h.Filename
-	ck, err := c.Ctx.Request.Cookie("uname")
+	//2.取得客户端用户名
+	sess, _ := globalSessions.SessionStart(c.Ctx.ResponseWriter, c.Ctx.Request)
+	defer sess.SessionRelease(c.Ctx.ResponseWriter)
+	v := sess.Get("uname")
 	var uname string
-	if err == nil {
-		uname = ck.Value
+	if v != nil {
+		uname = v.(string)
 	} else {
 		beego.Error(err)
 	}
+
+	// ck, err := c.Ctx.Request.Cookie("uname")
+	//
+	// if err == nil {
+	// 	uname = ck.Value
+	// }
 
 	// route := "/attachment/" + categoryproj.Number + " " + categoryproj.Title + "/" + categoryphase.Title + "/" + categoryspec.Title + "/" + category + "/" + h.Filename
 	//Catalogid := c.Input().Get("Catalogid")
@@ -416,18 +425,18 @@ func (c *CatalogController) Import_Xls_Catalog() {
 		for _, row := range sheet.Rows {
 			// for j := 2; j < 7; j += 5 {
 			j := 1
-			catalog.Tnumber = row.Cells[j].String()
-			catalog.Name = row.Cells[j+1].String()
-			catalog.Drawn = row.Cells[j+2].String()
-			catalog.Designd = row.Cells[j+3].String()
-			catalog.Checked = row.Cells[j+4].String()
-			catalog.Emamined = row.Cells[j+5].String()
-			catalog.Verified = row.Cells[j+6].String()
-			catalog.Approved = row.Cells[j+7].String()
-			catalog.Data = row.Cells[j+8].String()
-			catalog.DesignStage = row.Cells[j+9].String()
-			catalog.Section = row.Cells[j+10].String()
-			catalog.Projec = row.Cells[j+11].String()
+			catalog.Tnumber, _ = row.Cells[j].String()
+			catalog.Name, _ = row.Cells[j+1].String()
+			catalog.Drawn, _ = row.Cells[j+2].String()
+			catalog.Designd, _ = row.Cells[j+3].String()
+			catalog.Checked, _ = row.Cells[j+4].String()
+			catalog.Emamined, _ = row.Cells[j+5].String()
+			catalog.Verified, _ = row.Cells[j+6].String()
+			catalog.Approved, _ = row.Cells[j+7].String()
+			catalog.Data, _ = row.Cells[j+8].String()
+			catalog.DesignStage, _ = row.Cells[j+9].String()
+			catalog.Section, _ = row.Cells[j+10].String()
+			catalog.Projec, _ = row.Cells[j+11].String()
 			catalog.Created = time.Now()
 			catalog.Updated = time.Now()
 			catalog.Views = 0

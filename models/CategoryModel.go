@@ -533,7 +533,30 @@ func GetCategoryTitle(number string) (*Category, error) {
 	category := new(Category)
 	qs := o.QueryTable("category")
 	err := qs.Filter("number", number).One(category, "Title")
-	beego.Info(number)
+	// beego.Info(number)
+	if err == orm.ErrMultiRows {
+		// 多条的时候报错
+		beego.Info("Returned Multi Rows Not One")
+	}
+	if err == orm.ErrNoRows {
+		// 没有找到记录
+		beego.Info("Not row found")
+	}
+	return category, err
+}
+
+//由分类name（项目名称）取得分类本身
+func GetCategoryName(title string) (*Category, error) {
+	o := orm.NewOrm()
+	// Num, err := strconv.ParseInt(number, 10, 64)
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// o := orm.NewOrm()
+	category := new(Category)
+	qs := o.QueryTable("category")
+	err := qs.Filter("title", title).One(category, "Id")
+	// beego.Info(number)
 	if err == orm.ErrMultiRows {
 		// 多条的时候报错
 		beego.Info("Returned Multi Rows Not One")

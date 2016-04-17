@@ -200,7 +200,9 @@ func (c *TopicController) Post() { //这个post属于topic_modify.html提交修�
 	title := c.Input().Get("title")
 	tnumber := c.Input().Get("tnumber")
 	// beego.Info(tnumber)
-	content := c.Input().Get("content")
+	// content := c.Input().Get("content")
+	content := c.Input().Get("editorValue")
+	// beego.Info(content)
 	category := c.Input().Get("category")
 	categoryid := c.Input().Get("categoryid")
 	// categoryid, err := strconv.ParseInt(id, 10, 64)
@@ -233,6 +235,7 @@ func (c *TopicController) Post() { //这个post属于topic_modify.html提交修�
 	// if len(tid) == 0 {
 	// _, err = models.AddTopic(title, tnumber, category, categoryid, content, attachment)
 	// } else {
+	//其实这里只修改title, tnumber,和content
 	err := models.ModifyTopic(tid, title, tnumber, category, categoryid, content)
 	// }
 	if err != nil {
@@ -510,7 +513,7 @@ func (c *TopicController) Topic_one_addstandard() { //一对一上传，自动�
 	//没有项目则建立？？
 	//ueditor中的附件如何处理呢？
 	content := c.Input().Get("content")
-	beego.Info(content)
+	// beego.Info(content)
 	//获取上传的文件
 	_, h, err := c.GetFile("file") //ueditor用upfile
 	if err != nil {
@@ -688,12 +691,21 @@ func (c *TopicController) Topic_many_addbaidu() { //一对多模式
 		cid := strconv.FormatInt(topicid, 10)
 		filesize := strconv.FormatInt(filesize, 10)
 		err = models.AddAttachment(attachment, filesize, path, route, cid, uname)
+		if err != nil {
+			beego.Error(err)
+		}
 		// beego.Info(attachment)
-	} else {
+	} else { //用这种结合的方式不好，因为uploader先上传附件
 		err = models.ModifyTopic(tid, title, tnumber, category, categoryid, content)
-	}
-	if err != nil {
-		beego.Error(err)
+		if err != nil {
+			beego.Error(err) //return multi rows
+		}
+		// cid := strconv.FormatInt(topicid, 10)
+		filesize := strconv.FormatInt(filesize, 10)
+		err = models.AddAttachment(attachment, filesize, path, route, tid, uname)
+		if err != nil {
+			beego.Error(err)
+		}
 	}
 	c.TplName = "topic_many_add.tpl" //不加这句上传出错，虽然可以成功上传
 	// c.Redirect("/topic", 302)
@@ -706,6 +718,7 @@ func (c *TopicController) Topic_one_addbaidu() { //一对一模式
 	tnumber := c.Input().Get("tnumber")
 	content := c.Input().Get("content")
 	category := c.Input().Get("category")
+	// beego.Info(category)
 	categoryid := c.Input().Get("categoryid")
 
 	//获取文件保存路径，有了categoryid可以求出整个路径
@@ -791,6 +804,14 @@ func (c *TopicController) Topic_one_addbaidu() { //一对一模式
 		// beego.Info(attachment)
 	} else {
 		err = models.ModifyTopic(tid, title, tnumber, category, categoryid, content)
+		if err != nil {
+			beego.Error(err)
+		}
+		filesize := strconv.FormatInt(filesize, 10)
+		err = models.AddAttachment(attachment, filesize, path, route, tid, uname)
+		if err != nil {
+			beego.Error(err)
+		}
 	}
 	if err != nil {
 		beego.Error(err)
@@ -1144,7 +1165,6 @@ func (c *TopicController) View() {
 		return
 	}
 	c.Data["Replies"] = replies
-	c.Data["IsLogin"] = checkAccount(c.Ctx)
 }
 
 //设代日记查看，全页模式
@@ -1654,7 +1674,7 @@ func (c *TopicController) ExportToExcel() {
 	// var err error
 
 	file = xlsx.NewFile()
-	sheet = file.AddSheet("Sheet1")
+	sheet, _ = file.AddSheet("Sheet1")
 	row = sheet.AddRow() //增加行
 
 	// for j := 2; j < 5; j++ {

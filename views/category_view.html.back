@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+{{template "header"}}
+<title>{{.Category.Title}} - 水利设计CMS系统</title>
+<link rel="stylesheet" href="/static/css/cebianlan.css" media="screen" type="text/css" />
+<link rel="stylesheet" href="/static/css/celanstyle.css">
+<link href="/static/Font-Awesome-4.4.0/css/font-awesome.min.css" rel="stylesheet">
+<!-- 徽章颜色 RoyalBlue-->
+<style>
+.accordion li {
+  margin-top: 0px;
+  padding: 5px 30px;
+  /*background-color: #b94152;*/
+  font-size: .9rem;
+  color: #ddd; 
+}
+.accordion h1 {
+  margin-top: 0px;
+  }
+span.badge
+{
+background-color:#6495ED;
+}
+</style>
+
+
+</head>
+
+<body>
+<div class="navbar navba-default navbar-fixed-top">
+  <div class="container-fill">{{template "navbar" .}}</div>
+</div>
+
+<div class="col-lg-12">
+  <h1>
+    {{.Category.Number}}{{.Category.Title}}
+    <a href="/category/modify?cid={{.Tid}}" class="btn btn-default">修改项目</a>
+  </h1>
+
+</div>
+
+<div class="col-lg-12">
+  <div class="container-fluid">
+      <div class="col-lg-3">
+
+
+<aside class="accordion">
+  <ul id="accordion" class="accordion">  
+
+      
+             <a href="/category/viewbrief?id={{.Tid}}" target='main'>
+               <i class="glyphicon glyphicon-eye-open">项目简介</i>
+             </a>
+        {{range $k,$v :=.Categoryjieduan}}
+
+        <li>
+          <h1  class="link">
+
+              <i class="glyphicon glyphicon-cog"></i>
+                {{.Title}} <i class="fa fa-chevron-down"></i>
+          </h1>
+        </li>
+
+            <div>
+              {{range $k1,$v1 :=$.Categoryzhuanye}}
+                {{if eq $v.Id $v1.ParentId}}
+            <h2>
+              <!-- <li> -->
+              <!-- <a href="/category/view_3?id={{.Id}}"></a> -->
+              &nbsp;&nbsp;<i class="glyphicon glyphicon-file"></i><span class="pull-right glyphicon glyphicon-chevron-down"></span>{{.Title}}
+              <!-- </li> -->
+            </h2>
+                      <div>
+                       {{range $k2,$v2 :=$.Categorychengguo}}
+                          {{if eq $v1.Id $v2.ParentId}}
+                            <!-- <h3> -->
+                               <li>
+                                 <a href="/category/view?id={{.Id}}" target='main'>&nbsp;&nbsp;&nbsp;&nbsp;<i class="glyphicon glyphicon-grain"></i>┗━{{.Title}}<span class="badge">{{.TopicCount}}</span>
+                                 </a>
+                               </li>
+                             <!-- </h3>   -->
+                             {{end}}
+                          {{end}}
+                      </div> 
+                {{end}}
+              {{end}}
+            </div>                   
+        {{end}}
+      </ul>
+    </aside>        
+   </div>
+
+      <div class="col-lg-9">
+        <iframe src="/category/category_prod_view?id={{.Category.Id}}&title={{.Category.Title}}" name='main' id="iframepage" frameborder="0" width="100%" scrolling="no" marginheight="0" marginwidth="0" onLoad="iFrameHeight()"></iframe>
+      </div>    
+</div>
+</div>
+
+
+
+
+<!-- 自动适应高度 -->
+<script type="text/javascript" language="javascript">   
+function iFrameHeight() {   
+var ifm= document.getElementById("iframepage");   
+var subWeb = document.frames ? document.frames["iframepage"].document : ifm.contentDocument;   
+if(ifm != null && subWeb != null) {
+   ifm.height = subWeb.body.scrollHeight;
+   ifm.width = subWeb.body.scrollWidth;
+}   
+}   
+</script>
+
+
+<!-- <script type="text/javascript">
+  $(document).ready(function() {
+  $("table").tablesorter();
+  // $("#ajax-append").click(function() {
+  //    $.get("assets/ajax-content.html", function(html) {
+  //     // append the "ajax'd" data to the table body
+  //     $("table tbody").append(html);
+  //     // let the plugin know that we made a update
+  //     $("table").trigger("update");
+  //     // set sorting column列号 and direction排序方式, this will sort on the first第一列降序 and third column第三列升序
+  //     var sorting = [[2,1],[0,0]];
+  //     // sort on the first column
+  //     $("table").trigger("sorton",[sorting]);
+  //   });
+  //   return false;
+  // });
+});
+</script> -->
+<script>
+$(function() {
+  var Accordion = function(el, multiple) {
+    this.el = el || {};
+    this.multiple = multiple || false;
+
+    // Variables privadas
+    var links = this.el.find('.link');
+    // Evento
+    links.on('click', {el: this.el, multiple: this.multiple}, this.dropdown)
+  }
+
+  Accordion.prototype.dropdown = function(e) {
+    var $el = e.data.el;
+      $this = $(this),
+      $next = $this.next();
+
+    $next.slideToggle();
+    $this.parent().toggleClass('open');//增加li class=open，然后利用这个open，将i的字体图标旋转180度
+
+    if (!e.data.multiple) {
+      $el.find('.submenu').not($next).slideUp().parent().removeClass('open');
+    };
+  } 
+
+  var accordion = new Accordion($('#accordion'), false);
+});
+
+
+
+var headers = ["H1","H2","H3","H4","H5","H6"];
+
+$(".accordion").click(function(e) {
+  var target = e.target,
+      name = target.nodeName.toUpperCase();
+  
+  if($.inArray(name,headers) > -1) {
+    var subItem = $(target).next();
+    
+    //slideUp all elements (except target) at current depth or greater
+    var depth = $(subItem).parents().length;
+    var allAtDepth = $(".accordion p, .accordion div").filter(function() {
+      if($(this).parents().length >= depth && this !== subItem.get(0)) {
+        return true; 
+      }
+    });
+    $(allAtDepth).slideUp("fast");
+    
+    //slideToggle target content and adjust bottom border if necessary
+    subItem.slideToggle("fast",function() {
+        // $(".accordion :visible:last").css("border-radius","0 0 10px 10px");
+    });
+    // $(target).css({"border-bottom-right-radius":"0", "border-bottom-left-radius":"0"});
+  }
+});
+  </script>
+
+
+
+  <script src="/static/js/jquery-2.1.3.min.js"></script>
+  <!-- <script src="/static/js/celan.js"></script> -->
+</body>
+</html>

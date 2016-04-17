@@ -138,6 +138,12 @@ func init() {
 	beego.Router("/role/index", &controllers.RoleController{}, "*:Index")
 	beego.Router("/roleerr", &controllers.RoleController{}, "*:Roleerr") //显示权限不够
 
+	beego.Router("/standard", &controllers.StandardController{}, "*:Index")
+	beego.Router("/standard/search", &controllers.StandardController{}, "*:Search")
+	beego.Router("/standard/importexcel", &controllers.StandardController{}, "*:ImportExcel")
+	beego.Router("/standard/standard_one_addbaidu", &controllers.StandardController{}, "post:Standard_one_addbaidu")
+	beego.Router("/standard/importlibrary", &controllers.StandardController{}, "post:ImportLibrary")
+
 	//app.conf中要设置DirectoryIndex = true是否开启静态目录的列表显示，默认不显示目录，返回 403 错误
 	beego.SetStaticPath("/m", "models")
 	beego.SetStaticPath("/v", "views")

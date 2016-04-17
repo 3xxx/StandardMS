@@ -9,6 +9,7 @@ import (
 	// "net/url"
 	"quick/models"
 	// "strconv"
+	// "github.com/astaxie/beego/session"
 )
 
 type LoginController struct {
@@ -27,7 +28,7 @@ func (c *LoginController) Get() {
 	}
 
 	c.Data["Url"] = url
-	beego.Info(isExit)
+	// beego.Info(isExit)
 	// logout user
 	// func LogoutUser(ctx *context.Context) {
 	// 	DeleteRememberCookie(ctx)
@@ -38,17 +39,56 @@ func (c *LoginController) Get() {
 	sess, _ := globalSessions.SessionStart(c.Ctx.ResponseWriter, c.Ctx.Request)
 	defer sess.SessionRelease(c.Ctx.ResponseWriter)
 	if isExit {
-		c.Ctx.SetCookie("uname", "", -1, "/")
-		c.Ctx.SetCookie("pwd", "", -1, "/")
-		c.DelSession("gosessionid")
-		// c.DelSession("pwd")
-		c.DestroySession()
+		// c.Ctx.SetCookie("uname", "", -1, "/")
+		// c.Ctx.SetCookie("pwd", "", -1, "/")
+		// c.DelSession("gosessionid")
+		// c.DelSession("gosessionid")
+		// c.DelSession("admin")
+		// c.DelSession("uname")//这个不行
+		// c.DestroySession()
 		// c.Ctx.Input.CruSession.Delete("gosessionid")这句与上面一句重复
 		// c.Ctx.Input.CruSession.Flush()
-		beego.GlobalSessions.SessionDestroy(c.Ctx.ResponseWriter, c.Ctx.Request)
+		// beego.GlobalSessions.SessionDestroy(c.Ctx.ResponseWriter, c.Ctx.Request)
+		sess.Delete("uname") //这个可行。
+		// m.DestroySession()
+		// beego.Info(sess.SessionID())
+		// sess.SessionDestroy(sess.SessionID())
+		// c.DestroySession()
+		// sess.Flush()//这个不灵
 		c.Redirect("/", 301)
 		return
 	}
+	// https://github.com/astaxie/beego/issues/1196
+	// You can start session after user login , destory session after user logout.
+	// e.g:
+	// func (m *MainController) Login() {
+	//     // Save user info after user login.
+	//     m.SetSession("name", "ysqi")
+	//     m.SetSession("email", "devysq@gmail.com")
+	// }
+
+	// func (m *MainController) Logout() {
+	//     // Destory Session after user logout.
+	//     m.DestroySession()
+	// }
+	// If you only use beego session model.
+	// e.g:
+	// func login(w http.ResponseWriter, r *http.Request) {
+	//     sess, _ := globalSessions.SessionStart(w, r)
+	//     defer sess.SessionRelease(w)
+	//     username := sess.Get("username")
+	//     if r.Method == "GET" {
+	//         t, _ := template.ParseFiles("login.gtpl")
+	//         t.Execute(w, nil)
+	//     } else {
+	//         sess.Set("username", r.Form["username"])
+	//     }
+	// }
+	// func logout(w http.ResponseWriter, r *http.Request) {
+	//     sess, _ := globalSessions.SessionStart(w, r)
+	//     defer sess.SessionRelease(w)
+	//     sess.SessionDestroy(w,r)
+	// }
 
 	//	c.Data["Website"] = "My Website"
 	//	c.Data["Email"] = "your.email.address@example.com"
@@ -119,7 +159,7 @@ func (c *LoginController) Post() {
 		// c.Ctx.SetCookie("uname", user.Username, maxAge, "/")
 		sess.Set("uname", user.Username)
 		sess.Set("pwd", user.Password)
-		beego.Info(sess.Get("uname"))
+		// beego.Info(sess.Get("uname"))
 		// c.Ctx.SetCookie("pwd", user.Password, maxAge, "/")
 
 		//更新user表的lastlogintime

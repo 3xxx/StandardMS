@@ -8,7 +8,6 @@
     <!--这里加载的语言文件会覆盖你在配置项目里添加的语言类型，比如你在配置项目里配置的是英文，这里加载的中文，那最后就是中文-->
     <script type="text/javascript" charset="utf-8" src="/static/ueditor/lang/zh-cn/zh-cn.js"></script>
     <script src="/static/ueditor/ueditor.parse.js"></script>
-
 </head>
 
 <body>
@@ -18,7 +17,6 @@
 
 <div class="col-lg-12">
   <form method="post" action="/category/modifycategory" enctype="multipart/form-data">
-
     <div class="form-group">
       <label>项目名称</label>
       <input id="name" class="form-control"  placeholder="Enter ProjectName" name="name" value="{{.Category.Title}}"></div>
@@ -31,21 +29,18 @@
      <!-- <div id="content" class="content" name="content"> -->
      <!-- 用str2html不转义，就可以用uparse解析了 -->
     <!-- {{str2html .Category.Content}}</div> -->
-
 <div id="content">
     <script id="editor" type="text/plain" style="height:500px;"></script>
 </div>
 <!--     <div class="form-group" id="test-editormd">
       <textarea style="display:none;" name="test-editormd-html-code">{{.Category.Content}}</textarea>
     </div> -->
-
 <!--       <div class="input-group">
       <label>选择效果图：<input type="file" name="image" id="image" />{{.Filename}}</label><br/>
       <img style="-webkit-user-select: none; cursor: zoom-in;" src="{{.Category.Route}}" width="200">
     </div> -->
 <hr>
     <!-- <input type="hidden" name="op" value="modify"> -->
-
     <div class="col-md-4">
       <label>阶段</label>
       <div class="checkbox">

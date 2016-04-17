@@ -332,6 +332,8 @@ function delrow(){
       <th><span style="cursor: pointer">Password</span></th>
       <th><span style="cursor: pointer">Nickname</span></th>
       <th><span style="cursor: pointer">Email</span></th>
+        <th><span style="cursor: pointer">分院</span></th>
+        <th><span style="cursor: pointer">科室</span></th>
       <th><span style="cursor: pointer">Remark</span></th>
       <th><span style="cursor: pointer">Status</span></th>
       <th><span style="cursor: pointer">Lastlogintime</span></th>
@@ -348,6 +350,8 @@ function delrow(){
       <th><a href="/user/view?useid={{.Id}}" title={{.Title}}>{{substr .Password 0 15}}</a></th>
       <th>{{.Nickname}}</th>
       <th>{{.Email}}</th>
+      <th>{{.Department}}</th>
+      <th>{{.Secoffice}}</th>
       <th>{{.Remark}}</th>
       <th>{{.Status}}</th>
       <th>{{dateformat .Lastlogintime "2006-01-02"}}</th>
