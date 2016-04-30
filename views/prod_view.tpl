@@ -142,7 +142,7 @@ color:#DC143C;
   <tbody>
     {{range $index,$elem:=.Chengguo}}
     <tr>
-      <th><input type="checkbox" id="jd" name="checkbox" value="{{.Id}}"/>{{$index}}</th>
+      <th><input type="checkbox" name="checkbox" value="{{.Id}}"/>{{$index}}</th>
       <th><a href="/topic/view/{{.Id}}">{{substr .Tnumber 0 15}}</a></th>
       <th><a href="/topic/view_b/{{.Id}}" title={{.Title}} target="_blank">{{substr .Title 0 15}}</a></th>
       <th>{{.Category}}</th>
@@ -241,8 +241,8 @@ color:#DC143C;
    }
 </script>
 <script type="text/javascript">
-  $(document).ready(function() {
-  $("table").tablesorter();
+  // $(document).ready(function() {
+  // $("table").tablesorter();
   // $("#ajax-append").click(function() {
   //    $.get("assets/ajax-content.html", function(html) {
   //     // append the "ajax'd" data to the table body
@@ -256,7 +256,7 @@ color:#DC143C;
   //   });
   //   return false;
   // });
-});
+// });
 </script>
 
 <script>

@@ -15,46 +15,20 @@
 </div>
 
 <div class="col-lg-12">
-<!--             <div class="btns">
-                <button id="goto-line-btn">Goto line 90</button>
-                <button id="show-btn">Show editor</button>
-                <button id="hide-btn">Hide editor</button>
-                <button id="get-md-btn">Get Markdown</button>
-                <button id="get-html-btn">Get HTML</button>
-                <button id="watch-btn">Watch</button>
-                <button id="unwatch-btn">Unwatch</button>
-                <button id="preview-btn">Preview HTML (Press Shift + ESC cancel)</button>
-                <button id="fullscreen-btn">Fullscreen (Press ESC cancel)</button>
-                <button id="show-toolbar-btn">Show toolbar</button>
-                <button id="close-toolbar-btn">Hide toolbar</button>
-                <button id="toc-menu-btn">ToC Dropdown menu</button>
-                <button id="toc-default-btn">ToC default</button>
-            </div> -->
+<h2>第一步：建立目录</h2>
   <form method="post" action="/category" enctype="multipart/form-data">
- <!--  <form method="post" action="/topic/addtopic1" enctype="multipart/form-data"> -->
     <div class="form-group">
       <label>项目编号：</label>
       <input id="number" class="form-control"  placeholder="例如“SL1999”。上传效果图之前必须先填写项目编号和项目名称" name="number"></div> 
     <div class="form-group">
       <label>项目名称：</label>
       <input id="name" class="form-control"  placeholder="例如“珠三角水资源配置工程”。上传效果图之前必须先填写项目编号和项目名称" name="name"></div>
-    <label>项目简介:</label>
+    <!--<label>项目简介:</label>
 <div>
-    <!-- <h1>项目简介:</h1> -->
-    <script id="editor" type="text/plain" style="height:500px;"></script><!-- width:1024px; -->
-</div>
-<!--     <div class="form-group" id="test-editormd">
-      <textarea style="display:none;" name="test-editormd-html-code"></textarea>
-    </div> -->
+    <script id="editor" type="text/plain" style="height:500px;"></script> width:1024px; 
+</div>-->
 
-<!--       <div class="input-group">
-      <label>选择效果图：<input type="file" name="image" id="image" /></label>
-      <p> <font size="4" color="#A52A2A">全部选中将向数据库中写入7*7*6=294行记录，耗时较长，请选中1~2个体验即可。</font>
-      </p>
-    </div> -->
 <hr>
-    <!-- <input type="hidden" name="op" value="add"> 这句应该没什么用了，因为controller里用post函数了-->
-
     <div class="col-md-4">
       <label>设计阶段</label>
       <div class="checkbox">

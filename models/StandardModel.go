@@ -25,13 +25,13 @@ import (
 //)
 
 type Standard struct {
-	Id         int64
-	Number     string //`orm:"unique"`
-	Title      string
-	Uid        int64
-	CategoryId int64
-	Content    string `orm:"sie(5000)"`
-	Route      string
+	Id       int64
+	Number   string //`orm:"unique"`
+	Title    string
+	Uid      int64
+	Category string
+	Content  string `orm:"sie(5000)"`
+	Route    string
 	// AttachmentId int64
 	// Attachments     []*Attachment `orm:"reverse(many)"` // fk 的反向关系
 	Created time.Time `orm:"index","auto_now_add;type(datetime)"`
@@ -79,7 +79,7 @@ func SaveStandard(standard Standard) (sid int64, err error) {
 	//判断是否有重名
 	// var spider Spider //下面这个filter放在topic=&Topic{后面用返回one(topic)则查询出错！
 	//只有编号和主机都不同才写入。
-	err = o.QueryTable("standard").Filter("title", standard.Title).One(&standard, "Id")
+	err = o.QueryTable("standard").Filter("number", standard.Number).Filter("title", standard.Title).One(&standard, "Id")
 	// err = o.QueryTable("topic").Filter("categoryid", cid).Filter("tnumber", tnumber).One(&topic, "Id")
 	if err == orm.ErrNoRows { //Filter("tnumber", tnumber).One(topic, "Id")==nil则无法建立
 		// 没有找到记录
@@ -96,6 +96,9 @@ func SaveStandard(standard Standard) (sid int64, err error) {
 		if err != nil {
 			return 0, err //如果文章编号相同，则唯一性检查错误，返回id吗？
 		}
+	} else { //进行更新
+		// _, err = o.Update(cate)
+		sid, err = o.Update(&standard)
 	}
 	return sid, err
 	// 原来的代码orm := orm.NewOrm()
@@ -110,7 +113,7 @@ func SaveLibrary(library Library) (lid int64, err error) {
 	//判断是否有重名
 	// var spider Spider //下面这个filter放在topic=&Topic{后面用返回one(topic)则查询出错！
 	//只有编号和主机都不同才写入。
-	err = o.QueryTable("library").Filter("title", library.Title).One(&library, "Id")
+	err = o.QueryTable("library").Filter("number", library.Number).Filter("title", library.Title).One(&library, "Id")
 	// err = o.QueryTable("topic").Filter("categoryid", cid).Filter("tnumber", tnumber).One(&topic, "Id")
 	if err == orm.ErrNoRows { //Filter("tnumber", tnumber).One(topic, "Id")==nil则无法建立
 		// 没有找到记录
@@ -127,6 +130,9 @@ func SaveLibrary(library Library) (lid int64, err error) {
 		if err != nil {
 			return 0, err //如果文章编号相同，则唯一性检查错误，返回id吗？
 		}
+	} else {
+		//进行更新操作
+		lid, err = o.Update(&library)
 	}
 	return lid, err
 	// 原来的代码orm := orm.NewOrm()
@@ -181,4 +187,16 @@ func SearchLiabraryNumber(Category, Number string) (*Library, error) {
 		return nil, err
 	}
 	return library, err
+}
+
+func GetAllStandards() ([]*Standard, error) {
+	o := orm.NewOrm()
+	standards := make([]*Standard, 0)
+	qs := o.QueryTable("standard")
+	var err error
+	//这里进行过滤，parentid为空的才显示
+	// qs = qs.Filter("ParentId", 0)
+	_, err = qs.OrderBy("-created").All(&standards)
+	// _, err := qs.All(&cates)
+	return standards, err
 }

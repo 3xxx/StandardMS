@@ -4,10 +4,10 @@ import (
 	// "fmt"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
-	"github.com/astaxie/beego/toolbox"
+	// "github.com/astaxie/beego/toolbox"
 	// "github.com/beego/i18n"
 	"os"
-	"quick/controllers"
+	// "quick/controllers"
 	_ "quick/routers"
 	// "quick/models"
 )
@@ -32,13 +32,13 @@ func main() {
 	// 需要先注册一个模板函数
 	// beego.AddFuncMap("i18n", i18n.Tr)
 
-	time := beego.AppConfig.String("spec") //"0/time * * * * *"
+	// time := beego.AppConfig.String("spec") //"0/time * * * * *"
 	// time1 := "0/" + time + " * * * * *"
-	time1 := "0 0 */" + time + " * * *"
-	tk1 := toolbox.NewTask("tk1", time1, func() error { controllers.TestJsonStartsWithArray(); return nil }) //func() error { fmt.Println("tk1"); return nil }
-	toolbox.AddTask("tk1", tk1)
-	toolbox.StartTask()
-	defer toolbox.StopTask()
+	// time1 := "0 0 */" + time + " * * *"
+	// tk1 := toolbox.NewTask("tk1", time1, func() error { controllers.TestJsonStartsWithArray(); return nil }) //func() error { fmt.Println("tk1"); return nil }
+	// toolbox.AddTask("tk1", tk1)
+	// toolbox.StartTask()
+	// defer toolbox.StopTask()
 
 	//启动beeego
 	beego.Run()

@@ -17,7 +17,7 @@ type Standardmore struct {
 	Number        string //`orm:"unique"`
 	Title         string
 	Uname         string //换成用户名
-	CategoryName  int64  //换成规范类别GB、DL……
+	CategoryName  string //换成规范类别GB、DL……
 	Content       string `orm:"sie(5000)"`
 	Route         string
 	Created       time.Time `orm:"index","auto_now_add;type(datetime)"`
@@ -28,7 +28,7 @@ type Standardmore struct {
 	LiNumber      string //完整编号
 }
 
-func (c *StandardController) Get() { //
+func (c *StandardController) Get() { //这个没用到
 	c.Data["IsStandard"] = true //这里修改到ListAllPosts()
 	c.TplName = "standard.tpl"
 	c.Data["IsLogin"] = checkAccount(c.Ctx)
@@ -75,12 +75,12 @@ func (c *StandardController) Index() { //
 		c.Data["Uname"] = v.(string)
 	}
 
-	topics, err := models.GetAllTopics("", false) //这里传入空字符串
+	standards, err := models.GetAllStandards() //这里传入空字符串
 	if err != nil {
 		beego.Error(err.Error)
 	} else {
-		c.Data["Topics"] = topics
-		c.Data["Length"] = len(topics)
+		c.Data["Standards"] = standards
+		c.Data["Length"] = len(standards) //得到总记录数
 	}
 }
 
@@ -119,8 +119,10 @@ func (c *StandardController) Search() { //search用的是post方法
 	for i, v := range Results1 {
 		//由userid查username
 		user := models.GetUserByUserId(v.Uid)
+		// beego.Info(v.Uid)
+		// beego.Info(user.Username)
 		//由standardnumber正则得到编号50268和分类GB
-		Category, Number := SplitStandardFileNumber(v.Number)
+		Category, _, Number := SplitStandardFileNumber(v.Number)
 		//由分类和编号查有效版本库中的编号
 		library, err := models.SearchLiabraryNumber(Category, Number)
 		if err != nil {
@@ -130,6 +132,7 @@ func (c *StandardController) Search() { //search用的是post方法
 		aa[i].Number = v.Number //`orm:"unique"`
 		aa[i].Title = v.Title
 		aa[i].Uname = user.Username //换成用户名
+		// beego.Info(aa[i].Uname)
 		// CategoryName   //换成规范类别GB、DL……
 		// Content
 		aa[i].Route = v.Route
@@ -141,12 +144,20 @@ func (c *StandardController) Search() { //search用的是post方法
 			aa[i].LibraryTitle = library.Title
 			aa[i].LiNumber = library.LiNumber //完整编号
 		} else {
-			aa[i].LibraryNumber = "no LibraryNumber find!"
+			aa[i].LiNumber = "No LibraryNumber Match Find!"
+			aa[i].LibraryTitle = ""
+			aa[i].LibraryNumber = ""
 		}
 	}
-
 	c.Data["json"] = aa //这里必须要是c.Data["json"]，其他c.Data["Data"]不行
 	c.ServeJSON()
+	// standards, err := models.GetAllStandards() //这里传入空字符串
+	// if err != nil {
+	// 	beego.Error(err.Error)
+	// } else {
+	// 	c.Data["Standards"] = standards
+	// 	c.Data["Length"] = len(standards) //得到总记录数
+	// }
 }
 
 //上传excel文件，导入到数据库
@@ -276,12 +287,15 @@ func (c *StandardController) ImportLibrary() {
 }
 
 func (c *StandardController) Standard_one_addbaidu() { //一对一模式
+	var standard models.Standard
 	//获取上传的文件
 	_, h, err := c.GetFile("file")
 	if err != nil {
 		beego.Error(err)
 	}
-	_, fileNumber, fileName, _, category := SplitStandardName(h.Filename)
+	//2016-4-23这里将文件的分类强制变为2位，那么GB 122-2016与GBT 122-2016就是一个文件了。
+	//是否应该增加一个返回值，将真实的GBT返回来。
+	category, categoryname, fileNumber, year, fileName, _ := SplitStandardName(h.Filename)
 	var path string
 	var filesize int64
 	if h != nil {
@@ -304,22 +318,32 @@ func (c *StandardController) Standard_one_addbaidu() { //一对一模式
 		filesize, _ = FileSize(path)
 		filesize = filesize / 1000.0
 	}
+	//纯英文下没有取到汉字字符，所以没有名称
 	if fileName == "" {
 		fileName = fileNumber
 	}
+
 	//获取用户名
 	sess, _ := globalSessions.SessionStart(c.Ctx.ResponseWriter, c.Ctx.Request)
 	defer sess.SessionRelease(c.Ctx.ResponseWriter)
-	// v := sess.Get("uname")
-	// uname := v.(string)
+	v := sess.Get("uname")
+	if v != nil {
+		uname := v.(string)
+		user := models.GetUserByUsername(uname)
+		//这里增加用户id
+		standard.Uid = user.Id
+		// beego.Info(user.Id)
+	}
 
-	var standard models.Standard
-
-	standard.Number = fileNumber
-	standard.Title = fileName
-
-	//这里增加用户id和CategoryId
-
+	if category != "Atlas" {
+		standard.Number = categoryname + " " + fileNumber + "-" + year
+		standard.Title = fileName
+	} else {
+		standard.Number = fileNumber
+		standard.Title = fileName
+	}
+	//这里增加Category
+	standard.Category = category
 	standard.Created = time.Now()
 	standard.Updated = time.Now()
 	standard.Route = "/attachment/standard/" + category + "/" + h.Filename

@@ -22,7 +22,7 @@ h4 {
 <table class="table table-striped">
   <thead>
       <tr>
-      <!-- <th><span style="cursor: pointer">Id</span></th> -->
+      <th><span style="cursor: pointer">UserId</span></th>
       <th><span style="cursor: pointer">Username</span></th>
       <th><span style="cursor: pointer">Password</span></th>
       <th><span style="cursor: pointer">Nickname</span></th>
@@ -43,7 +43,7 @@ h4 {
    {{range $index, $elem :=.Role}}
     <tr><!--tr表格的行，td定义一个单元格，<th> 标签定义表格内的表头单元格-->
       <!-- <th>{{$index}}</th> -->
-      <!-- <th>{{$.User.Id}}</th> value="{{$.User.Password}}"-->
+       <th>{{$.User.Id}}</th> <!-- value="{{$.User.Password}}" -->
       <th>{{$.User.Username}}</th>
       <th><input type="password" id="input" name="password"  size='18'/></th>
       <th><input type="text" id="input" name="nickname" value="{{$.User.Nickname}}" size='6'/></th>

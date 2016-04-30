@@ -199,150 +199,226 @@ func Record(filenameWithSuffix string) (Suffix, FileNumber, FileName, ProNumber,
 	return Suffix, FileNumber, FileName, ProNumber, ProJiduan, ProLeixing, ProZhuanye
 }
 
-//分离规范名称为编号好名称，用于规范上传
-func SplitStandardName(filenameWithSuffix string) (Suffix, FileNumber, FileName, Year, Category string) {
+//分离规范名称为分类，编号，年代和名称，用于规范上传
+func SplitStandardName(filenameWithSuffix string) (Category, Categoryname, FileNumber, Year, FileName, Suffix string) {
 	FileSuffix := path.Ext(filenameWithSuffix) //只留下后缀名
 	LengthSuffix := len([]rune(FileSuffix))
 	Suffix = SubString(FileSuffix, 1, LengthSuffix-1)
 	var filenameOnly string
 	filenameOnly = strings.TrimSuffix(filenameWithSuffix, FileSuffix) //只留下文件名，无后缀
+	lengthname := len([]rune(filenameOnly))
 	// fmt.Println("文件全名：", filenameOnly)                                //filenameOnly= mai
 	//这个测试一个字符串是否符合一个表达式。
 	//    match, _ := regexp.MatchString("p([a-z]+)ch", "peach")
 	//    fmt.Println(match)
 	//上面我们是直接使用字符串，但是对于一些其他的正则任务，你需要使用 Compile 一个优化的 Regexp 结构体。
 	//	r, _ := regexp.Compile(`[\P{Han}+`)
-	reg := regexp.MustCompile(`[\P{Han}]+`)
-	FileNumber1 := reg.FindAllString(filenameOnly, -1)
-	FileNumber = FileNumber1[0]
-	//	fmt.Printf("%q\n", FileNumber)
-	lengthnumber := len([]rune(FileNumber))
-	lengthname := len([]rune(filenameOnly))
-	FileName = SubString(filenameOnly, lengthnumber, lengthname)
+	//采用数字和非数字来进行分离
+	//如果符合标准的格式，才进行分离，否则不分离
+	//标准格式正则表达式为：英文 空格 数字或英文 减号 数字 英文或汉字或其他
+	//r, _ := regexp.Compile(`[[:upper:]]{2}[0-9]+[[:upper:]\.0-9]+[-][0-9]+[-][0-9]+[\p{Han} \(\)\/~]`)
+	r, _ := regexp.Compile(`[a-zA-Z]+\s[0-9A-Za-z\.]+[-][0-9]+[\p{Han}a-zA-Z0-9 \(\)\/~]`)
+	//这个结构体有很多方法。这里是类似我们前面看到的一个匹配测试。
+	// fmt.Println(r.MatchString(filenameOnly))
+	if r.MatchString(filenameOnly) { //如果符合正则表达式
+		//		fmt.Printf("%q\n", "ok")
+		//减号后的数字，2个或4个，然后就是名称
+		jianhao := UnicodeIndex(filenameOnly, "-")
 
-	// fmt.Printf("%q\n", FileName)
-
-	if SubString(FileNumber, lengthnumber-1, lengthnumber) == " " { //如果最后一个字符是空格,                                                   //如果没有空格，则用正则表达式获取编号
-		FileNumber = SubString(FileNumber, 0, lengthnumber-1)
-	}
-
-	// fmt.Printf("%q\n", FileNumber)
-
-	//这里继续提取年代
-	jianhao := UnicodeIndex(FileNumber, "-")
-	lengthnumber = len([]rune(FileNumber))
-	Year = SubString(FileNumber, jianhao+1, lengthnumber)
-	// fmt.Printf("%q\n", Year)
-	//获取分类
-	Category = SubString(FileNumber, 0, 2)
-	switch Category {
-	case "GB":
-		Category = "GB"
-	case "SL":
-		Category = "SL"
-	case "DL":
-		Category = "DL"
-	case "JT":
-		Category = "JT"
-	case "CE":
-		Category = "CECS"
-	case "CJ":
-		Category = "CJ"
-	case "DG":
-		Category = "DG"
-	case "AW":
-		Category = "AWWA"
-	case "EN":
-		Category = "EN"
-	case "JB":
-		Category = "JB"
-	case "BS":
-		Category = "BS"
-	case "HG":
-		Category = "HG"
-	case "SY":
-		Category = "SY"
-	case "IS":
-		Category = "ISO"
-	case "SH":
-		Category = "SH"
-	case "AS":
-		Category = "ASME"
-	case "JI":
-		Category = "JIS"
-	case "NA":
-		Category = "NACE"
-	case "RC":
-		Category = "RCC"
-	default: //图集
+		FileName = SubString(filenameOnly, jianhao+1, lengthname)
+		//		fmt.Printf("%q\n", FileName)
+		reg := regexp.MustCompile(`[0-9]+`)
+		Year1 := reg.FindAllString(FileName, -1)
+		Year = Year1[0]
+		// fmt.Printf("%q\n", Year)
+		lengthyear := len([]rune(Year))
+		lengthname1 := len([]rune(FileName))
+		FileName = SubString(FileName, lengthyear, lengthname1)
+		// fmt.Printf("%q\n", FileName)
+		//bianhao
+		//kongge he jianhao zhijian
+		kongge := UnicodeIndex(filenameOnly, " ")
+		jianhao = UnicodeIndex(filenameOnly, "-")
+		//		fmt.Printf("%q\n", jianhao)
+		FileNumber = SubString(filenameOnly, kongge+1, jianhao-kongge-1)
+		// fmt.Printf("%q\n", FileNumber)
+		//获取分类
+		Categoryname = SubString(filenameOnly, 0, kongge-1)
+		Category = SubString(filenameOnly, 0, 2)
+		switch Category {
+		case "GB":
+			Category = "GB"
+		case "SL":
+			Category = "SL"
+		case "DL":
+			Category = "DL"
+		case "JT":
+			Category = "JT"
+		case "JG":
+			Category = "JG"
+		case "JC":
+			Category = "JC"
+		case "DB":
+			Category = "DB"
+		case "TB":
+			Category = "TB"
+		case "CE":
+			Category = "CECS"
+		case "CJ":
+			Category = "CJ"
+		case "DG":
+			Category = "DG"
+		case "AW":
+			Category = "AWWA"
+		case "EN":
+			Category = "EN"
+		case "DI":
+			Category = "DIN"
+		case "JB":
+			Category = "JB"
+		case "BS":
+			Category = "BS"
+		case "HG":
+			Category = "HG"
+		case "HJ":
+			Category = "HJ"
+		case "HY":
+			Category = "HY"
+		case "SY":
+			Category = "SY"
+		case "IS":
+			Category = "ISO"
+		case "SH":
+			Category = "SH"
+		case "AS":
+			Category = "ASME"
+		case "AN":
+			Category = "ANSI"
+		case "JI":
+			Category = "JIS"
+		case "NA":
+			Category = "NACE"
+		case "RC":
+			Category = "RCC"
+		default: //图集
+			Category = "Atlas"
+		}
+		//		reg = regexp.MustCompile(`[\P{Han}]+`)
+		//		FileNumber1 := reg.FindAllString(filenameOnly, -1)
+		//		FileNumber = FileNumber1[0]
+		//		//	fmt.Printf("%q\n", FileNumber)
+		//		lengthnumber := len([]rune(FileNumber))
+		//		//		lengthname := len([]rune(filenameOnly))
+		//		FileName = SubString(filenameOnly, lengthnumber, lengthname)
+		//		//chazhaolianxushuzi
+		//		fmt.Printf("%q\n", FileName)
+		//		if SubString(FileNumber, lengthnumber-1, lengthnumber) == " " { //如果最后一个字符是空格,                                                   //如果没有空格，则用正则表达式获取编号
+		//			FileNumber = SubString(FileNumber, 0, lengthnumber-1)
+		//		}
+		//	fmt.Printf("%q\nFileNumber：", FileNumber)
+		//这里继续提取年代
+		//2016-4-20减号后连续数字，不超过4位
+		//		jianhao := UnicodeIndex(FileNumber, "-")
+		//		lengthnumber = len([]rune(FileNumber))
+		//		Year = SubString(FileNumber, jianhao+1, lengthnumber)
+		//	fmt.Printf("%q\nYear：", Year)
+		// fmt.Printf("%q\n", Category)
+	} else {
+		//如果不符合正则，则对字母和汉字，数字和汉字，空格前后进行分割
+		blankloc := UnicodeIndex(filenameOnly, " ") // 查找空格这个字符的位置
+		if blankloc == 0 {                          //如果没有空格, 找汉字
+			reg := regexp.MustCompile(`[\P{Han}]+`)
+			FileNumber1 := reg.FindAllString(filenameOnly, -1)
+			FileNumber = FileNumber1[0]
+			// fmt.Printf("%q\nNumber：", FileNumber)
+			//		reg = regexp.MustCompile(`[\P{Han}]+`)
+			// FileNumber = FileNumber
+			lengthNumber := len([]rune(FileNumber))
+			FileName = SubString(filenameOnly, lengthNumber+1, lengthname)
+		} else { //有空格
+			FileNumber = SubString(filenameOnly, 0, blankloc-1)
+			FileName = SubString(filenameOnly, blankloc+1, lengthname)
+		}
 		Category = "Atlas"
+		//		 fmt.Printf("%q\n", FileName)
 	}
-
-	return Suffix, FileNumber, FileName, Year, Category
+	return Category, Categoryname, FileNumber, Year, FileName, Suffix
 }
 
 //分离上面结果中FileNumber的分类GB和编号50268
-func SplitStandardFileNumber(filenumber string) (Category, Number string) {
-	//查找连续的字母
-	reg := regexp.MustCompile(`[a-zA-Z]+`)
-	Number1 := reg.FindAllString(filenumber, -1)
-	rl := len([]rune(Number1[0]))
-	//这里继续提取编号
-	jianhao := UnicodeIndex(filenumber, "-")
-	//	lengthnumber := len([]rune(filenumber))
-	blankloc := UnicodeIndex(filenumber, " ") // 查找空格这个字符的位置
-	if blankloc == 0 {                        //如果没有空格
-		Number = SubString(filenumber, rl, jianhao-rl)
-	} else { //如果有空格
-		Number = SubString(filenumber, rl+1, jianhao-rl-1)
-	}
-	// fmt.Printf("%q\n", Number)
-	Number2 := Number1[0]
-	Category = SubString(Number2, 0, 2) //如果不够2位，返回全部范围
-	switch Category {
-	case "GB":
-		Category = "GB"
-	case "SL":
-		Category = "SL"
-	case "DL":
-		Category = "DL"
-	case "JT":
-		Category = "JT"
-	case "CE":
-		Category = "CECS"
-	case "CJ":
-		Category = "CJ"
-	case "DG":
-		Category = "DG"
-	case "AW":
-		Category = "AWWA"
-	case "EN":
-		Category = "EN"
-	case "JB":
-		Category = "JB"
-	case "BS":
-		Category = "BS"
-	case "HG":
-		Category = "HG"
-	case "SY":
-		Category = "SY"
-	case "IS":
-		Category = "ISO"
-	case "SH":
-		Category = "SH"
-	case "AS":
-		Category = "ASME"
-	case "JI":
-		Category = "JIS"
-	case "NA":
-		Category = "NACE"
-	case "RC":
-		Category = "RCC"
-	default: //图集
+func SplitStandardFileNumber(filenumber string) (Category, Categoryname, Number string) {
+	r, _ := regexp.Compile(`[a-zA-Z]+\s[0-9A-Za-z\.]+[-][0-9]+`)
+	if r.MatchString(filenumber) { //如果符合正则表达式
+		blankloc := UnicodeIndex(filenumber, " ") // 查找空格这个字符的位置
+		jianhao := UnicodeIndex(filenumber, "-")
+		Number = SubString(filenumber, blankloc+1, jianhao-blankloc-1)
+		Categoryname = SubString(filenumber, 0, blankloc-1) //如果不够2位，返回全部范围
+
+		Category = SubString(filenumber, 0, 2)
+		switch Category {
+		case "GB":
+			Category = "GB"
+		case "SL":
+			Category = "SL"
+		case "DL":
+			Category = "DL"
+		case "JT":
+			Category = "JT"
+		case "JG":
+			Category = "JG"
+		case "JC":
+			Category = "JC"
+		case "DB":
+			Category = "DB"
+		case "TB":
+			Category = "TB"
+		case "CE":
+			Category = "CECS"
+		case "CJ":
+			Category = "CJ"
+		case "DG":
+			Category = "DG"
+		case "AW":
+			Category = "AWWA"
+		case "EN":
+			Category = "EN"
+		case "DI":
+			Category = "DIN"
+		case "JB":
+			Category = "JB"
+		case "BS":
+			Category = "BS"
+		case "HG":
+			Category = "HG"
+		case "HJ":
+			Category = "HJ"
+		case "HY":
+			Category = "HY"
+		case "SY":
+			Category = "SY"
+		case "IS":
+			Category = "ISO"
+		case "SH":
+			Category = "SH"
+		case "AS":
+			Category = "ASME"
+		case "AN":
+			Category = "ANSI"
+		case "JI":
+			Category = "JIS"
+		case "NA":
+			Category = "NACE"
+		case "RC":
+			Category = "RCC"
+		default: //图集
+			Category = "Atlas"
+		}
+	} else {
 		Category = "Atlas"
 	}
 	// fmt.Printf("%q\n", Category)
-	return Category, Number
+	// fmt.Printf("%q\n", Number)
+	return Category, Categoryname, Number
 }
 
 func SubStrings(filenameWithSuffix string) (substr1, substr2 string) {

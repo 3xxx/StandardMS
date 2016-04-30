@@ -68,10 +68,20 @@ func init() {
 	beego.Router("/category/userdefinedpost", &controllers.CategoryController{}, "post:UserdefinedPost")
 	//项目B显示路由
 	beego.Router("/category_b", &controllers.CategoryController{}, "get:Get_b")
+	//添加项目视图第一步
 	beego.Router("/category/add", &controllers.CategoryController{}, "get:Add")
+	//添加项目视图第二步
+	beego.Router("/category/add2", &controllers.CategoryController{}, "get:Add2")
+	//添加项目第二步方法提交
+	beego.Router("/category/post2", &controllers.CategoryController{}, "post:Post2")
+	//添加项目第二步上传封面图片
+	beego.Router("/category/addcoverphoto", &controllers.CategoryController{}, "post:AddCoverPhoto")
+
 	//添加自定义目录
 	beego.Router("/category/add_b", &controllers.CategoryController{}, "get:Add_b")
+	//添加项目第一步方法提交 等等
 	beego.AutoRouter(&controllers.CategoryController{}) //这句代替上句也行
+
 	beego.Router("/category/view", &controllers.CategoryController{}, "get:View")
 	beego.Router("/category/viewbrief", &controllers.CategoryController{}, "get:ViewBrief")
 	//项目B模式显示指定成果类型里的成果

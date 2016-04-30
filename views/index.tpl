@@ -135,9 +135,10 @@ h1[id] {
         </h3>
         
   <div class="content">
-  {{str2html .Content}}
+  {{str2html .Cover}}
   <!-- 项目简介如何截取html呢？ -->
   </div>
+  <img src="{{.Route}}" width="800" align="middle">
    <!--  <div id="editormd-{{$index}}" name="test-editormd-view2" class="content">class="markdown-body editormd-html-preview"
        <textarea id="{{$index}}" style="display:none;">{{.Content}}</textarea> append-test
     </div> --> 

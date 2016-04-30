@@ -29,7 +29,7 @@
 <div class="text-center">
   <h1 > <i class="glyphicon glyphicon-chevron-right"></i> <i class="glyphicon glyphicon-minus"></i>
   </h1>
-  <h1 >搜索 0,361 个 文件</h1>
+  <h1 >搜索{{.Length}}个 文件</h1>
   <p class="large">
     HydroCMS 是一个微服务系统，你可以上传你的资料，也可以在自己电脑上运行HydroCMS，像本站这样发布资料，还可以将资料打包共享。
   </p>
@@ -59,11 +59,11 @@
           <i class="browser icon"></i>
           查询结果
         </h1>
-        <table class="ui basic table">
+        <table class="table table-striped"><!-- class="ui basic table" -->
           <thead>
             <tr>
-              <th width="35%">编号</th>
-              <th width="25%">名称</th>
+              <th >编号</th>
+              <th >名称</th>
               <th>链接</th>
               <th>上传者</th>
               <th>有效版本库</th>
@@ -150,34 +150,51 @@ $("#search").click(function(){//这里应该用button的id来区分按钮的哪�
                 data: {name: $("#name").val()},
                 success:function(data,status){//数据提交成功时返回数据
                   // alert(data);
+                  // alert(data[1].Uname);
                   $.each(data,function(i,d){
-                  $("#results").append('<tr>'); 
-                  $("#results").append('<th>' + data[i].Number + '</th>');
-                  $("#results").append('<th>' + data[i].Title + '</th>');
-                  $("#results").append('<th><a href="' + data[i].Route + '"  target="_black"><i class="glyphicon glyphicon-download-alt"></i>下载</a></th>');
-                  $("#results").append('<th>' + data[i].Uid + '</th>');
-                  $("#results").append('<th>' + data[i].LiNumber + data[i].LibraryTitle + '</th>');
-                  $("#results").append('</tr>');
-                  // <a href="/topic/view_b/{{.Id}}"><i class="glyphicon glyphicon-download-alt"></i>下载</a>
-                  // $("#results").append("<li>"+data[i].Title+"</li>");
-                            }); 
+                    var tr=$("<tr></tr>");
+                    var th1=$('<th>' + data[i].Number + '</th>');
+                    var th2=$('<th>' + data[i].Title + '</th>');
+                    var th3=$('<th><a href="' + data[i].Route + '"  target="_black"><i                    class="glyphicon glyphicon-download-alt"></i>下载</a></th>');
+                    var th4=$('<th>' + data[i].Uname + '</th>');
+                    var th5=$('<th>' + data[i].LiNumber + data[i].LibraryTitle + '</th>');
+                    tr.append(th1);
+                    tr.append(th2);
+                    tr.append(th3);
+                    tr.append(th4);
+                    tr.append(th5);
+                    $("#results").append(tr);
+
+                  // $("#results").append('<tr>'); 
+                  // $("#results").append('<th>' + data[i].Number + '</th>');
+                  // $("#results").append('<th>' + data[i].Title + '</th>');
+                  // $("#results").append('<th><a href="' + data[i].Route + '"  target="_black"><i class="glyphicon glyphicon-download-alt"></i>下载</a></th>');
+                  // $("#results").append('<th>' + data[i].Uname + '</th>');
+                  // $("#results").append('<th>' + data[i].LiNumber + data[i].LibraryTitle + '</th>');
+                  // $("#results").append('</tr>');
+                    }); 
                     // alert("成功！"+data[0].Title); 
                   }       
             });
 
-            // $.ajax({
-            //     type:"post",
-            //     url:"/standard/search",
-            //     data: {name: $("#name").val()},
-            //     alert(data)
-            //     success:function(data,status){//数据提交成功时返回数据
-            //       $.each(data,function(i,d){
-            //           $("#results").append('<p value="' + data[i].Title + '"></p>');
-            //                 }); 
-            //         alert("成功！");
-            //     }
-            // });
-            // return true;
+// function addRow(){
+//     //声明tr td对象
+//     var tr=$("<tr></tr>");
+//     var td1=$("<td></td>");//拼接td，如果有td里有内容拼接时候填充进去
+//     var td2=$("<td></td>");//拼接td，如果有td里有内容拼接时候填充进去
+//     var td3=$("<td></td>");//拼接td，如果有td里有内容拼接时候填充进去
+//     var td4=$("<td></td>");//拼接td，如果有td里有内容拼接时候填充进去
+//     //将td添加到tr里
+//     tr.append(td1);
+//     tr.append(td2);
+//     tr.append(td3);
+//     tr.append(td4);
+//     //或者
+//     var tr="<tr><td></td> <td></td> <td></td> <td></td></tr>";//拼接html，如果有td里有内容拼接时候填充进去
+    
+//     //再将tr添加到表格内
+//     $("#表格的id").append(tr);
+// }
  });
 });
 
@@ -297,13 +314,18 @@ function getKey()
                 success:function(data,status){//数据提交成功时返回数据
                   // alert(data);
                   $.each(data,function(i,d){
-                  $("#results").append('<tr>'); 
-                  $("#results").append('<th>' + data[i].Number + '</th>');
-                  $("#results").append('<th>' + data[i].Title + '</th>');
-                  $("#results").append('<th><a href="' + data[i].Route + '"  target="_black"><i class="glyphicon glyphicon-download-alt"></i>下载</a></th>');
-                  $("#results").append('<th>' + data[i].Uid + '</th>');
-                  $("#results").append('<th>' + data[i].LiNumber + data[i].LibraryTitle + '</th>');
-                  $("#results").append('</tr>');
+                    var tr=$("<tr></tr>");
+                    var th1=$('<th>' + data[i].Number + '</th>');
+                    var th2=$('<th>' + data[i].Title + '</th>');
+                    var th3=$('<th><a href="' + data[i].Route + '"  target="_black"><i                    class="glyphicon glyphicon-download-alt"></i>下载</a></th>');
+                    var th4=$('<th>' + data[i].Uname + '</th>');
+                    var th5=$('<th>' + data[i].LiNumber + data[i].LibraryTitle + '</th>');
+                    tr.append(th1);
+                    tr.append(th2);
+                    tr.append(th3);
+                    tr.append(th4);
+                    tr.append(th5);
+                    $("#results").append(tr);
                   // <a href="/topic/view_b/{{.Id}}"><i class="glyphicon glyphicon-download-alt"></i>下载</a>
                   // $("#results").append("<li>"+data[i].Title+"</li>");
                             }); 

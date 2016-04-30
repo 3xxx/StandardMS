@@ -291,8 +291,8 @@ function toggle_checkall(field_name, state) {
    }
 </script>
 <script type="text/javascript">
-  $(document).ready(function() {
-  $("table").tablesorter();
+  // $(document).ready(function() {
+  // $("table").tablesorter();
   // $("#ajax-append").click(function() {
   //    $.get("assets/ajax-content.html", function(html) {
   //     // append the "ajax'd" data to the table body
@@ -306,7 +306,7 @@ function toggle_checkall(field_name, state) {
   //   });
   //   return false;
   // });
-});
+// });
 </script>
 
 

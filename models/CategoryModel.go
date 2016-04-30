@@ -16,6 +16,7 @@ type Category struct {
 	Title           string `form:"title;text;title:",valid:"MinSize(1);MaxSize(20)"` //orm:"unique",
 	Number          string `orm:"unique",form:"title;text;title:",valid:"MinSize(1);MaxSize(20)"`
 	Content         string `orm:"sie(5000)"`
+	Cover           string `orm:"sie(5000)"`
 	Route           string
 	Created         time.Time `orm:"index","auto_now_add;type(datetime)"`
 	Updated         time.Time `orm:"index","auto_now_add;type(datetime)"`
@@ -34,18 +35,19 @@ func init() {
 	orm.RegisterDataBase("default", "sqlite3", "database/hydrocms.db", 10)
 }
 
-func AddCategory(name, number, content, path, route, uname, diskdirectory, url string) (id int64, err error) {
+func AddCategory(name, number, content, cover, path, route, uname, diskdirectory, url string) (id int64, err error) {
 	o := orm.NewOrm()
 	cate := &Category{
 		Title:         name,
 		Number:        number,
 		Content:       content,
+		Cover:         cover,
 		Author:        uname,
 		Route:         route,
 		Created:       time.Now(),
 		Updated:       time.Now(),
-		DiskDirectory: diskdirectory,
-		Url:           url,
+		DiskDirectory: ".\\attachment\\" + number + name + "\\",
+		Url:           "/attachment/" + number + name + "/",
 	}
 	qs := o.QueryTable("category") //不知道主键就用这个过滤操作
 	//进行编号唯一性检查
@@ -362,7 +364,7 @@ func AdduserdefinedCategory(name, number, content string, path2, path3, path4 []
 	return id, nil
 }
 
-func ModifyCategory(cid, name, number, content, path, route, uname string) error {
+func ModifyCategory(cid, name, number, content, cover, path, route, uname string) error {
 	cidNum, err := strconv.ParseInt(cid, 10, 64)
 	// cid, err := strconv.ParseInt(categoryid, 10, 64)
 	if err != nil {
@@ -386,11 +388,13 @@ func ModifyCategory(cid, name, number, content, path, route, uname string) error
 	// 	}
 	// }
 	if o.Read(cate) == nil {
-		if route == "" { //如果没有更新图片，则不更新图片地址
-			cate.Title = name
-			cate.Number = number
+		if name == "" { //如果名称为空，则是添加封面
+			// cate.Title = name
+			// cate.Number = number
+			cate.Route = route
 			cate.Content = content
-			cate.Author = uname
+			cate.Cover = cover
+			// cate.Author = uname
 			// cate.Route = route
 			// cate.Created: time.Now(),
 			cate.Updated = time.Now()
@@ -402,6 +406,7 @@ func ModifyCategory(cid, name, number, content, path, route, uname string) error
 			cate.Title = name
 			cate.Number = number
 			cate.Content = content
+			cate.Cover = cover
 			cate.Author = uname
 			cate.Route = route
 			// cate.Created: time.Now(),
