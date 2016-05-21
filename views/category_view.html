@@ -10,6 +10,7 @@
 
 <!-- 徽章颜色 RoyalBlue-->
 <style>
+img{max-width:100%}
 span.badge
 {
 background-color:#6495ED;
@@ -28,10 +29,14 @@ background-color:#6495ED;
   <h1>
     {{.Category.Number}}{{.Category.Title}}
     <a href="/category/modify?cid={{.Tid}}" class="btn btn-default">修改项目</a>
+    <a href="/category/modifyfrm?cid={{.Tid}}" class="btn btn-default">修改目录</a>
   </h1>
+{{range $k,$v :=.Label}}
+  <a href="/category?op=viewlabel&label={{.Title}}" ><span class="label label-info">{{.Title}}</span></a>
+{{end}}
+
 </div>
-
-
+<p>&nbsp; </p>
 
 <div class="col-lg-12">
 <div class="container-fluid">
@@ -40,8 +45,6 @@ background-color:#6495ED;
     <aside class="sidebar">
       <nav class="sidebar-nav">
         <ul class="metismenu" id="menu">
-
-
 <!--           <li>
             <a href="#" aria-expanded="false">Menu 1 <span class="glyphicon arrow"></span></a>
             <ul aria-expanded="false">
@@ -73,25 +76,31 @@ background-color:#6495ED;
           </a></li>
 
         {{range $k,$v :=.Categoryjieduan}}
+        {{if $v.Isshow}}
           <li>
             <a href="#" aria-expanded="false"><i class="glyphicon glyphicon-stop"></i>&nbsp;{{.Title}} <span class="glyphicon arrow"></span></a>
             <ul aria-expanded="false">
             {{range $k1,$v1 :=$.Categoryzhuanye}}
                 {{if eq $v.Id $v1.ParentId}}
+                {{if $v1.Isshow}}
               <li>
                 <a href="#" aria-expanded="false"><i class="glyphicon glyphicon-th-large"></i>&nbsp;{{.Title}} <span class="fa plus-minus"></span></a>
                 <ul aria-expanded="false">
                       {{range $k2,$v2 :=$.Categorychengguo}}
                           {{if eq $v1.Id $v2.ParentId}}
+                          {{if $v2.Isshow}}
                           <li><a href="/category/view?id={{.Id}}" target='main'>&nbsp;&nbsp;<i class="glyphicon glyphicon-th"></i>&nbsp;{{.Title}}-<span class="badge">{{.TopicCount}}</span></a></li>
+                          {{end}}
                           {{end}}
                       {{end}}
                 </ul>
               </li>
                 {{end}}
+                {{end}}
               {{end}}
             </ul>
           </li>
+        {{end}}
         {{end}}
 
         </ul>
@@ -100,23 +109,13 @@ background-color:#6495ED;
 
   </div>
   <!-- <hr> -->
-
 </div>
-
-
-
-      
-        
-      
 
       <div class="col-lg-9">
         <iframe src="/category/category_prod_view?id={{.Category.Id}}&title={{.Category.Title}}" name='main' id="iframepage" frameborder="0" width="100%" scrolling="no" marginheight="0" marginwidth="0" onLoad="iFrameHeight()"></iframe>
       </div>    
 </div>
 </div>
-
-
-
 
 <!-- 自动适应高度 -->
 <script type="text/javascript" language="javascript">   

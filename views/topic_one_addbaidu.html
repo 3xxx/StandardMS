@@ -9,8 +9,6 @@
     <script type="text/javascript" charset="utf-8" src="/static/ueditor/lang/zh-cn/zh-cn.js"></script>
 <!--引入CSS-->
 <link rel="stylesheet" type="text/css" href="/static/fex-team-webuploader/css/webuploader.css">
-<!-- <script type="text/javascript" src="/static/js/jquery-2.1.3.min.js"></script> -->
-<!--引入JS-->
 <script type="text/javascript" src="/static/fex-team-webuploader/dist/webuploader.js"></script>
     <style type="text/css">
 h3 {line-height: 150%;
@@ -42,13 +40,6 @@ h3 {line-height: 150%;
 }
 </style>
 </head>
-
-
-<!--引入CSS-->
-<link rel="stylesheet" type="text/css" href="/static/fex-team-webuploader/css/webuploader.css">
-<!-- <script type="text/javascript" src="/static/js/jquery-2.1.3.min.js"></script> -->
-<!--引入JS-->
-<script type="text/javascript" src="/static/fex-team-webuploader/dist/webuploader.js"></script>
 
 <body>
 <div class="navbar navba-default navbar-fixed-top">
@@ -323,14 +314,13 @@ jQuery(function() {
 
     // 当有文件添加进来的时候
     uploader.on( 'fileQueued', function( file ) {
-    var c=$('#container').val();
+        var categoryid = $('#categoryid').val();
+        var category = $('#category').val();
+        var html = ue.getContent();
       uploader.option('formData', {
-        // uid: 123
-        // 'tnumber':a,
-        // 'title':b,
-        'categoryid':a,
-        'category':b,
-        'content':c,
+        'categoryid':categoryid,
+        'category':category,
+        'content':html,
         // {'tnumber':a,'title':b,'categoryid':c,'category':d,'content':e}
       });
 

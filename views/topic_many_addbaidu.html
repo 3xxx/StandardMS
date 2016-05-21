@@ -234,6 +234,7 @@ jQuery(function() {
 
     uploader.on( 'uploadComplete', function( file ) {
         $( '#'+file.id ).find('.progress').fadeOut();
+        //每一个上传成功alert("成功！");
     });
 
     uploader.on( 'all', function( type ) {

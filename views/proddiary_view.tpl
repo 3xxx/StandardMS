@@ -63,8 +63,8 @@ $("#export").click(function(){//这里应该用button的id来区分按钮的哪�
   <thead>
     <tr>
       <th style="cursor: pointer">#{{.Length}}</th>
-      <th style="cursor: pointer">日记编号</th>
-      <th style="cursor: pointer">日记名称</th>
+      <th style="cursor: pointer">文章编号</th>
+      <th style="cursor: pointer">文章名称</th>
       <th style="cursor: pointer">最后更新</th>
       <th style="cursor: pointer">浏览</th>
       <th style="cursor: pointer">回复数</th>
@@ -77,14 +77,14 @@ $("#export").click(function(){//这里应该用button的id来区分按钮的哪�
       <th>{{$index}}</th>
 <!--       <th><a href="/topic/view/{{.Id}}" target="_blank">{{.Tnumber}}</a></th>
       <th><a href="/topic/view/{{.Id}}" title={{.Title}}>{{substr .Title 0 15}}</a></th> -->
-      <th><a href="/topic/view/{{.Id}}">{{substr .Tnumber 0 15}}</a></th>
+      <th><a href="/topic/view_b/{{.Id}}" title={{.Title}} target="_blank">{{substr .Tnumber 0 15}}</a></th>
       <th><a href="/topic/view_b/{{.Id}}" title={{.Title}} target="_blank">{{substr .Title 0 15}}</a></th>
 
       <th>{{dateformat .Updated "2006-01-02"}}</th>
       <th>{{.Views}}</th>
       <th>{{.ReplyCount}}</th>
-      <th><a href="/topic/view/{{.Id}}">下载</a>
-      <a href="/topic/modify?tid={{.Id}}">修改</a>
+      <th><a href="/topic/view_b/{{.Id}}" title={{.Title}} target="_blank">下载</a>
+      <a href="/topic/modify?tid={{.Id}}" target="_blank">修改</a>
       <a href="/topic/delete?tid={{.Id}}">删除</a></th>
       <!--<th>
         <a href="/topic?op=del&id={{.Id}}">删除</a>

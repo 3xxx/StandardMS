@@ -146,29 +146,32 @@ func AddCatalog(name, tnumber string) (id int64, err error) {
 		err = o.QueryTable("catalog").Filter("tnumber", tnumber).One(&catalog, "Id")
 		id = catalog.Id
 	}
-
 	return id, err
 }
 
-func ModifyCatalog(tid, title, tnumber string) error {
-	tidNum, err := strconv.ParseInt(tid, 10, 64)
-	_, err = strconv.ParseInt(title, 10, 64)
+func ModifyCatalog(cid string, catalog1 Catalog) error {
+	cidNum, err := strconv.ParseInt(cid, 10, 64)
 	if err != nil {
 		return err
 	}
-
-	// var oldAttach string //oldCate,
-	// var oldCatalog string
 	o := orm.NewOrm()
-	catalog := &Catalog{Id: tidNum}
+	catalog := &Catalog{Id: cidNum}
 	if o.Read(catalog) == nil {
-		// oldAttach = topic.Attachment
-
-		catalog.Name = title
-		catalog.Tnumber = tnumber
-
-		// topic.Attachment = attachment
-		// catalog.Updated = time.Now()
+		catalog.Tnumber = catalog1.Tnumber
+		catalog.Name = catalog1.Name
+		catalog.Drawn = catalog1.Drawn
+		catalog.Designd = catalog1.Designd
+		catalog.Checked = catalog1.Checked
+		catalog.Emamined = catalog1.Emamined
+		catalog.Verified = catalog1.Verified
+		catalog.Approved = catalog1.Approved
+		catalog.Data = catalog1.Data
+		catalog.DesignStage = catalog1.DesignStage
+		catalog.Section = catalog1.Section
+		catalog.Projec = catalog1.Projec
+		// catalogid, _ := strconv.ParseInt(cid, 10, 64)
+		// catalog.Created = time.Now()
+		catalog.Updated = time.Now()
 		_, err = o.Update(catalog)
 		if err != nil {
 			return err
@@ -177,48 +180,26 @@ func ModifyCatalog(tid, title, tnumber string) error {
 	return err
 }
 
-func DeletCatalog(tid string) error { //应该在controllers中显示警告
-	tidNum, err := strconv.ParseInt(tid, 10, 64)
+func DeletCatalog(cid string) error { //应该在controllers中显示警告
+	cidNum, err := strconv.ParseInt(cid, 10, 64)
 	if err != nil {
 		return err
 	}
 
-	var oldCateId int64
 	o := orm.NewOrm()
 	// Read 默认通过查询主键赋值，可以使用指定的字段进行查询：
 	// user := User{Name: "slene"}
 	// err = o.Read(&user, "Name")
-
-	topic := Topic{Id: tidNum}
-	if o.Read(&topic) == nil {
-		oldCateId = topic.CategoryId
-		_, err = o.Delete(&topic)
+	catalog := Catalog{Id: cidNum}
+	if o.Read(&catalog) == nil {
+		_, err = o.Delete(&catalog)
 		if err != nil {
 			return err
 		}
 	}
-
-	attachment := Attachment{TopicId: tidNum}
-	if o.Read(&attachment, "TopicId") == nil {
-		// oldCate = topic.Category
-		_, err = o.Delete(&attachment)
-		if err != nil {
-			return err
-		}
-	}
-
-	if oldCateId > 0 {
-		cate := new(Category)
-		qs := o.QueryTable("category")
-		err = qs.Filter("id", oldCateId).One(cate)
-		if err == nil {
-			cate.TopicCount--
-			_, err = o.Update(cate)
-		}
-	}
-	_, err = o.Delete(&topic) //这句为何重复？
 	return err
 }
+
 func GetCatalog(tid string) (*Catalog, error) {
 	tidNum, err := strconv.ParseInt(tid, 10, 64)
 	if err != nil {

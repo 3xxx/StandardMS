@@ -25,22 +25,22 @@ import (
 //)
 
 type Topic struct {
-	Id         int64
-	Uid        int64
-	Title      string
-	Tnumber    string //`orm:"unique"`
-	Category   string
-	CategoryId int64
-	Content    string `orm:"sie(5000)"`
-	Attachment string
+	Id                int64
+	Uid               int64
+	Title             string
+	Tnumber           string //`orm:"unique"`
+	Category          string
+	CategoryId        int64
+	Content           string `orm:"sie(5000)"`
+	Attachment        string
+	Created           time.Time `orm:"index","auto_now_add;type(datetime)"`
+	Updated           time.Time `orm:"index","auto_now;type(datetime)"`
+	Views             int64     `orm:"index"`
+	Author            string
+	ReplyTime         time.Time `orm:"index"`
+	ReplyCount        int64
+	ReplyLastUserName string
 	// Attachments     []*Attachment `orm:"reverse(many)"` // fk 的反向关系
-	Created         time.Time `orm:"index","auto_now_add;type(datetime)"`
-	Updated         time.Time `orm:"index","auto_now;type(datetime)"`
-	Views           int64     `orm:"index"`
-	Author          string
-	ReplyTime       time.Time `orm:"index"`
-	ReplyCount      int64
-	ReplyLastUserId int64
 }
 
 //附件,attachment 和 topic 是 ManyToOne 关系，也就是 ForeignKey 为 topic
@@ -286,7 +286,7 @@ func GetAllTopics(cate string, isDesc bool) ([]*Topic, error) {
 	topics := make([]*Topic, 0)
 	qs := o.QueryTable("topic")
 	var err error
-	if len(cate) > 0 { //这一半整个系统没有用到？？
+	if len(cate) > 0 {
 		qs := o.QueryTable("Category")
 		category := new(Category)
 		err = qs.Filter("Title", cate).One(category) //由项目名称获得项目id

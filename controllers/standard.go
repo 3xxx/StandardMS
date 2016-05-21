@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"github.com/astaxie/beego"
+	"github.com/astaxie/beego/logs"
 	"github.com/tealeg/xlsx"
 	"os"
 	"quick/models"
@@ -32,23 +33,9 @@ func (c *StandardController) Get() { //这个没用到
 	c.Data["IsStandard"] = true //这里修改到ListAllPosts()
 	c.TplName = "standard.tpl"
 	c.Data["IsLogin"] = checkAccount(c.Ctx)
-	//2.取得客户端用户名
-	sess, _ := globalSessions.SessionStart(c.Ctx.ResponseWriter, c.Ctx.Request)
-	defer sess.SessionRelease(c.Ctx.ResponseWriter)
-	v := sess.Get("uname")
-	if v != nil {
-		c.Data["Uname"] = v.(string)
-	}
-	// ck, err := c.Ctx.Request.Cookie("uname")
-	// if err == nil {
-	// 	c.Data["Uname"] = ck.Value
-	// } else {
-	// 	beego.Error(err)
-	// }
-
-	// beego.Info(ck.Value)
-	// uname := ck.Value
-
+	uname, _, _ := checkRoleread(c.Ctx) //login里的
+	// rolename, _ = strconv.Atoi(role)
+	c.Data["Uname"] = uname
 	topics, err := models.GetAllTopics("", false) //这里传入空字符串
 	if err != nil {
 		beego.Error(err.Error)
@@ -67,14 +54,9 @@ func (c *StandardController) Index() { //
 	c.Data["IsStandard"] = true //
 	c.TplName = "standard.tpl"
 	c.Data["IsLogin"] = checkAccount(c.Ctx)
-	//2.取得客户端用户名
-	sess, _ := globalSessions.SessionStart(c.Ctx.ResponseWriter, c.Ctx.Request)
-	defer sess.SessionRelease(c.Ctx.ResponseWriter)
-	v := sess.Get("uname")
-	if v != nil {
-		c.Data["Uname"] = v.(string)
-	}
-
+	uname, _, _ := checkRoleread(c.Ctx) //login里的
+	// rolename, _ = strconv.Atoi(role)
+	c.Data["Uname"] = uname
 	standards, err := models.GetAllStandards() //这里传入空字符串
 	if err != nil {
 		beego.Error(err.Error)
@@ -82,6 +64,12 @@ func (c *StandardController) Index() { //
 		c.Data["Standards"] = standards
 		c.Data["Length"] = len(standards) //得到总记录数
 	}
+
+	logs := logs.NewLogger(1000)
+	logs.SetLogger("file", `{"filename":"log/test.log"}`)
+	logs.EnableFuncCallDepth(true)
+	logs.Info(c.Ctx.Input.IP())
+	logs.Close()
 }
 
 //搜索规范或者图集的名称或编号
@@ -90,13 +78,9 @@ func (c *StandardController) Search() { //search用的是post方法
 	c.Data["IsStandard"] = true //
 	c.TplName = "standard.tpl"
 	c.Data["IsLogin"] = checkAccount(c.Ctx)
-	//2.取得客户端用户名
-	sess, _ := globalSessions.SessionStart(c.Ctx.ResponseWriter, c.Ctx.Request)
-	defer sess.SessionRelease(c.Ctx.ResponseWriter)
-	v := sess.Get("uname")
-	if v != nil {
-		c.Data["Uname"] = v.(string)
-	}
+	uname, _, _ := checkRoleread(c.Ctx) //login里的
+	// rolename, _ = strconv.Atoi(role)
+	c.Data["Uname"] = uname
 	//搜索名称
 	Results1, err := models.SearchStandardsName(name, false)
 	if err != nil {
@@ -111,9 +95,7 @@ func (c *StandardController) Search() { //search用的是post方法
 	}
 	// Standards := make([]*Standard, 0)
 	Results1 = append(Results1, Results2...)
-
 	//由categoryid查categoryname
-
 	aa := make([]Standardmore, len(Results1))
 	//由standardnumber查librarynumber
 	for i, v := range Results1 {
@@ -151,6 +133,12 @@ func (c *StandardController) Search() { //search用的是post方法
 	}
 	c.Data["json"] = aa //这里必须要是c.Data["json"]，其他c.Data["Data"]不行
 	c.ServeJSON()
+
+	logs := logs.NewLogger(1000)
+	logs.SetLogger("file", `{"filename":"log/test.log"}`)
+	logs.EnableFuncCallDepth(true)
+	logs.Info(c.Ctx.Input.IP() + " " + "SearchStandardsName:" + name)
+	logs.Close()
 	// standards, err := models.GetAllStandards() //这里传入空字符串
 	// if err != nil {
 	// 	beego.Error(err.Error)
@@ -323,18 +311,9 @@ func (c *StandardController) Standard_one_addbaidu() { //一对一模式
 		fileName = fileNumber
 	}
 
-	//获取用户名
-	sess, _ := globalSessions.SessionStart(c.Ctx.ResponseWriter, c.Ctx.Request)
-	defer sess.SessionRelease(c.Ctx.ResponseWriter)
-	v := sess.Get("uname")
-	if v != nil {
-		uname := v.(string)
-		user := models.GetUserByUsername(uname)
-		//这里增加用户id
-		standard.Uid = user.Id
-		// beego.Info(user.Id)
-	}
-
+	uname, _, _ := checkRoleread(c.Ctx) //login里的
+	// rolename, _ = strconv.Atoi(role)
+	c.Data["Uname"] = uname
 	if category != "Atlas" {
 		standard.Number = categoryname + " " + fileNumber + "-" + year
 		standard.Title = fileName

@@ -14,105 +14,77 @@ type TagController struct {
 	beego.Controller
 }
 
-func (this *TagController) Index() {
-	//1.首先判断是否注册
-	if !checkAccount(this.Ctx) {
-		// port := strconv.Itoa(c.Ctx.Input.Port())//c.Ctx.Input.Site() + ":" + port +
-		route := this.Ctx.Request.URL.String()
-		this.Data["Url"] = route
-		this.Redirect("/login?url="+route, 302)
-		// c.Redirect("/login", 302)
+func (c *TagController) Index() {
+	var rolename int
+	var uname string
+	//2.如果登录或ip在允许范围内，进行访问权限检查
+	uname, role, _ := checkRoleread(c.Ctx) //login里的
+	if role != "0" {
+		rolename, _ = strconv.Atoi(role)
+		c.Data["Uname"] = uname
+	} else {
+		port := strconv.Itoa(c.Ctx.Input.Port())
+		route := c.Ctx.Input.Site() + ":" + port + c.Ctx.Input.URL()
+		c.Data["Url"] = route
+		c.Redirect("/login?url="+route, 302)
 		return
 	}
-	//2.取得客户端用户名
-	sess, _ := globalSessions.SessionStart(this.Ctx.ResponseWriter, this.Ctx.Request)
-	defer sess.SessionRelease(this.Ctx.ResponseWriter)
-	v := sess.Get("uname")
-	if v != nil {
-		this.Data["Uname"] = v.(string)
-	}
-	// ck, err := this.Ctx.Request.Cookie("uname")
-	// if err == nil {
-	// 	this.Data["Uname"] = ck.Value
-	// } else {
-	// 	beego.Error(err)
-	// }
-	//2.取得客户端用户名
-	// ck, err := c.Ctx.Request.Cookie("uname")
-	// if err != nil {
-	// 	beego.Error(err)
-	// }
-	// uname := ck.Value
-	//3.取出用户的权限等级
-	// category, err := models.GetCategory(id)
-	// beego.Info(username)
-	//4.取得客户端用户名
-	// ck, err := c.Ctx.Request.Cookie("uname")
-	// if err != nil {
-	// 	beego.Error(err)
-	// }
-	// uname := ck.Value
-	//5.取出用户的权限等级
-	role, _ := checkRole(this.Ctx) //login里的
-	// beego.Info(role)
-	//6.进行逻辑分析：
-	rolename, _ := strconv.ParseInt(role, 10, 64)
-	// if filetype != "pdf" && filetype != "jpg" && filetype != "diary" {
 	if rolename > 1 { //&& uname != category.Author
 		// port := strconv.Itoa(c.Ctx.Input.Port())//c.Ctx.Input.Site() + ":" + port +
-		route := this.Ctx.Request.URL.String()
-		this.Data["Url"] = route
-		this.Redirect("/roleerr?url="+route, 302)
+		route := c.Ctx.Request.URL.String()
+		c.Data["Url"] = route
+		c.Redirect("/roleerr?url="+route, 302)
 		// c.Redirect("/roleerr", 302)
 		return
 	}
 	// }
 
-	this.Data["IsLogin"] = checkAccount(this.Ctx)
+	c.Data["IsLogin"] = checkAccount(c.Ctx)
 	//2.取得客户端用户名
-	// ck, err := this.Ctx.Request.Cookie("uname")
+	// ck, err := c.Ctx.Request.Cookie("uname")
 	// if err != nil {
 	// 	beego.Error(err)
 	// } else {
-	// 	this.Data["Uname"] = ck.Value
+	// 	c.Data["Uname"] = ck.Value
 	// }
 	users, count := m.Getuserlist(1, 2000, "Id")
-	if this.IsAjax() {
-		this.Data["json"] = &map[string]interface{}{"total": count, "rows": &users}
-		this.ServeJSON()
+	if c.IsAjax() {
+		c.Data["json"] = &map[string]interface{}{"total": count, "rows": &users}
+		c.ServeJSON()
 		return
 	} else {
-		this.Data["Users"] = &users
-		this.TplName = "user.tpl"
+		c.Data["Users"] = &users
+		c.TplName = "user.tpl"
 	}
 }
 
-func (this *TagController) View() {
-	this.Data["IsLogin"] = checkAccount(this.Ctx)
-	//2.取得客户端用户名
-	sess, _ := globalSessions.SessionStart(this.Ctx.ResponseWriter, this.Ctx.Request)
-	defer sess.SessionRelease(this.Ctx.ResponseWriter)
-	v := sess.Get("uname")
-	if v != nil {
-		this.Data["Uname"] = v.(string)
+func (c *TagController) View() {
+	c.Data["IsLogin"] = checkAccount(c.Ctx)
+	// var rolename int
+	var uname string
+	//2.如果登录或ip在允许范围内，进行访问权限检查
+	uname, role, _ := checkRoleread(c.Ctx) //login里的
+	if role != "0" {
+		// rolename, _ = strconv.Atoi(role)
+		c.Data["Uname"] = uname
+	} else {
+		port := strconv.Itoa(c.Ctx.Input.Port())
+		route := c.Ctx.Input.Site() + ":" + port + c.Ctx.Input.URL()
+		c.Data["Url"] = route
+		c.Redirect("/login?url="+route, 302)
+		return
 	}
-	// ck, err := this.Ctx.Request.Cookie("uname")
-	// if err != nil {
-	// 	beego.Error(err)
-	// } else {
-	// 	this.Data["Uname"] = ck.Value
-	// }
-	userid, _ := strconv.ParseInt(this.Input().Get("useid"), 10, 64)
+	userid, _ := strconv.ParseInt(c.Input().Get("useid"), 10, 64)
 	user := m.GetUserByUserId(userid)
 	list, _ := m.GetRoleByUserId(userid)
-	this.Data["User"] = user
-	this.Data["Role"] = list
-	this.TplName = "admin_user_view.tpl"
+	c.Data["User"] = user
+	c.Data["Role"] = list
+	c.TplName = "admin_user_view.tpl"
 }
 
-func (this *TagController) AddUser() {
+func (c *TagController) AddUser() {
 	u := m.User{}
-	if err := this.ParseForm(&u); err != nil {
+	if err := c.ParseForm(&u); err != nil {
 		beego.Error(err.Error)
 		return
 	}
@@ -125,11 +97,11 @@ func (this *TagController) AddUser() {
 	}
 
 }
-func (this *TagController) UpdateUser() {
-	userid := this.Input().Get("userid")
-	nickname := this.Input().Get("nickname")
-	email := this.Input().Get("email")
-	Pwd1 := this.Input().Get("password")
+func (c *TagController) UpdateUser() {
+	userid := c.Input().Get("userid")
+	nickname := c.Input().Get("nickname")
+	email := c.Input().Get("email")
+	Pwd1 := c.Input().Get("password")
 	if Pwd1 != "" {
 		md5Ctx := md5.New()
 		md5Ctx.Write([]byte(Pwd1))
@@ -141,10 +113,10 @@ func (this *TagController) UpdateUser() {
 			beego.Error(err)
 		}
 		//更新role
-		roleid := this.Input().Get("roletitle1")
+		roleid := c.Input().Get("roletitle1")
 		if roleid != "" {
 			roleid1, _ := strconv.ParseInt(roleid, 10, 64)
-			roleid2, _ := strconv.ParseInt(this.Input().Get("roletitle2"), 10, 64)
+			roleid2, _ := strconv.ParseInt(c.Input().Get("roletitle2"), 10, 64)
 			userid1, _ := strconv.ParseInt(userid, 10, 64)
 			_, err = m.UpdateRoleUser(roleid1, roleid2, userid1)
 			if err != nil {
@@ -157,10 +129,10 @@ func (this *TagController) UpdateUser() {
 			beego.Error(err)
 		}
 		//更新role
-		roleid := this.Input().Get("roletitle1")
+		roleid := c.Input().Get("roletitle1")
 		if roleid != "" {
 			roleid1, _ := strconv.ParseInt(roleid, 10, 64)
-			roleid2, _ := strconv.ParseInt(this.Input().Get("roletitle2"), 10, 64)
+			roleid2, _ := strconv.ParseInt(c.Input().Get("roletitle2"), 10, 64)
 			userid1, _ := strconv.ParseInt(userid, 10, 64)
 			_, err = m.UpdateRoleUser(roleid1, roleid2, userid1)
 			if err != nil {
@@ -168,60 +140,61 @@ func (this *TagController) UpdateUser() {
 			}
 		}
 	}
-	this.TplName = "user_view.tpl"
+	c.TplName = "user_view.tpl"
 }
 
-func (this *TagController) DelUser() {
-	Id, _ := this.GetInt64("userid")
+func (c *TagController) DelUser() {
+	Id, _ := c.GetInt64("userid")
 	status, err := m.DelUserById(Id)
 	if err == nil && status > 0 {
-		// this.Rsp(true, "Success")
-		this.Redirect("/user/index", 302)
+		// c.Rsp(true, "Success")
+		c.Redirect("/user/index", 302)
 		return
 	} else {
-		// this.Rsp(false, err.Error())
+		// c.Rsp(false, err.Error())
 		beego.Error(err.Error)
 		return
 	}
 }
 
-func (this *TagController) GetUserByUsername() {
+func (c *TagController) GetUserByUsername() {
 	// 	c.Data["IsCategory"] = true
 	// c.TplName = "category.tpl"
-	this.Data["IsLogin"] = checkAccount(this.Ctx)
-	//2.取得客户端用户名
-	sess, _ := globalSessions.SessionStart(this.Ctx.ResponseWriter, this.Ctx.Request)
-	defer sess.SessionRelease(this.Ctx.ResponseWriter)
-	v := sess.Get("uname")
-	if v != nil {
-		this.Data["Uname"] = v.(string)
+	c.Data["IsLogin"] = checkAccount(c.Ctx)
+	// var rolename int
+	var uname string
+	//2.如果登录或ip在允许范围内，进行访问权限检查
+	uname, role, _ := checkRoleread(c.Ctx) //login里的
+	if role != "0" {
+		// rolename, _ = strconv.Atoi(role)
+		c.Data["Uname"] = uname
+	} else {
+		port := strconv.Itoa(c.Ctx.Input.Port())
+		route := c.Ctx.Input.Site() + ":" + port + c.Ctx.Input.URL()
+		c.Data["Url"] = route
+		c.Redirect("/login?url="+route, 302)
+		return
 	}
-	// ck, err := this.Ctx.Request.Cookie("uname")
-	// if err != nil {
-	// 	beego.Error(err)
-	// } else {
-	// 	this.Data["Uname"] = ck.Value
-	// }
-	username := this.Input().Get("username")
+	username := c.Input().Get("username")
 	// beego.Info(userid)
 	user := m.GetUserByUsername(username)
 	list, _, _ := m.GetRoleByUsername(username)
-	this.Data["User"] = user
-	this.Data["Role"] = list
-	this.TplName = "user_view.tpl"
+	c.Data["User"] = user
+	c.Data["Role"] = list
+	c.TplName = "user_view.tpl"
 }
 
 //上传excel文件，导入到数据库
 //引用来自category的查看成果类型里的成果
-func (this *TagController) ImportExcel() {
+func (c *TagController) ImportExcel() {
 	//解析表单
-	// this.Data["IsLogin"] = checkAccount(this.Ctx)
+	// c.Data["IsLogin"] = checkAccount(c.Ctx)
 	// id := c.Input().Get("id")
 	// path := c.Input().Get("path")
 	// filename := c.Input().Get("filename")
 
 	//获取上传的文件
-	_, h, err := this.GetFile("excel")
+	_, h, err := c.GetFile("excel")
 	if err != nil {
 		beego.Error(err)
 	}
@@ -238,7 +211,7 @@ func (this *TagController) ImportExcel() {
 		// path = path[3:]
 		// path = "./attachment" + "/" + h.Filename
 		// f.Close()                                             // 关闭上传的文件，不然的话会出现临时文件不能清除的情况
-		err = this.SaveToFile("excel", path) //.Join("attachment", attachment)) //存文件    WaterMark(path)    //给文件加水印
+		err = c.SaveToFile("excel", path) //.Join("attachment", attachment)) //存文件    WaterMark(path)    //给文件加水印
 		if err != nil {
 			beego.Error(err)
 		}

@@ -40,8 +40,8 @@ color:#DC143C;
     {{range $index, $elem :=.Chengguo}}
     <tr>
       <th>{{$index}}</th>
-      <th><a href="/topic/view/{{.Id}}">{{substr .Tnumber  0 15}}</a></th>
-      <th><a href="/topic/view/{{.Id}}" title={{.Title}}>{{substr .Title 0 15}}</a></th>
+      <th><a href="/topic/view_b/{{.Id}}" title={{.Title}} target="_blank">{{substr .Tnumber  0 15}}</a></th>
+      <th><a href="/topic/view_b/{{.Id}}" title={{.Title}} target="_blank">{{substr .Title 0 15}}</a></th>
       <th>{{.Category}}</th>
       <th>{{.Author}}</th>
       <th>{{dateformat .Updated "2006-01-02"}}</th>
@@ -51,8 +51,8 @@ color:#DC143C;
       <a href="/topic/modify?tid={{.Id}}">修改</a>
       <a href="/topic/delete?tid={{.Id}}">删除</a></th> -->
         <th>
-          <a href="/topic/view/{{.Id}}"><i class="glyphicon glyphicon-download-alt"></i>下载</a>
-          <a href="/topic/modify?tid={{.Id}}"><i class="glyphicon glyphicon-edit"></i>修改</a>
+          <a href="/topic/view_b/{{.Id}}" title={{.Title}} target="_blank"><i class="glyphicon glyphicon-download-alt"></i>下载</a>
+          <a href="/topic/modify?tid={{.Id}}"><i class="glyphicon glyphicon-edit" target="_blank"></i>修改</a>
           <a href="/topic/delete?tid={{.Id}}"><i id="delete" class="glyphicon glyphicon-remove-sign"></i>删除</a>
         </th>
       <!--<th>

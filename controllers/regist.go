@@ -15,10 +15,12 @@ type RegistController struct {
 }
 
 func (this *RegistController) Get() {
+	// this.Data["IsLogin"] = true
 	this.TplName = "regist.tpl"
 }
 
 func (this *RegistController) RegistErr() {
+	// this.Data["IsLogin"] = true
 	this.TplName = "registerr.tpl"
 }
 

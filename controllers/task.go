@@ -13,32 +13,28 @@ type TaskController struct {
 	beego.Controller
 }
 
-func (this *TaskController) Get() {
-	this.Data["IsLogin"] = checkAccount(this.Ctx)
+func (c *TaskController) Get() {
+	c.Data["IsLogin"] = checkAccount(c.Ctx)
 	// c.Data["IsCategoryb"] = true
-	this.Data["IsTask"] = true
-	//3.取得客户端用户名
-	sess, _ := globalSessions.SessionStart(this.Ctx.ResponseWriter, this.Ctx.Request)
-	defer sess.SessionRelease(this.Ctx.ResponseWriter)
-	v := sess.Get("uname")
-	if v != nil {
-		this.Data["Uname"] = v.(string)
-	}
-	this.TplName = "todo.html"
+	c.Data["IsTask"] = true
+	uname, _, _ := checkRoleread(c.Ctx) //login里的
+	// rolename, _ = strconv.Atoi(role)
+	c.Data["Uname"] = uname
+	c.TplName = "todo.html"
 	tasks, tasks1, tasks2, err := models.GetAllTasks() //这里传入空字符串
 	if err != nil {
 		beego.Error(err.Error)
 	} else {
-		this.Data["Tasks"] = tasks
-		this.Data["Tasks1"] = tasks1
-		this.Data["Tasks2"] = tasks2
+		c.Data["Tasks"] = tasks
+		c.Data["Tasks1"] = tasks1
+		c.Data["Tasks2"] = tasks2
 	}
-	// this.Render()
+	// c.Render()
 }
 
-func (this *TaskController) ShowDetails() {
-	// this.TplName = "todo.html"
-	tid := this.Input().Get("id")
+func (c *TaskController) ShowDetails() {
+	// c.TplName = "todo.html"
+	tid := c.Input().Get("id")
 	beego.Info(tid)
 	tasks, err := models.GetDetails(tid) //这里传入空字符串
 	if err != nil {
@@ -46,16 +42,16 @@ func (this *TaskController) ShowDetails() {
 	} else {
 		// b, err := json.Marshal(tasks)
 		// if err == nil {
-		// this.Ctx.WriteString(string(b))
-		this.Data["json"] = tasks //string(b)
-		this.ServeJSON()
+		// c.Ctx.WriteString(string(b))
+		c.Data["json"] = tasks //string(b)
+		c.ServeJSON()
 		// }
 	}
 }
 
-func (this *TaskController) AddTask() {
-	// if !checkAccount(this.Ctx) { //这里应该不需要
-	// 	this.Redirect("/login", 302)
+func (c *TaskController) AddTask() {
+	// if !checkAccount(c.Ctx) { //这里应该不需要
+	// 	c.Redirect("/login", 302)
 	// 	return
 	// }
 	//解析表单     表示时间的变量和字段，应为time.Time类型
@@ -77,10 +73,10 @@ func (this *TaskController) AddTask() {
 	// return
 
 	var err error
-	tid := this.Input().Get("tid")
-	title := this.Input().Get("title")
-	content := this.Input().Get("content")
-	daterange := this.Input().Get("datefilter")
+	tid := c.Input().Get("tid")
+	title := c.Input().Get("title")
+	content := c.Input().Get("content")
+	daterange := c.Input().Get("datefilter")
 	array := strings.Split(daterange, " - ")
 	// for _, v := range array {
 	starttime1 := array[0]
@@ -88,15 +84,15 @@ func (this *TaskController) AddTask() {
 	endtime1 := array[1]
 	beego.Info(array[1])
 	// }
-	// starttime1 := this.Input().Get("starttime")
-	// endtime1 := this.Input().Get("endtime")
+	// starttime1 := c.Input().Get("starttime")
+	// endtime1 := c.Input().Get("endtime")
 	const lll = "2006-01-02" //"2006-01-02 15:04:05" //12-19-2015 22:40:24
 	starttime, _ := time.Parse(lll, starttime1)
 	endtime, _ := time.Parse(lll, endtime1)
 	t1 := starttime.Add(-time.Duration(hours) * time.Hour)
 	t2 := endtime.Add(-time.Duration(hours) * time.Hour)
 	//12-19-2015 22:40:24
-	// ck, err := this.Ctx.Request.Cookie("uname")
+	// ck, err := c.Ctx.Request.Cookie("uname")
 	// if err != nil {
 	// beego.Error(err)
 	// }
@@ -110,29 +106,29 @@ func (this *TaskController) AddTask() {
 	if err != nil {
 		beego.Error(err)
 	}
-	this.Redirect("/todo", 302)
+	c.Redirect("/todo", 302)
 }
 
-func (this *TaskController) Delete() {
-	err := models.DeleteTask(this.Input().Get("tid")) //(c.Ctx.Input.Param("0"))
+func (c *TaskController) Delete() {
+	err := models.DeleteTask(c.Input().Get("tid")) //(c.Ctx.Input.Param("0"))
 	if err != nil {
 		beego.Error(err)
 	}
-	this.Redirect("/todo", 302)
+	c.Redirect("/todo", 302)
 }
-func (this *TaskController) Update() {
-	err := models.UpdateTaskstate(this.Input().Get("tid"))
+func (c *TaskController) Update() {
+	err := models.UpdateTaskstate(c.Input().Get("tid"))
 	if err != nil {
 		beego.Error(err)
 	}
-	this.Redirect("/todo", 302) //这里增加topic
+	c.Redirect("/todo", 302) //这里增加topic
 }
-func (this *TaskController) Update1() {
-	err := models.UpdateTaskstate1(this.Input().Get("tid"))
+func (c *TaskController) Update1() {
+	err := models.UpdateTaskstate1(c.Input().Get("tid"))
 	if err != nil {
 		beego.Error(err)
 	}
-	this.Redirect("/todo", 302) //这里增加topic
+	c.Redirect("/todo", 302) //这里增加topic
 }
 
 // Example:
@@ -142,10 +138,10 @@ func (this *TaskController) Update1() {
 //          {"ID": 1, "Title": "Learn Go", "Done": false},
 //          {"ID": 2, "Title": "Buy bread", "Done": true}
 //        ]}
-func (this *TaskController) ListTasks() {
+func (c *TaskController) ListTasks() {
 	res := struct{ Tasks []*models.Task }{models.DefaultTaskList.All()}
-	this.Data["json"] = res
-	this.ServeJSON()
+	c.Data["json"] = res
+	c.ServeJSON()
 }
 
 // Examples:
@@ -155,17 +151,17 @@ func (this *TaskController) ListTasks() {
 //
 //   req: POST /task/ {"Title": "Buy bread"}
 //   res: 200
-func (this *TaskController) NewTask() {
+func (c *TaskController) NewTask() {
 	req := struct{ Title string }{}
-	if err := json.Unmarshal(this.Ctx.Input.RequestBody, &req); err != nil {
-		this.Ctx.Output.SetStatus(400)
-		this.Ctx.Output.Body([]byte("empty title"))
+	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &req); err != nil {
+		c.Ctx.Output.SetStatus(400)
+		c.Ctx.Output.Body([]byte("empty title"))
 		return
 	}
 	// t, err := models.NewTask(req.Title)
 	// if err != nil {
-	// 	this.Ctx.Output.SetStatus(400)
-	// 	this.Ctx.Output.Body([]byte(err.Error()))
+	// 	c.Ctx.Output.SetStatus(400)
+	// 	c.Ctx.Output.Body([]byte(err.Error()))
 	// 	return
 	// }
 	// models.DefaultTaskList.Save(t)
@@ -178,19 +174,19 @@ func (this *TaskController) NewTask() {
 //
 //   req: GET /task/42
 //   res: 404 task not found
-func (this *TaskController) GetTask() {
-	id := this.Ctx.Input.Param(":id")
+func (c *TaskController) GetTask() {
+	id := c.Ctx.Input.Param(":id")
 	beego.Info("Task is ", id)
 	intid, _ := strconv.ParseInt(id, 10, 64)
 	t, ok := models.DefaultTaskList.Find(intid)
 	beego.Info("Found", ok)
 	if !ok {
-		this.Ctx.Output.SetStatus(404)
-		this.Ctx.Output.Body([]byte("task not found"))
+		c.Ctx.Output.SetStatus(404)
+		c.Ctx.Output.Body([]byte("task not found"))
 		return
 	}
-	this.Data["json"] = t
-	this.ServeJSON()
+	c.Data["json"] = t
+	c.ServeJSON()
 }
 
 // Example:
@@ -200,24 +196,24 @@ func (this *TaskController) GetTask() {
 //
 //   req: PUT /task/2 {"ID": 2, "Title": "Learn Go", "Done": true}
 //   res: 400 inconsistent task IDs
-func (this *TaskController) UpdateTask() {
-	id := this.Ctx.Input.Param(":id")
+func (c *TaskController) UpdateTask() {
+	id := c.Ctx.Input.Param(":id")
 	beego.Info("Task is ", id)
 	intid, _ := strconv.ParseInt(id, 10, 64)
 	var t models.Task
-	if err := json.Unmarshal(this.Ctx.Input.RequestBody, &t); err != nil {
-		this.Ctx.Output.SetStatus(400)
-		this.Ctx.Output.Body([]byte(err.Error()))
+	if err := json.Unmarshal(c.Ctx.Input.RequestBody, &t); err != nil {
+		c.Ctx.Output.SetStatus(400)
+		c.Ctx.Output.Body([]byte(err.Error()))
 		return
 	}
 	if t.ID != intid {
-		this.Ctx.Output.SetStatus(400)
-		this.Ctx.Output.Body([]byte("inconsistent task IDs"))
+		c.Ctx.Output.SetStatus(400)
+		c.Ctx.Output.Body([]byte("inconsistent task IDs"))
 		return
 	}
 	if _, ok := models.DefaultTaskList.Find(intid); !ok {
-		this.Ctx.Output.SetStatus(400)
-		this.Ctx.Output.Body([]byte("task not found"))
+		c.Ctx.Output.SetStatus(400)
+		c.Ctx.Output.Body([]byte("task not found"))
 		return
 	}
 	models.DefaultTaskList.Save(&t)

@@ -1,6 +1,10 @@
 <!DOCTYPE html>
 <head>
 <!-- 对jquery的引用必须放在head中-->
+<!-- 防止get方法缓存 -->
+<META HTTP-EQUIV="Pragma" CONTENT="no-cache"> 
+<META HTTP-EQUIV="Cache-Control" CONTENT="no-cache"> 
+<META HTTP-EQUIV="Expires" CONTENT="0">
 
   <script type="text/javascript" src="/static/js/jquery-2.1.3.min.js"></script>
   <script type="text/javascript" src="/static/js/bootstrap.min.js"></script>
@@ -77,7 +81,6 @@ color:#DC143C;
 
     <form id="form3" method="post" action="/topic/exporttoexcel" >
       <input type="hidden" name="id" value="{{.Category.Id}}"/>
-      <input type="hidden" name="path" value="{{.Category.DiskDirectory}}"/>
       <input type="hidden" name="filename" value="{{.Category.Title}}"/>
       <!-- {{.CategoryProj.Number}}{{.CategoryProj.Title}}\{{.CategoryPhase.Title}}\{{.CategorySpec.Title}}\{{.Category.Title}}\<button type="submit" class="btn btn-default">导出excel</button> -->
     </form>
@@ -143,7 +146,7 @@ color:#DC143C;
     {{range $index,$elem:=.Chengguo}}
     <tr>
       <th><input type="checkbox" name="checkbox" value="{{.Id}}"/>{{$index}}</th>
-      <th><a href="/topic/view/{{.Id}}">{{substr .Tnumber 0 15}}</a></th>
+      <th><a href="/topic/view_b/{{.Id}}" title={{.Title}} target="_blank">{{substr .Tnumber 0 15}}</a></th>
       <th><a href="/topic/view_b/{{.Id}}" title={{.Title}} target="_blank">{{substr .Title 0 15}}</a></th>
       <th>{{.Category}}</th>
       <th>{{.Author}}</th>
@@ -155,8 +158,8 @@ color:#DC143C;
       <a href="/topic/modify?tid={{.Id}}">修改</a>
       <a href="/topic/delete?tid={{.Id}}">删除</a></th> -->
         <th>
-          <a href="/topic/view/{{.Id}}"><i class="glyphicon glyphicon-download-alt"></i>下载</a>
-          <a href="/topic/modify?tid={{.Id}}"><i class="glyphicon glyphicon-edit"></i>修改</a>
+          <a href="/topic/view_b/{{.Id}}" title={{.Title}} target="_blank"><i class="glyphicon glyphicon-download-alt"></i>下载</a>
+          <a href="/topic/modify?tid={{.Id}}" target="_blank"><i class="glyphicon glyphicon-edit"></i>修改</a>
           <a href="/topic/delete?tid={{.Id}}"><i id="delete" class="glyphicon glyphicon-remove-sign"></i>删除</a>
         </th>
       <!--<th>

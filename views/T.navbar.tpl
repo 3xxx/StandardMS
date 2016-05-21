@@ -33,9 +33,8 @@
     </ul>
 
     <form class="navbar-form navbar-left" role="search" method="get" action="/search">
-      <!--这里添加method和action就对了-->
       <div class="form-group">
-        <input id="tuming" type="text" class="form-control"  class="search-query span2" placeholder="Search" name="tuming"></div>
+        <input id="tuming" type="text" class="form-control"  class="search-query span2" placeholder="Search local" name="tuming"></div>
       <button type="submit" class="btn btn-default">Submit</button>
     </form>
 
@@ -60,9 +59,13 @@
           <a href="/login">登陆</a>
         </li>
         {{end}}
-        <li {{if .IsHelp}}class="active"{{end}}>
-          <a href="/help">自述</a>
+        <li {{if .IsWiki}}class="active"{{end}}>
+          <a href="/wiki">Wiki</a>
         </li>
+        <!-- <li {{if .IsHelp}}class="active"{{end}}>
+          <a href="/help">自述</a>
+        </li> -->
+
         <li {{if .IsTask}}class="active"{{end}}>
           <a href="/todo">Todo</a>
         </li>        

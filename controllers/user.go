@@ -3,12 +3,19 @@ package controllers
 import (
 	// m "github.com/beego/admin/src/models"
 	// "github.com/astaxie/beego/orm"
+	"bufio"
 	"crypto/md5"
 	"encoding/hex"
 	"github.com/astaxie/beego"
 	"github.com/tealeg/xlsx"
+	// "io"
+	"fmt"
+	"net"
+	"os"
 	m "quick/models"
+	// "regexp"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -16,126 +23,119 @@ type UserController struct {
 	beego.Controller
 }
 
-func (this *UserController) Index() {
-	// page, _ := this.GetInt64("page")
-	// page_size, _ := this.GetInt64("rows")
-	// sort := this.GetString("sort")
-	// order := this.GetString("order")
-	// if len(order) > 0 {
-	// 	if order == "desc" {
-	// 		sort = "-" + sort
-	// 	}
-	// } else {
-	// 	sort = "Id"
-	// }
-	// 	c.Data["IsCategory"] = true
-	// c.TplName = "category.tpl"
-	//1.首先判断是否注册
-	if !checkAccount(this.Ctx) {
-		// port := strconv.Itoa(c.Ctx.Input.Port())//c.Ctx.Input.Site() + ":" + port +
-		route := this.Ctx.Request.URL.String()
-		this.Data["Url"] = route
-		this.Redirect("/login?url="+route, 302)
-		// c.Redirect("/login", 302)
+// 1 init函数是用于程序执行前做包的初始化的函数，比如初始化包里的变量等
+// 2 每个包可以拥有多个init函数
+// 3 包的每个源文件也可以拥有多个init函数
+// 4 同一个包中多个init函数的执行顺序go语言没有明确的定义(说明)
+// 5 不同包的init函数按照包导入的依赖关系决定该初始化函数的执行顺序
+// 6 init函数不能被其他函数调用，而是在main函数执行之前，自动被调用
+//读取iprole.txt文件，作为全局变量Iprolemaps，供调用访问者ip的权限用
+var (
+	Iprolemaps map[string]int
+)
+
+func init() {
+	Iprolemaps = make(map[string]int)
+	f, err := os.OpenFile("./conf/iprole.txt", os.O_RDONLY, 0660)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "%s err read from %s : %s\n", err)
+	}
+	var scanner *bufio.Scanner
+	scanner = bufio.NewScanner(f)
+	for scanner.Scan() {
+		args := strings.Split(scanner.Text(), " ")
+		maps := processFlag(args)
+		for i, v := range maps {
+			Iprolemaps[i] = v
+		}
+	}
+
+	f.Close()
+}
+
+func (c *UserController) Admin() {
+	c.TplName = "AdminLTE/index.html"
+}
+
+func (c *UserController) Index() {
+	var rolename int
+	var uname string
+	//2.如果登录或ip在允许范围内，进行访问权限检查
+	uname, role, _ := checkRoleread(c.Ctx) //login里的
+	if role != "0" {
+		rolename, _ = strconv.Atoi(role)
+		c.Data["Uname"] = uname
+	} else {
+		port := strconv.Itoa(c.Ctx.Input.Port())
+		route := c.Ctx.Input.Site() + ":" + port + c.Ctx.Input.URL()
+		c.Data["Url"] = route
+		c.Redirect("/login?url="+route, 302)
 		return
 	}
-	//2.取得客户端用户名
-	sess, _ := globalSessions.SessionStart(this.Ctx.ResponseWriter, this.Ctx.Request)
-	defer sess.SessionRelease(this.Ctx.ResponseWriter)
-	v := sess.Get("uname")
-	if v != nil {
-		this.Data["Uname"] = v.(string)
-	}
-	// ck, err := this.Ctx.Request.Cookie("uname")
-	// if err == nil {
-	// 	this.Data["Uname"] = ck.Value
-	// } else {
-	// 	beego.Error(err)
-	// }
-	//2.取得客户端用户名
-	// ck, err := c.Ctx.Request.Cookie("uname")
-	// if err != nil {
-	// 	beego.Error(err)
-	// }
-	// uname := ck.Value
-	//3.取出用户的权限等级
-	// category, err := models.GetCategory(id)
-	// beego.Info(username)
-	//4.取得客户端用户名
-	// ck, err := c.Ctx.Request.Cookie("uname")
-	// if err != nil {
-	// 	beego.Error(err)
-	// }
-	// uname := ck.Value
-	//5.取出用户的权限等级
-	role, _ := checkRole(this.Ctx) //login里的
-	// beego.Info(role)
-	//6.进行逻辑分析：
-	rolename, _ := strconv.ParseInt(role, 10, 64)
 	// if filetype != "pdf" && filetype != "jpg" && filetype != "diary" {
 	if rolename > 1 { //&& uname != category.Author
 		// port := strconv.Itoa(c.Ctx.Input.Port())//c.Ctx.Input.Site() + ":" + port +
-		route := this.Ctx.Request.URL.String()
-		this.Data["Url"] = route
-		this.Redirect("/roleerr?url="+route, 302)
+		route := c.Ctx.Request.URL.String()
+		c.Data["Url"] = route
+		c.Redirect("/roleerr?url="+route, 302)
 		// c.Redirect("/roleerr", 302)
 		return
 	}
 	// }
 
-	this.Data["IsLogin"] = checkAccount(this.Ctx)
+	c.Data["IsLogin"] = checkAccount(c.Ctx)
 	//2.取得客户端用户名
-	// ck, err := this.Ctx.Request.Cookie("uname")
+	// ck, err := c.Ctx.Request.Cookie("uname")
 	// if err != nil {
 	// 	beego.Error(err)
 	// } else {
-	// 	this.Data["Uname"] = ck.Value
+	// 	c.Data["Uname"] = ck.Value
 	// }
 
 	users, count := m.Getuserlist(1, 2000, "Id")
-	if this.IsAjax() {
-		this.Data["json"] = &map[string]interface{}{"total": count, "rows": &users}
-		this.ServeJSON()
+	if c.IsAjax() {
+		c.Data["json"] = &map[string]interface{}{"total": count, "rows": &users}
+		c.ServeJSON()
 		return
 	} else {
-		// tree := this.GetTree()
-		// this.Data["tree"] = &tree
-		this.Data["Users"] = &users
-		this.TplName = "user.tpl"
-		// if this.GetTemplatetype() != "easyui" {
-		// this.Layout = this.GetTemplatetype() + "/public/layout.tpl"
+		// tree := c.GetTree()
+		// c.Data["tree"] = &tree
+		c.Data["Users"] = &users
+		c.TplName = "user.tpl"
+		// if c.GetTemplatetype() != "easyui" {
+		// c.Layout = c.GetTemplatetype() + "/public/layout.tpl"
 		// }
-		// this.TplName = this.GetTemplatetype() + "/rbac/user.tpl"
+		// c.TplName = c.GetTemplatetype() + "/rbac/user.tpl"
 	}
 
 }
 
-func (this *UserController) View() {
+func (c *UserController) View() {
 	// c.Data["IsCategory"] = true
 	// c.TplName = "category.tpl"
-	this.Data["IsLogin"] = checkAccount(this.Ctx)
+	c.Data["IsLogin"] = checkAccount(c.Ctx)
 	//2.取得客户端用户名
-	sess, _ := globalSessions.SessionStart(this.Ctx.ResponseWriter, this.Ctx.Request)
-	defer sess.SessionRelease(this.Ctx.ResponseWriter)
+	sess, _ := globalSessions.SessionStart(c.Ctx.ResponseWriter, c.Ctx.Request)
+	defer sess.SessionRelease(c.Ctx.ResponseWriter)
 	v := sess.Get("uname")
 	if v != nil {
-		this.Data["Uname"] = v.(string)
+		c.Data["Uname"] = v.(string)
 	}
-	// ck, err := this.Ctx.Request.Cookie("uname")
+	// ck, err := c.Ctx.Request.Cookie("uname")
 	// if err != nil {
 	// 	beego.Error(err)
 	// } else {
-	// 	this.Data["Uname"] = ck.Value
+	// 	c.Data["Uname"] = ck.Value
 	// }
-	// userid, _ := this.GetInt64("Id")
-	// id := this.Ctx.Input.Param("0")这里为何无效？？？？这个需要routers中设置AutoRouter
+	// userid, _ := c.GetInt64("Id")
+	// id := c.Ctx.Input.Param("0")这里为何无效？？？？这个需要routers中设置AutoRouter
 	// beego.Info(id)
 	// userid, _ := strconv.ParseInt(id, 10, 64)
 
-	userid, _ := strconv.ParseInt(this.Input().Get("useid"), 10, 64)
+	userid, _ := strconv.ParseInt(c.Input().Get("useid"), 10, 64)
 	// beego.Info(userid)
 	user := m.GetUserByUserId(userid)
-	// if this.IsAjax() {
+	// if c.IsAjax() {
 	// users, _ := m.Getuserlist(1, 1000, "Id")
 	list, _ := m.GetRoleByUserId(userid)
 	// if err != nil {
@@ -154,64 +154,64 @@ func (this *UserController) View() {
 	// if len(users) < 1 {
 	// 	users = []orm.Params{}
 	// }
-	// this.Data["json"] = &map[string]interface{}{"total": count, "rows": &users}
-	// this.ServeJSON()
+	// c.Data["json"] = &map[string]interface{}{"total": count, "rows": &users}
+	// c.ServeJSON()
 	// return
 	// } else {
-	this.Data["User"] = user
-	this.Data["Role"] = list
-	// this.Data["Users"] = &users
-	this.TplName = "admin_user_view.tpl"
-	// this.TplName = this.GetTemplatetype() + "/rbac/roletouserlist.tpl"
+	c.Data["User"] = user
+	c.Data["Role"] = list
+	// c.Data["Users"] = &users
+	c.TplName = "admin_user_view.tpl"
+	// c.TplName = c.GetTemplatetype() + "/rbac/roletouserlist.tpl"
 	// }
 }
 
-func (this *UserController) AddUser() {
+func (c *UserController) AddUser() {
 	u := m.User{}
-	if err := this.ParseForm(&u); err != nil {
+	if err := c.ParseForm(&u); err != nil {
 		//handle error
-		// this.Rsp(false, err.Error())
+		// c.Rsp(false, err.Error())
 		beego.Error(err.Error)
 		return
 	}
 	id, err := m.AddUser(&u)
 	if err == nil && id > 0 {
-		// this.Rsp(true, "Success")
+		// c.Rsp(true, "Success")
 		return
 	} else {
-		// this.Rsp(false, err.Error())
+		// c.Rsp(false, err.Error())
 		beego.Error(err.Error)
 		return
 	}
 
 }
 
-// func (this *UserController) UpdateUser() {
+// func (c *UserController) UpdateUser() {
 // 	u := m.User{}
-// 	if err := this.ParseForm(&u); err != nil {
+// 	if err := c.ParseForm(&u); err != nil {
 // 		//handle error
-// 		// this.Rsp(false, err.Error())
+// 		// c.Rsp(false, err.Error())
 // 		beego.Error(err.Error)
 // 		return
 // 	}
 // 	id, err := m.UpdateUser(&u)
 // 	if err == nil && id > 0 {
-// 		// this.Rsp(true, "Success")
+// 		// c.Rsp(true, "Success")
 // 		return
 // 	} else {
-// 		// this.Rsp(false, err.Error())
+// 		// c.Rsp(false, err.Error())
 // 		beego.Error(err.Error)
 // 		return
 // 	}
 
 // }
-func (this *UserController) UpdateUser() {
+func (c *UserController) UpdateUser() {
 
-	userid := this.Input().Get("userid")
-	// username := this.Input().Get("username")
-	nickname := this.Input().Get("nickname")
-	email := this.Input().Get("email")
-	Pwd1 := this.Input().Get("password")
+	userid := c.Input().Get("userid")
+	// username := c.Input().Get("username")
+	nickname := c.Input().Get("nickname")
+	email := c.Input().Get("email")
+	Pwd1 := c.Input().Get("password")
 	if Pwd1 != "" {
 		md5Ctx := md5.New()
 		md5Ctx.Write([]byte(Pwd1))
@@ -227,10 +227,10 @@ func (this *UserController) UpdateUser() {
 			beego.Error(err)
 		}
 		//更新role
-		roleid := this.Input().Get("roletitle1")
+		roleid := c.Input().Get("roletitle1")
 		if roleid != "" {
 			roleid1, _ := strconv.ParseInt(roleid, 10, 64)
-			roleid2, _ := strconv.ParseInt(this.Input().Get("roletitle2"), 10, 64)
+			roleid2, _ := strconv.ParseInt(c.Input().Get("roletitle2"), 10, 64)
 			userid1, _ := strconv.ParseInt(userid, 10, 64)
 			_, err = m.UpdateRoleUser(roleid1, roleid2, userid1)
 			if err != nil {
@@ -243,10 +243,10 @@ func (this *UserController) UpdateUser() {
 			beego.Error(err)
 		}
 		//更新role
-		roleid := this.Input().Get("roletitle1")
+		roleid := c.Input().Get("roletitle1")
 		if roleid != "" {
 			roleid1, _ := strconv.ParseInt(roleid, 10, 64)
-			roleid2, _ := strconv.ParseInt(this.Input().Get("roletitle2"), 10, 64)
+			roleid2, _ := strconv.ParseInt(c.Input().Get("roletitle2"), 10, 64)
 			userid1, _ := strconv.ParseInt(userid, 10, 64)
 			_, err = m.UpdateRoleUser(roleid1, roleid2, userid1)
 			if err != nil {
@@ -254,60 +254,61 @@ func (this *UserController) UpdateUser() {
 			}
 		}
 	}
-	this.TplName = "user_view.tpl"
+	c.TplName = "user_view.tpl"
 }
 
-func (this *UserController) DelUser() {
-	Id, _ := this.GetInt64("userid")
+func (c *UserController) DelUser() {
+	Id, _ := c.GetInt64("userid")
 	status, err := m.DelUserById(Id)
 	if err == nil && status > 0 {
-		// this.Rsp(true, "Success")
-		this.Redirect("/user/index", 302)
+		// c.Rsp(true, "Success")
+		c.Redirect("/user/index", 302)
 		return
 	} else {
-		// this.Rsp(false, err.Error())
+		// c.Rsp(false, err.Error())
 		beego.Error(err.Error)
 		return
 	}
 }
 
-func (this *UserController) GetUserByUsername() {
+func (c *UserController) GetUserByUsername() {
 	// 	c.Data["IsCategory"] = true
 	// c.TplName = "category.tpl"
-	this.Data["IsLogin"] = checkAccount(this.Ctx)
+	c.Data["IsLogin"] = checkAccount(c.Ctx)
 	//2.取得客户端用户名
-	sess, _ := globalSessions.SessionStart(this.Ctx.ResponseWriter, this.Ctx.Request)
-	defer sess.SessionRelease(this.Ctx.ResponseWriter)
+	sess, _ := globalSessions.SessionStart(c.Ctx.ResponseWriter, c.Ctx.Request)
+	defer sess.SessionRelease(c.Ctx.ResponseWriter)
 	v := sess.Get("uname")
 	if v != nil {
-		this.Data["Uname"] = v.(string)
+		c.Data["Uname"] = v.(string)
 	}
-	// ck, err := this.Ctx.Request.Cookie("uname")
+	// ck, err := c.Ctx.Request.Cookie("uname")
 	// if err != nil {
 	// 	beego.Error(err)
 	// } else {
-	// 	this.Data["Uname"] = ck.Value
+	// 	c.Data["Uname"] = ck.Value
 	// }
-	username := this.Input().Get("username")
+	username := c.Input().Get("username")
 	// beego.Info(userid)
 	user := m.GetUserByUsername(username)
 	list, _, _ := m.GetRoleByUsername(username)
-	this.Data["User"] = user
-	this.Data["Role"] = list
-	this.TplName = "user_view.tpl"
+	c.Data["User"] = user
+	c.Data["Role"] = list
+	c.TplName = "user_view.tpl"
 }
 
 //上传excel文件，导入到数据库
 //引用来自category的查看成果类型里的成果
-func (this *UserController) ImportExcel() {
+func (c *UserController) ImportExcel() {
+
 	//解析表单
-	// this.Data["IsLogin"] = checkAccount(this.Ctx)
+	// c.Data["IsLogin"] = checkAccount(c.Ctx)
 	// id := c.Input().Get("id")
 	// path := c.Input().Get("path")
 	// filename := c.Input().Get("filename")
 
 	//获取上传的文件
-	_, h, err := this.GetFile("excel")
+	_, h, err := c.GetFile("excel")
 	if err != nil {
 		beego.Error(err)
 	}
@@ -324,7 +325,7 @@ func (this *UserController) ImportExcel() {
 		// path = path[3:]
 		// path = "./attachment" + "/" + h.Filename
 		// f.Close()                                             // 关闭上传的文件，不然的话会出现临时文件不能清除的情况
-		err = this.SaveToFile("excel", path) //.Join("attachment", attachment)) //存文件    WaterMark(path)    //给文件加水印
+		err = c.SaveToFile("excel", path) //.Join("attachment", attachment)) //存文件    WaterMark(path)    //给文件加水印
 		if err != nil {
 			beego.Error(err)
 		}
@@ -359,27 +360,31 @@ func (this *UserController) ImportExcel() {
 	if err != nil {
 		beego.Error(err)
 	}
+	j := 0 //表格第一列从0开始
+	var i int
 	for _, sheet := range xlFile.Sheets {
 		for _, row := range sheet.Rows {
-			// for j := 2; j < 7; j += 5 {
-			j := 1
-			user.Username, _ = row.Cells[j].String()
-			Pwd1, _ := row.Cells[j+1].String()
-			md5Ctx := md5.New()
-			md5Ctx.Write([]byte(Pwd1))
-			cipherStr := md5Ctx.Sum(nil)
-			user.Password = hex.EncodeToString(cipherStr)
-			user.Email, _ = row.Cells[j+2].String()
-			user.Nickname, _ = row.Cells[j+3].String()
-			user.Department, _ = row.Cells[j+5].String()
-			user.Secoffice, _ = row.Cells[j+6].String()
-			user.Lastlogintime = time.Now()
-			uid, err := m.SaveUser(user)
-			role, _ := row.Cells[j+4].String()
-			roleid, _ := strconv.ParseInt(role, 10, 64)
-			_, err = m.AddRoleUser(roleid, uid)
-			if err != nil {
-				beego.Error(err)
+			// for i, cell := range row.Cells { //第一行从0开始，过滤掉第一行表头
+			if i != 0 { //忽略第一行
+				// len(row.Cells) //总列数是从1开始
+				user.Username, _ = row.Cells[j+1].String() //第一列从0开始，第二列是用户名qin.xc
+				Pwd1, _ := row.Cells[j+2].String()
+				md5Ctx := md5.New()
+				md5Ctx.Write([]byte(Pwd1))
+				cipherStr := md5Ctx.Sum(nil)
+				user.Password = hex.EncodeToString(cipherStr)
+				user.Email, _ = row.Cells[j+3].String()
+				user.Nickname, _ = row.Cells[j+4].String()
+				user.Department, _ = row.Cells[j+6].String()
+				user.Secoffice, _ = row.Cells[j+7].String()
+				user.Lastlogintime = time.Now()
+				uid, err := m.SaveUser(user)
+				role, _ := row.Cells[j+5].String() //这里应该是由rolename查询roleid
+				roleid, _ := strconv.ParseInt(role, 10, 64)
+				_, err = m.AddRoleUser(roleid, uid)
+				if err != nil {
+					beego.Error(err)
+				}
 			}
 			// }
 			// for _, cell := range row.Cells {
@@ -388,4 +393,134 @@ func (this *UserController) ImportExcel() {
 			// }
 		}
 	}
+}
+
+//取得访问者的权限
+func Getiprole(ip string) (role int) {
+	role = Iprolemaps[ip]
+	return role
+}
+
+//获取下一个IP
+func nextIp(ip string) string {
+	ips := strings.Split(ip, ".")
+	var i int
+	for i = len(ips) - 1; i >= 0; i-- {
+		n, _ := strconv.Atoi(ips[i])
+		if n >= 255 {
+			//进位
+			ips[i] = "1"
+		} else {
+			//+1
+			n++
+			ips[i] = strconv.Itoa(n)
+			break
+		}
+	}
+	if i == -1 {
+		//全部IP段都进行了进位,说明此IP本身已超出范围
+		return ""
+	}
+	ip = ""
+	leng := len(ips)
+	for i := 0; i < leng; i++ {
+		if i == leng-1 {
+			ip += ips[i]
+		} else {
+			ip += ips[i] + "."
+		}
+	}
+	return ip
+}
+
+//生成IP地址列表
+func processIp(startIp, endIp string) []string {
+	var ips = make([]string, 0)
+	for ; startIp != endIp; startIp = nextIp(startIp) {
+		if startIp != "" {
+			ips = append(ips, startIp)
+		}
+	}
+	ips = append(ips, startIp)
+	return ips
+}
+
+func processFlag(arg []string) (maps map[string]int) {
+	//开始IP,结束IP
+	var startIp, endIp string
+	//端口
+	var ports []int = make([]int, 0)
+	index := 0
+	startIp = arg[index]
+	si := net.ParseIP(startIp)
+	if si == nil {
+		//开始IP不合法
+		fmt.Println("'startIp' Setting error")
+		return nil
+	}
+	index++
+	endIp = arg[index]
+	ei := net.ParseIP(endIp)
+	if ei == nil {
+		//未指定结束IP,即只扫描一个IP
+		endIp = startIp
+	} else {
+		index++
+	}
+
+	tmpPort := arg[index]
+	if strings.Index(tmpPort, "-") != -1 {
+		//连续端口
+		tmpPorts := strings.Split(tmpPort, "-")
+		var startPort, endPort int
+		var err error
+		startPort, err = strconv.Atoi(tmpPorts[0])
+		if err != nil || startPort < 1 || startPort > 65535 {
+			//开始端口不合法
+			return nil
+		}
+		if len(tmpPorts) >= 2 {
+			//指定结束端口
+			endPort, err = strconv.Atoi(tmpPorts[1])
+			if err != nil || endPort < 1 || endPort > 65535 || endPort < startPort {
+				//结束端口不合法
+				fmt.Println("'endPort' Setting error")
+				return nil
+			}
+		} else {
+			//未指定结束端口
+			endPort = 65535
+		}
+		for i := 0; startPort+i <= endPort; i++ {
+			ports = append(ports, startPort+i)
+		}
+	} else {
+		//一个或多个端口
+		ps := strings.Split(tmpPort, ",")
+		for i := 0; i < len(ps); i++ {
+			p, err := strconv.Atoi(ps[i])
+			if err != nil {
+				//端口不合法
+				fmt.Println("'port' Setting error")
+				return nil
+			}
+			ports = append(ports, p)
+		}
+	}
+
+	//生成扫描地址列表
+	ips := processIp(startIp, endIp)
+	il := len(ips)
+	m1 := make(map[string]int)
+	for i := 0; i < il; i++ {
+		pl := len(ports)
+		for j := 0; j < pl; j++ {
+			//			ipAddrs <- ips[i] + ":" + strconv.Itoa(ports[j])
+			//			ipAddrs := ips[i] + ":" + strconv.Itoa(ports[j])
+			m1[ips[i]] = ports[j]
+		}
+	}
+	//	fmt.Print(slice1)
+	return m1
+	//	close(ipAddrs)
 }

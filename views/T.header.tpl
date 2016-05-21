@@ -1,7 +1,21 @@
 {{define "header"}}
 <html>
 <head>
-
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<!-- <meta name="author" content="Jophy" /> -->
+	<link rel="stylesheet" type="text/css" href="/static/css/bootstrap.min.css"/>	
+	<!-- <link rel="stylesheet" href="/static/css/style.css"> -->
+	<!--[if lte IE 9]>兼容ie的方面：先引用bootstrapcss，再引用js
+	<script src="bootstrap/js/respond.min.js"></script>
+	<script src="bootstrap/js/html5.js"></script>
+	<![endif]-->
+<script type="text/javascript" src="/static/js/jquery-2.1.3.min.js"></script>
+<script type="text/javascript" src="/static/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="/static/js/jquery.tablesorter.js"></script> 
+<script src="/static/js/respond.min.js"></script>
+<script src="/static/js/html5shiv.min.js"></script>
  <link rel="shortcut icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQAAAAEACAYAAABccqhmAAAi20lEQVR42u2dD4xcx13HZ5OWOE3a
 nCvanJVS75G0uQNBLi0k5xSoA4LYUMgZIWyLolwaLJ8rpF4KbWyk4guo+FwKvlSiuQhdcwGJnClV
 HFTwWVXJlarNhhbloH/stJfmUhrs0D9xoY0vVZPl930zv3ezu+/tvt333s7um99Hmpu3e2/fvpk3
@@ -160,21 +174,6 @@ VNe5gNb42mewIIg9A9BneJEVNLe4eZQof638xHLsy+aYl2BDE4EFwLt8FgHIHvQL3GaOR5udaBfe
 iH6DnSZeUoINalrsGTmR4jqcr5h+vOI6Ua4QAcgeEYB8EQHIEBGAfCmrjarrrdZxHDxKcFR5XCjb
 oKw2RNYWWzhM8ZDpmvKwdz8pIgD5UlYiAHlSViIAqRABEASPEQEQBI8RARAEjxEBEASPEQEQBI8R
 ARAEjxEBEASP+X87oVIPorbKnwAAAABJRU5ErkJggg==" type="image/x-icon" />
-<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
-<link rel="stylesheet" type="text/css" href="/static/css/bootstrap.min.css"/>
-<!-- <link rel="stylesheet" href="/static/editor.md/css/editormd.css" /> -->
-<script type="text/javascript" src="/static/js/jquery-2.1.3.min.js"></script>
-<script type="text/javascript" src="/static/js/bootstrap.min.js"></script>
-<!-- <script type="text/javascript" src="/static/js/jquery-latest.js"></script>2015-12-23日注释掉，是否有影响？？对ajax有影响--> 
-<script type="text/javascript" src="/static/js/jquery.tablesorter.js"></script> 
-<!-- <script src="/static/editor.md/editormd.min.js"></script> -->
-<!-- <script src="/static/editor.md/lib/marked.min.js"></script>
-<script src="/static/editor.md/lib/prettify.min.js"></script>
-<script src="/static/editor.md/lib/raphael.min.js"></script>
-<script src="/static/editor.md/lib/underscore.min.js"></script>
-<script src="/static/editor.md/lib/sequence-diagram.min.js"></script>
-<script src="/static/editor.md/lib/flowchart.min.js"></script>
-<script src="/static/editor.md/lib/jquery.flowchart.min.js"></script> -->
 <div class="page-header"></div>
-<!--这是一条横线吧-->
+<!--这是一条横线-->
 {{end}}

@@ -3,6 +3,7 @@ package controllers
 import (
 	"fmt"
 	"github.com/astaxie/beego"
+	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/utils/pagination"
 	"image/png"
 	"os"
@@ -29,6 +30,7 @@ func (c *CategoryController) Get() {
 		c.Data["IsCategory"] = true
 		name := c.Input().Get("name")
 		number := c.Input().Get("number")
+		label := c.Input().Get("label")
 		content := c.Input().Get("content")
 		image := c.Input().Get("image")
 		path := c.Input().Get("tempString")
@@ -100,8 +102,8 @@ func (c *CategoryController) Get() {
 		// 		beego.Error(err)
 		// 	}
 		// }
-		diskdirectory := ".\\attachment\\" + number + name + "\\"
-		url := "/attachment/" + number + name + "/"
+		// diskdirectory := ".\\attachment\\" + number + name + "\\"
+		// url := "/attachment/" + number + name + "/"
 		//保存上传的图片
 		//获取上传的文件
 		_, h, err := c.GetFile(image)
@@ -134,85 +136,55 @@ func (c *CategoryController) Get() {
 			beego.Error(err)
 		}
 		//存入数据库
-		id, err := models.AddCategory(name, number, content, "", path, route, uname, diskdirectory, url)
+		id, err := models.AddCategory(name, number, label, content, "", path, route, uname)
 		if err != nil {
 			beego.Error(err)
 		}
 		id1 := strconv.FormatInt(id, 10)
 		c.Redirect("/category?op=view&id="+id1, 301)
 		return
-	case "del":
-		//1.首先判断是否注册
-		if !checkAccount(c.Ctx) {
-			// port := strconv.Itoa(c.Ctx.Input.Port())//c.Ctx.Input.Site() + ":" + port +
-			route := c.Ctx.Request.URL.String()
-			c.Data["Url"] = route
-			c.Redirect("/login?url="+route, 302)
-			// c.Redirect("/login", 302)
-			return
-		}
-		//2.取得Id
-		id := c.Input().Get("id")
-		if len(id) == 0 {
-			break
-		}
-		//3.由Id查询数据库中的用户名
-		// category, err := models.GetCategory(id)
-		// beego.Info(username)
-		//4.取得客户端用户名
-		// ck, err := c.Ctx.Request.Cookie("uname")
-		// if err != nil {
-		// 	beego.Error(err)
-		// }
-		// uname := ck.Value
-		//5.取出用户的权限等级
-		role, _ := checkRole(c.Ctx) //login里的
-		// beego.Info(role)
-		//6.进行逻辑分析：
-		rolename, _ := strconv.ParseInt(role, 10, 64)
-		// if filetype != "pdf" && filetype != "jpg" && filetype != "diary" {
-		if rolename > 1 { //&& uname != category.Author
-			// port := strconv.Itoa(c.Ctx.Input.Port())//c.Ctx.Input.Site() + ":" + port +
-			route := c.Ctx.Request.URL.String()
-			c.Data["Url"] = route
-			c.Redirect("/roleerr?url="+route, 302)
-			// c.Redirect("/roleerr", 302)
-			return
-		}
-		// }
-		err := models.DelCategory(id)
-		if err != nil {
-			beego.Error(err)
-		}
-		//删除目录
-		// func RemoveAll(path string) errorRemoveAll删除path指定的文件，或目录及它包含的任何下级对象。它会尝试删除所有东西，除非遇到错误并返回。如果path指定的对象不存在，RemoveAll会返回nil而不返回错误。
+	// case "del":
+	// 	var rolename int
+	// 	var uname string
+	// 	uname, role, _ := checkRolewrite(c.Ctx) //login里的
+	// 	rolename, _ = strconv.Atoi(role)
+	// 	c.Data["Uname"] = uname
+	// 	id := c.Input().Get("id")
+	// 	if len(id) == 0 {
+	// 		break
+	// 	}
+	// 	if rolename > 1 { //&& uname != category.Author
+	// 		route := c.Ctx.Request.URL.String()
+	// 		c.Data["Url"] = route
+	// 		c.Redirect("/roleerr?url="+route, 302)
+	// 		return
+	// 	}
+	// 	err := models.DelCategory(id)
+	// 	if err != nil {
+	// 		beego.Error(err)
+	// 	}
+	// 	c.Redirect("/category", 301)
+	// 	return
 
-		c.Redirect("/category", 301)
-		return
-
-	case "view":
+	case "view": //http://127.0.0.1/category?op=view&id=2726这个view是整个项目查看
 		c.Data["IsLogin"] = checkAccount(c.Ctx)
 		c.Data["IsCategory"] = true
 		c.TplName = "category_view.html"
-		//2.取得客户端用户名
-		sess, _ := globalSessions.SessionStart(c.Ctx.ResponseWriter, c.Ctx.Request)
-		defer sess.SessionRelease(c.Ctx.ResponseWriter)
-		v := sess.Get("uname")
-		if v != nil {
-			c.Data["Uname"] = v.(string)
-		}
-		// ck, err := c.Ctx.Request.Cookie("uname")
-		// if err == nil {
-		// 	c.Data["Uname"] = ck.Value
-		// } else {
-		// 	beego.Error(err)
-		// }
+
+		var uname string
+		//2.如果登录或ip在允许范围内，进行访问权限检查
+		uname, _, _ = checkRoleread(c.Ctx) //login里的
+		c.Data["Uname"] = uname
+
 		id := c.Input().Get("id")
 		if len(id) == 0 {
 			break
 		}
-
-		category, _ := models.GetCategory(id) //由分类id取出本身（项目名称等）
+		category, label, err := models.GetCategory(id) //由分类id取出本身（项目名称等）
+		if err != nil {
+			beego.Error(err)
+		}
+		// beego.Info(category.Title)
 		topics, err := models.GetAllTopics(category.Title, false)
 		categorychengguo, _ := models.GetCategoryChengguo(id)
 		categoryzhuanye, _ := models.GetCategoryLeixing(id)
@@ -223,6 +195,7 @@ func (c *CategoryController) Get() {
 		// 	return
 		// }
 		c.Data["Category"] = category
+		c.Data["Label"] = label
 		c.Data["Categorychengguo"] = categorychengguo
 		c.Data["Categoryzhuanye"] = categoryzhuanye
 		c.Data["Categoryjieduan"] = categoryjieduan
@@ -241,28 +214,24 @@ func (c *CategoryController) Get() {
 			beego.Error(err)
 		}
 		c.Data["Categories"] = categories
+		logs := logs.NewLogger(1000)
+		logs.SetLogger("file", `{"filename":"log/test.log"}`)
+		logs.EnableFuncCallDepth(true)
+		logs.Info(c.Ctx.Input.IP() + " " + "ViewCategory" + " " + category.Title)
+		logs.Close()
+
 	case "view_b":
 		c.Data["IsLogin"] = checkAccount(c.Ctx)
 		c.Data["IsCategoryb"] = true
-		//2.取得客户端用户名
-		sess, _ := globalSessions.SessionStart(c.Ctx.ResponseWriter, c.Ctx.Request)
-		defer sess.SessionRelease(c.Ctx.ResponseWriter)
-		v := sess.Get("uname")
-		if v != nil {
-			c.Data["Uname"] = v.(string)
-		}
-		// ck, err := c.Ctx.Request.Cookie("uname")
-		// if err == nil {
-		// 	c.Data["Uname"] = ck.Value
-		// } else {
-		// 	beego.Error(err)
-		// }
+		uname, _, _ := checkRoleread(c.Ctx) //login里的
+		// rolename, _ = strconv.Atoi(role)
+		c.Data["Uname"] = uname
 		id := c.Input().Get("id")
 		if len(id) == 0 {
 			break
 		}
 
-		category, _ := models.GetCategory(id) //由成果id取出成果
+		category, label, _ := models.GetCategory(id) //由成果id取出成果
 		c.TplName = "category_view_b.html"
 		categorychengguo, _ := models.GetCategoryChengguo(id)
 		categoryzhuanye, _ := models.GetCategoryLeixing(id)
@@ -273,6 +242,7 @@ func (c *CategoryController) Get() {
 		// 	return
 		// }
 		c.Data["Category"] = category
+		c.Data["Label"] = label
 		c.Data["Categorychengguo"] = categorychengguo
 		c.Data["Categoryzhuanye"] = categoryzhuanye
 		c.Data["Categoryjieduan"] = categoryjieduan
@@ -291,24 +261,59 @@ func (c *CategoryController) Get() {
 			beego.Error(err)
 		}
 		c.Data["Categories"] = categories
-	default:
+
+	case "viewlabel": //按label查看
+		c.Data["IsCategory"] = true
+		c.TplName = "category_label.tpl"
+		c.Data["IsLogin"] = checkAccount(c.Ctx)
+		uname, _, _ := checkRoleread(c.Ctx) //login里的
+		// rolename, _ = strconv.Atoi(role)
+		c.Data["Uname"] = uname
+		label := c.Input().Get("label")
+		// beego.Info(label)
+		if len(label) == 0 {
+			break
+		}
+		categories, err := models.GetCategoriesbylabel(label) //由分类id取出本身（项目名称等）
+		if err != nil {
+			beego.Error(err)
+		}
+
+		// count := len(categories)
+		// count1 := strconv.Itoa(count)
+		// count2, err := strconv.ParseInt(count1, 10, 64)
+		// if err != nil {
+		// 	beego.Error(err)
+		// }
+		// c.Data["Length"] = len(categories)
+
+		// sets this.Data["paginator"] with the current offset (from the url query param)
+		// categoriesPerPage := 20
+		// paginator := pagination.SetPaginator(c.Ctx, categoriesPerPage, count2)
+		// // beego.Info(c.Ctx)
+		// beego.Info(paginator.Offset())   0
+		// p := pagination.NewPaginator(c.Ctx.Request, 10, 9)
+		// beego.Info(p.Offset())   0
+		// fetch the next 20 posts
+		// categories, err = models.ListCategoriesByOffsetAndLimit(paginator.Offset(), categoriesPerPage)
+		// if err != nil {
+		// 	beego.Error(err)
+		// }
+		c.Data["Category"] = categories
+		c.Data["Label"] = label
+		// c.Data["paginator"] = paginator
+		logs := logs.NewLogger(1000)
+		logs.SetLogger("file", `{"filename":"log/test.log"}`)
+		logs.EnableFuncCallDepth(true)
+		logs.Info(c.Ctx.Input.IP() + " " + "ViewCategory")
+		logs.Close()
+	default: //即http://127.0.0.1/category
 		c.Data["IsCategory"] = true
 		c.TplName = "category.tpl"
 		c.Data["IsLogin"] = checkAccount(c.Ctx)
-		//2.取得客户端用户名
-		sess, _ := globalSessions.SessionStart(c.Ctx.ResponseWriter, c.Ctx.Request)
-		defer sess.SessionRelease(c.Ctx.ResponseWriter)
-		v := sess.Get("uname")
-		if v != nil {
-			c.Data["Uname"] = v.(string)
-		}
-		// ck, err := c.Ctx.Request.Cookie("uname")
-		// if err == nil {
-		// 	c.Data["Uname"] = ck.Value
-		// } else {
-		// 	beego.Error(err)
-		// }
-		// var err error
+		uname, _, _ := checkRoleread(c.Ctx) //login里的
+		// rolename, _ = strconv.Atoi(role)
+		c.Data["Uname"] = uname
 		categories, err := models.GetAllCategories()
 		if err != nil {
 			beego.Error(err)
@@ -336,11 +341,53 @@ func (c *CategoryController) Get() {
 		}
 		c.Data["Category"] = categories
 		c.Data["paginator"] = paginator
+		logs := logs.NewLogger(1000)
+		logs.SetLogger("file", `{"filename":"log/test.log"}`)
+		logs.EnableFuncCallDepth(true)
+		logs.Info(c.Ctx.Input.IP() + " " + "ViewCategory")
+		logs.Close()
 	}
 	var err error
 	if err != nil {
 		beego.Error(err)
 	}
+}
+
+//删除项目
+func (c *CategoryController) Delete() {
+	url := c.Input().Get("url")
+	var rolename int
+	var uname string
+	//2.如果登录或ip在允许范围内，进行访问权限检查
+	uname, role, _ := checkRolewrite(c.Ctx) //login里的
+	rolename, _ = strconv.Atoi(role)
+	c.Data["Uname"] = uname
+	//2.取得Id
+	id := c.Input().Get("cid")
+	// if filetype != "pdf" && filetype != "jpg" && filetype != "diary" {
+	if rolename > 1 { //&& uname != category.Author
+		// port := strconv.Itoa(c.Ctx.Input.Port())//c.Ctx.Input.Site() + ":" + port +
+		route := c.Ctx.Request.URL.String()
+		c.Data["Url"] = route
+		c.Redirect("/roleerr?url="+route, 302)
+		// c.Redirect("/roleerr", 302)
+		return
+	}
+	// }
+	err := models.DelCategory(id)
+	if err != nil {
+		beego.Error(err)
+	} else {
+		data := "ok!"
+		c.Ctx.WriteString(data)
+	}
+	// return               //Handler crashed with error can't find templatefile in the path:topiccontroller/delete.tpl
+	c.Redirect(url, 302) //这里增加topic
+	//删除目录
+	// func RemoveAll(path string) errorRemoveAll删除path指定的文件，或目录及它包含的任何下级对象。它会尝试删除所有东西，除非遇到错误并返回。如果path指定的对象不存在，RemoveAll会返回nil而不返回错误。
+
+	// c.Redirect("/category", 301)
+	// return
 }
 
 func (c *CategoryController) Get_b() { //项目B显示控制
@@ -376,39 +423,12 @@ func (c *CategoryController) Get_b() { //项目B显示控制
 
 //添加项目第一步视图
 func (c *CategoryController) Add() {
-	//1.首先判断是否注册
-	if !checkAccount(c.Ctx) {
-		// port := strconv.Itoa(c.Ctx.Input.Port())//c.Ctx.Input.Site() + ":" + port +
-		route := c.Ctx.Request.URL.String()
-		c.Data["Url"] = route
-		c.Redirect("/login?url="+route, 302)
-		// c.Redirect("/login", 302)
-		return
-	}
-	//2.取得客户端用户名
-	sess, _ := globalSessions.SessionStart(c.Ctx.ResponseWriter, c.Ctx.Request)
-	defer sess.SessionRelease(c.Ctx.ResponseWriter)
-	v := sess.Get("uname")
-	if v != nil {
-		c.Data["Uname"] = v.(string)
-	}
-	// ck, err := c.Ctx.Request.Cookie("uname")
-	// if err == nil {
-	// 	c.Data["Uname"] = ck.Value
-	// } else {
-	// 	beego.Error(err)
-	// }
-	//2.取得客户端用户名
-	// ck, err := c.Ctx.Request.Cookie("uname")
-	// if err != nil {
-	// 	beego.Error(err)
-	// }
-	// uname := ck.Value
-	//3.取出用户的权限等级
-	role, _ := checkRole(c.Ctx) //login里的
-	// beego.Info(role)
-	//4.进行逻辑分析：
-	rolename, _ := strconv.ParseInt(role, 10, 64)
+	var rolename int
+	var uname string
+	//2.如果登录或ip在允许范围内，进行访问权限检查
+	uname, role, _ := checkRolewrite(c.Ctx) //login里的
+	rolename, _ = strconv.Atoi(role)
+	c.Data["Uname"] = uname
 	if rolename > 2 { //&& uname != category.Author
 		// port := strconv.Itoa(c.Ctx.Input.Port())//c.Ctx.Input.Site() + ":" + port +
 		route := c.Ctx.Request.URL.String()
@@ -459,6 +479,7 @@ func (c *CategoryController) Post() {
 
 	name := c.Input().Get("name")
 	number := c.Input().Get("number")
+	label := c.Input().Get("label")
 	// content := c.Input().Get("editorValue")
 	// image := c.Input().Get("image")
 	path := c.Input().Get("tempString")
@@ -575,23 +596,11 @@ func (c *CategoryController) Post() {
 	// 	fi.Close()
 	// 	route = "/attachment/" + number + name + "/u1.png"
 	// }
-	//2.取得客户端用户名
-	sess, _ := globalSessions.SessionStart(c.Ctx.ResponseWriter, c.Ctx.Request)
-	defer sess.SessionRelease(c.Ctx.ResponseWriter)
-	v := sess.Get("uname")
-	var uname string
-	if v != nil {
-		uname = v.(string)
-		c.Data["Uname"] = v.(string)
-	}
-	// ck, err := c.Ctx.Request.Cookie("uname")
-	// if err != nil {
-	// 	beego.Error(err)
-	// }
-	// uname := ck.Value
-
+	uname, _, _ := checkRoleread(c.Ctx) //login里的
+	// rolename, _ = strconv.Atoi(role)
+	c.Data["Uname"] = uname
 	//存入数据库
-	id, err := models.AddCategory(name, number, "", "", path, "", uname, "", "")
+	id, err := models.AddCategory(name, number, label, "", "", path, "", uname)
 	if err != nil {
 		beego.Error(err)
 	}
@@ -603,39 +612,12 @@ func (c *CategoryController) Post() {
 
 //添加项目第二步视图
 func (c *CategoryController) Add2() {
-	//1.首先判断是否注册
-	if !checkAccount(c.Ctx) {
-		// port := strconv.Itoa(c.Ctx.Input.Port())//c.Ctx.Input.Site() + ":" + port +
-		route := c.Ctx.Request.URL.String()
-		c.Data["Url"] = route
-		c.Redirect("/login?url="+route, 302)
-		// c.Redirect("/login", 302)
-		return
-	}
-	//2.取得客户端用户名
-	sess, _ := globalSessions.SessionStart(c.Ctx.ResponseWriter, c.Ctx.Request)
-	defer sess.SessionRelease(c.Ctx.ResponseWriter)
-	v := sess.Get("uname")
-	if v != nil {
-		c.Data["Uname"] = v.(string)
-	}
-	// ck, err := c.Ctx.Request.Cookie("uname")
-	// if err == nil {
-	// 	c.Data["Uname"] = ck.Value
-	// } else {
-	// 	beego.Error(err)
-	// }
-	//2.取得客户端用户名
-	// ck, err := c.Ctx.Request.Cookie("uname")
-	// if err != nil {
-	// 	beego.Error(err)
-	// }
-	// uname := ck.Value
-	//3.取出用户的权限等级
-	role, _ := checkRole(c.Ctx) //login里的
-	// beego.Info(role)
-	//4.进行逻辑分析：
-	rolename, _ := strconv.ParseInt(role, 10, 64)
+	var rolename int
+	var uname string
+	//2.如果登录或ip在允许范围内，进行访问权限检查
+	uname, role, _ := checkRolewrite(c.Ctx) //login里的
+	rolename, _ = strconv.Atoi(role)
+	c.Data["Uname"] = uname
 	if rolename > 2 { //&& uname != category.Author
 		// port := strconv.Itoa(c.Ctx.Input.Port())//c.Ctx.Input.Site() + ":" + port +
 		route := c.Ctx.Request.URL.String()
@@ -650,13 +632,14 @@ func (c *CategoryController) Add2() {
 	c.TplName = "category_add2.tpl"
 
 	id := c.Input().Get("id") //这个get也能获取地址栏中的id啊
-	category, err := models.GetCategory(id)
+	category, label, err := models.GetCategory(id)
 	if err != nil {
 		beego.Error(err)
 		c.Redirect("/", 302) //这里注释掉，否则在图纸页面无法进入添加页面，因为传入的id为空，导致err发生
 		return
 	}
 	c.Data["Category"] = category
+	c.Data["Label"] = label
 	c.Data["Id"] = id
 }
 
@@ -680,7 +663,7 @@ func (c *CategoryController) Post2() {
 	// }
 
 	//更新数据库
-	err := models.ModifyCategory(cid, "", "", content, cover, "", route, "")
+	err := models.ModifyCategory(cid, "", "", "", content, cover, "", route, "")
 	// id, err := models.AddCategory("", "", content, "", "", "", "", "")
 	if err != nil {
 		beego.Error(err)
@@ -695,13 +678,17 @@ func (c *CategoryController) Post2() {
 func (c *CategoryController) AddCoverPhoto() {
 	//解析表单
 	cid := c.Input().Get("categoryid")
-	beego.Info(cid)
-	category1, err := models.GetCategory(cid)
+	// beego.Info(cid)
+	// category1, _, err := models.GetCategory(cid)
+	// if err != nil {
+	// 	beego.Error(err)
+	// 	return
+	// }
+	url, diskdirectory, err := models.GetCategoryUrl(cid)
 	if err != nil {
 		beego.Error(err)
-		// c.Redirect("/", 302)//这里注释掉，否则在图纸页面无法进入添加页面，因为传入的id为空，导致err发生
-		return
 	}
+	// beego.Info(diskdirectory)
 	//获取上传的文件
 	_, h, err := c.GetFile("file")
 	if err != nil {
@@ -713,7 +700,8 @@ func (c *CategoryController) AddCoverPhoto() {
 	if h != nil {
 		//保存附件
 		// attachment := h.Filename
-		path = category1.DiskDirectory + h.Filename
+		path = diskdirectory + h.Filename
+		beego.Info(h.Filename)
 		err = c.SaveToFile("file", path) //.Join("attachment", attachment)) //存文件    WaterMark(path)    //给文件加水印
 		if err != nil {
 			beego.Error(err)
@@ -722,7 +710,7 @@ func (c *CategoryController) AddCoverPhoto() {
 		filesize = filesize / 1000.0
 	}
 
-	route := category1.Url + h.Filename
+	route := url + h.Filename
 
 	if err != nil {
 		beego.Error(err)
@@ -737,15 +725,52 @@ func (c *CategoryController) AddCoverPhoto() {
 	//    url     : "图片地址"        // 上传成功时才返回
 }
 
+//删除项目结构中的项目——删除下级——删除下级中的成果
+func (c *CategoryController) DeleteCategory() {
+	cid := c.Input().Get("cid") //项目id
+	id := c.Input().Get("id")   //要删除的id
+	idNum, err := strconv.ParseInt(id, 10, 64)
+	err = models.DeleteCategory(idNum)
+	if err != nil {
+		beego.Error(err)
+	}
+	c.Redirect("/category/modifyfrm?cid="+cid, 301)
+
+}
+
+//显示项目结构中的项目
+func (c *CategoryController) ShowCategory() {
+	cid := c.Input().Get("cid") //项目id
+	id := c.Input().Get("id")   //要删除的id
+	idNum, err := strconv.ParseInt(id, 10, 64)
+	err = models.ShowCategory(idNum)
+	if err != nil {
+		beego.Error(err)
+	}
+	c.Redirect("/category/modifyfrm?cid="+cid, 301)
+}
+
+//隐藏项目结构中的项目
+func (c *CategoryController) HideCategory() {
+	cid := c.Input().Get("cid") //项目id
+	id := c.Input().Get("id")   //要删除的id
+	idNum, err := strconv.ParseInt(id, 10, 64)
+	err = models.HideCategory(idNum)
+	if err != nil {
+		beego.Error(err)
+	}
+	c.Redirect("/category/modifyfrm?cid="+cid, 301)
+}
+
 //这个是测试用的
 func (c *CategoryController) Uploadimagesct() {
 	name := "111"    //c.Input().Get("name")
 	number := "222"  //c.Input().Get("number")
 	content := "333" //c.Input().Get("test-editormd-html-code")
 	path := "c"      //c.Input().Get("tempString")
-
-	diskdirectory := ".\\attachment\\" + "test" + "\\"
-	url := "/attachment/" + "test" + "/"
+	label := c.Input().Get("label")
+	// diskdirectory := ".\\attachment\\" + "test" + "\\"
+	// url := "/attachment/" + "test" + "/"
 	//保存上传的图片
 	//获取上传的文件，直接可以获取表单名称对应的文件名，不用另外提取
 	_, h, err := c.GetFile("editormd-image-file") //editormd-image-file
@@ -787,7 +812,7 @@ func (c *CategoryController) Uploadimagesct() {
 	uname := "4"
 
 	//存入数据库
-	_, err = models.AddCategory(name, number, content, "", path, route, uname, diskdirectory, url)
+	_, err = models.AddCategory(name, number, label, content, "", path, route, uname)
 	if err != nil {
 		beego.Error(err)
 	} else {
@@ -818,34 +843,44 @@ func (c *CategoryController) Uploadimagesct() {
 	return //???
 }
 
+//添加自定义项目第一步视图
+func (c *CategoryController) Add_b() {
+	var rolename int
+	var uname string
+	//2.如果登录或ip在允许范围内，进行访问权限检查
+	uname, role, _ := checkRolewrite(c.Ctx) //login里的
+	rolename, _ = strconv.Atoi(role)
+	c.Data["Uname"] = uname
+	if rolename > 2 { //&& uname != category.Author
+		// port := strconv.Itoa(c.Ctx.Input.Port())//c.Ctx.Input.Site() + ":" + port +
+		route := c.Ctx.Request.URL.String()
+		c.Data["Url"] = route
+		c.Redirect("/roleerr?url="+route, 302)
+		// c.Redirect("/roleerr", 302)
+		return
+	}
+	c.Data["IsLogin"] = checkAccount(c.Ctx)
+	c.Data["IsCategory"] = true
+	c.TplName = "category_add_b.tpl"
+}
+
+//添加自定义项目第一步提交方法
 func (c *CategoryController) UserdefinedPost() {
-	//也可以先c.Input().Get("category2")再切割strings.Split(category2, ",")
-	// category2 := c.GetStrings("category2")
-	// category3 := c.GetStrings("category3")
-	// category4 := c.GetStrings("category4")
-	// for _, v := range category2 {
-	//   if category3!=""{}如果有3级目录
-	//   for _, w := range category3 {
-	//     if category4!=""{}如果有4级目录
-	//     for _, t := range category4 {
-	// 	err :=os.MkdirAll(".\\attachment\\"+number+" "+name+"\\"+v+"\\"+w+"\\"+t, 0777)
-	//
-	// 	if err != nil {
-	// 		beego.Error(err)
-	// 	}
-	// }
 	c.Data["IsLogin"] = checkAccount(c.Ctx)
 	c.Data["IsCategory"] = true
 	name := c.Input().Get("name")
 	number := c.Input().Get("number")
-	content := c.Input().Get("editorValue") //editorValue  test-editormd-html-code
+	label := c.Input().Get("label")
+	// content := c.Input().Get("editorValue") //editorValue  test-editormd-html-code
 	// image := c.Input().Get("image")
 	// path1 := c.Input().Get("category2")
 	// beego.Info(path1) //只能取到一个值 [I] 2-1
 	// path2 := c.Input().Get("category3")
 	// path3 := c.Input().Get("category4")
 	var path2, path3, path4 []string
-	var diskdirectory, url string
+	// var diskdirectory, url string
+	//单选按钮值的字符串，用,号隔开；；单选按钮的字符；；单选按钮传值的名字button0~buttoni
+	var radio, radio1, radiostring string
 	// path := c.Input()通过把这个map传到models里，models取得map，通过键取得值，就可以实现无数层的目录建立了
 	// slice := []int{10, 20, 30, 40, 50}
 	// arrSlice := []int{1, 2, 3, 4, 5}
@@ -861,6 +896,7 @@ func (c *CategoryController) UserdefinedPost() {
 	//建立目录
 	// array := strings.Split(path, ",") //字符串切割 [a b c d e]
 	category2 := c.GetStrings("category2") //func (c *Controller) GetStrings(key string) []string
+	// beego.Info(category2)
 	category3 := c.GetStrings("category3")
 	category4 := c.GetStrings("category4")
 	// beego.Info(category2) //[2-1 2-2]
@@ -870,20 +906,29 @@ func (c *CategoryController) UserdefinedPost() {
 			if len(category3) > 0 { //如果有3级目录，则建立3级，没有则建立2级
 				for _, w := range category3 {
 					if len(category4) > 0 { //如果有4级目录，则建立4级，没有则建立3级
-						for _, t := range category4 {
+						path4 = category4
+						path3 = category3
+						path2 = category2
+						for i, t := range category4 {
 							err := os.MkdirAll(".\\attachment\\"+number+name+"\\"+v+"\\"+w+"\\"+t, 0777)
-							path4 = category4
-							path3 = category3
-							path2 = category2
+							if err != nil {
+								beego.Error(err)
+							}
+							ii := strconv.Itoa(i)
+							radiostring = "radiobutton" + ii
+							radio1 = c.Input().Get(radiostring)
+							if i == 0 {
+								radio = radio1
+							} else {
+								radio = radio + "," + radio1
+							}
 							// diskdirectory = ".\\attachment\\" + number + name + "\\" + v + "\\" + w + "\\" + t + "\\"
 							// url = "/attachment/" + number + name + "/" + v + "/" + w + "/" + t + "/"
 							// path = append(category2, category3...)
 							// path = append(path, category4...)
 							// path = path1 + "," + path2 + "," + path3
 							// beego.Info(path)
-							if err != nil {
-								beego.Error(err)
-							}
+
 						}
 					} else { //如果没有4级目录，则建立3级目录
 						err := os.MkdirAll(".\\attachment\\"+number+name+"\\"+v+"\\"+w, 0777)
@@ -918,130 +963,26 @@ func (c *CategoryController) UserdefinedPost() {
 			beego.Error(err)
 		}
 	}
-	diskdirectory = ".\\attachment\\" + number + name + "\\"
-	url = "/attachment/" + number + name + "/"
-	//保存上传的图片
-	//获取上传的文件，直接可以获取表单名称对应的文件名，不用另外提取
-	_, h, err := c.GetFile("image")
-	// beego.Info(h)
-	if err != nil {
-		beego.Error(err)
-	}
-	// var attachment string
-	// var path string
-	var filesize int64
-	var route string
-	if h != nil {
-		//保存附件
-		// attachment = h.Filename
-		// beego.Info(attachment)
-		path1 := ".\\attachment\\" + number + name + "\\" + h.Filename
-		err = c.SaveToFile("image", path1) //.Join("attachment", attachment)) //存文件    WaterMark(path)    //给文件加水印
-		if err != nil {
-			beego.Error(err)
-		}
-		//如果扩展名为jpg
-		// if strings.ToLower(path.Ext(h.Filename)) == ".jpg" {
-		// }
-		//如果包含jpg，则进行压缩
-		if strings.Contains(strings.ToLower(h.Filename), ".jpg") { //ToLower转成小写
-			// 随机名称
-			// to := path + random_name() + ".jpg"
-			origin := path1 //path + file.Name()
-			fmt.Println("正在处理" + origin + ">>>" + origin)
-			cmd_resize(origin, 2048, 0, origin)
-			//defer os.Remove(origin)//删除原文件
-		}
-		filesize, _ = FileSize(path1)
-		filesize = filesize / 1000.0
-		route = "/attachment/" + number + name + "/" + h.Filename
-	} else {
-		route = ""
-	}
-	sess, _ := globalSessions.SessionStart(c.Ctx.ResponseWriter, c.Ctx.Request)
-	defer sess.SessionRelease(c.Ctx.ResponseWriter)
-	v := sess.Get("uname")
-	// if v != nil {
-	uname := v.(string)
-	// }
-	// ck, err := c.Ctx.Request.Cookie("uname")
-	// if err != nil {
-	// 	beego.Error(err)
-	// }
-	// uname := ck.Value
-
+	// diskdirectory = ".\\attachment\\" + number + name + "\\"
+	// url = "/attachment/" + number + name + "/"
+	uname, _, _ := checkRoleread(c.Ctx) //login里的
+	// rolename, _ = strconv.Atoi(role)
+	c.Data["Uname"] = uname
 	//存入数据库
-	var id int64
-	id, err = models.AdduserdefinedCategory(name, number, content, path2, path3, path4, route, uname, diskdirectory, url)
+	// var id int64
+	id, err := models.AdduserdefinedCategory(name, number, label, "", "", path2, path3, path4, radio, "", uname)
 	if err != nil {
 		beego.Error(err)
 	}
 	id1 := strconv.FormatInt(id, 10)
-	c.Redirect("/category?op=view&id="+id1, 301)
+	c.Redirect("/category/add2?id="+id1, 301) //跳转到添加封面图片、封面说明和项目简介
+	// beego.Info(radio)
 	return
 	//2.取得客户端用户名
 	// ck, err := c.Ctx.Request.Cookie("uname")
 	// if err != nil {
 	// 	beego.Error(err)
 	// }
-	c.Data["Uname"] = v.(string)
-}
-
-func (c *CategoryController) Add_b() {
-	//1.首先判断是否注册
-	if !checkAccount(c.Ctx) {
-		// port := strconv.Itoa(c.Ctx.Input.Port())//c.Ctx.Input.Site() + ":" + port +
-		route := c.Ctx.Request.URL.String()
-		c.Data["Url"] = route
-		c.Redirect("/login?url="+route, 302)
-		// c.Redirect("/login", 302)
-		return
-	}
-	//2.取得客户端用户名
-	sess, _ := globalSessions.SessionStart(c.Ctx.ResponseWriter, c.Ctx.Request)
-	defer sess.SessionRelease(c.Ctx.ResponseWriter)
-	v := sess.Get("uname")
-	if v != nil {
-		c.Data["Uname"] = v.(string)
-	}
-	// ck, err := c.Ctx.Request.Cookie("uname")
-	// if err == nil {
-	// 	c.Data["Uname"] = ck.Value
-	// } else {
-	// 	beego.Error(err)
-	// }
-
-	//2.取得客户端用户名
-	// ck, err := c.Ctx.Request.Cookie("uname")
-	// if err != nil {
-	// 	beego.Error(err)
-	// }
-	// uname := ck.Value
-	//3.取出用户的权限等级
-	role, _ := checkRole(c.Ctx) //login里的
-	// beego.Info(role)
-	//4.进行逻辑分析：
-	rolename, _ := strconv.ParseInt(role, 10, 64)
-	if rolename > 2 { //&& uname != category.Author
-		// port := strconv.Itoa(c.Ctx.Input.Port())//c.Ctx.Input.Site() + ":" + port +
-		route := c.Ctx.Request.URL.String()
-		c.Data["Url"] = route
-		c.Redirect("/roleerr?url="+route, 302)
-		// c.Redirect("/roleerr", 302)
-		return
-	}
-	c.Data["IsLogin"] = checkAccount(c.Ctx)
-	c.Data["IsCategory"] = true
-	c.TplName = "category_add_b.tpl"
-	// id := c.Input().Get("id")
-	// category, err := models.GetCategory(id)
-	// if err != nil {
-	// beego.Error(err)
-	// c.Redirect("/", 302)//这里注释掉，否则在图纸页面无法进入添加页面，因为传入的id为空，导致err发生
-	// return
-	// }
-	// c.Data["Category"] = category
-	// c.Data["Id"] = id
 }
 
 //根据用户名查看项目
@@ -1049,20 +990,10 @@ func (c *CategoryController) Viewbyuname() {
 	c.Data["IsLogin"] = checkAccount(c.Ctx)
 	c.Data["IsCategory"] = true
 	c.TplName = "category_uname.tpl"
-	//2.取得客户端用户名
-	sess, _ := globalSessions.SessionStart(c.Ctx.ResponseWriter, c.Ctx.Request)
-	defer sess.SessionRelease(c.Ctx.ResponseWriter)
-	v := sess.Get("uname")
-	if v != nil {
-		c.Data["Uname"] = v.(string)
-	}
-	// ck, err := c.Ctx.Request.Cookie("uname")
-	// if err == nil {
-	// 	c.Data["Uname"] = ck.Value
-	// } else {
-	// 	beego.Error(err)
-	// }
-	uname := c.Input().Get("uname")
+	uname, _, _ := checkRoleread(c.Ctx) //login里的
+	// rolename, _ = strconv.Atoi(role)
+	c.Data["Uname"] = uname
+	uname = c.Input().Get("uname")
 	// if len(uname) == 0 {
 	// 	break
 	// }
@@ -1097,31 +1028,22 @@ func (c *CategoryController) Viewbyuname() {
 	// c.Data["Categories"] = categories
 }
 
-//查看成果类型里的成果
+//查看成果类型里的成果——这个view是点击侧栏后显示的页面
 func (c *CategoryController) View() {
 	c.Data["IsLogin"] = checkAccount(c.Ctx)
 	c.Data["IsCategory"] = true
-	//2.取得客户端用户名
-	sess, _ := globalSessions.SessionStart(c.Ctx.ResponseWriter, c.Ctx.Request)
-	defer sess.SessionRelease(c.Ctx.ResponseWriter)
-	v := sess.Get("uname")
-	if v != nil {
-		c.Data["Uname"] = v.(string)
-	}
-	// ck, err := c.Ctx.Request.Cookie("uname")
-	// if err == nil {
-	// 	c.Data["Uname"] = ck.Value
-	// } else {
-	// 	beego.Error(err)
-	// }
-
+	uname, _, _ := checkRoleread(c.Ctx) //login里的
+	// rolename, _ = strconv.Atoi(role)
+	c.Data["Uname"] = uname
 	id := c.Input().Get("id")
 	// if len(id) == 0 {
 	// 	break
 	// }
-	//判断父级title是否是“文章/设代日记”
-	category, _ := models.GetCategorySpec(id)
-	if category.Title == "文章/设代日记" {
+	//判断父级title是否是“文章/设代日记”或者图文模式为真
+	category, _ := models.GetCategorySpec(id) //这是父一级的，所以下面判断是否图文模式还不行
+	category1, label, _ := models.GetCategory(id)
+	// beego.Info(category1.Graphicmode)
+	if category.Title == "文章/设代日记" || category1.Graphicmode {
 		c.TplName = "proddiary_view.tpl"
 	} else {
 		c.TplName = "prod_view.tpl"
@@ -1137,18 +1059,18 @@ func (c *CategoryController) View() {
 	categoryproj, _ := models.GetCategoryProj(id)
 	categoryphase, _ := models.GetCategoryPhase(id)
 	categoryspec, _ := models.GetCategorySpec(id)
-	category1, _ := models.GetCategory(id)
 
 	c.Data["CategoryProj"] = categoryproj
 	c.Data["CategoryPhase"] = categoryphase
 	c.Data["CategorySpec"] = categoryspec
 	c.Data["Category"] = category1
+	c.Data["Label"] = label
 	c.Data["Chengguo"] = chengguo
 	c.Data["Length"] = len(chengguo)
 
 	//
 	cid := strconv.FormatInt(categoryproj.Id, 10)
-	categorycelan, _ := models.GetCategory(cid) //由分类id取出本身（项目名称等）
+	categorycelan, _, _ := models.GetCategory(cid) //由分类id取出本身（项目名称等）
 	// topics, err := models.GetAllTopics(category.Title, false)
 	categorychengguo, _ := models.GetCategoryChengguo(cid)
 	categoryzhuanye, _ := models.GetCategoryLeixing(cid)
@@ -1183,54 +1105,32 @@ func (c *CategoryController) View() {
 func (c *CategoryController) ViewBrief() {
 	c.Data["IsLogin"] = checkAccount(c.Ctx)
 	c.Data["IsCategory"] = true
-	//2.取得客户端用户名
-	sess, _ := globalSessions.SessionStart(c.Ctx.ResponseWriter, c.Ctx.Request)
-	defer sess.SessionRelease(c.Ctx.ResponseWriter)
-	v := sess.Get("uname")
-	if v != nil {
-		c.Data["Uname"] = v.(string)
-	}
-	// ck, err := c.Ctx.Request.Cookie("uname")
-	// if err == nil {
-	// 	c.Data["Uname"] = ck.Value
-	// } else {
-	// 	beego.Error(err)
-	// }
-
+	uname, _, _ := checkRoleread(c.Ctx) //login里的
+	// rolename, _ = strconv.Atoi(role)
+	c.Data["Uname"] = uname
 	id := c.Input().Get("id")
-	category, _ := models.GetCategory(id)
+	category, label, _ := models.GetCategory(id)
 	c.Data["Category"] = category
+	c.Data["Label"] = label
 	// if category.Title == "diary" {
 	c.TplName = "category_view_brief.tpl"
 	// } else {
 	// 	c.TplName = "prod_view_b.tpl"
 	// }
-
 }
 
 //查看专业里或第3级目录中的成果
 func (c *CategoryController) View_3() {
 	c.Data["IsLogin"] = checkAccount(c.Ctx)
 	c.Data["IsCategory"] = true
-	//2.取得客户端用户名
-	sess, _ := globalSessions.SessionStart(c.Ctx.ResponseWriter, c.Ctx.Request)
-	defer sess.SessionRelease(c.Ctx.ResponseWriter)
-	v := sess.Get("uname")
-	if v != nil {
-		c.Data["Uname"] = v.(string)
-	}
-	// ck, err := c.Ctx.Request.Cookie("uname")
-	// if err == nil {
-	// 	c.Data["Uname"] = ck.Value
-	// } else {
-	// 	beego.Error(err)
-	// }
-
+	uname, _, _ := checkRoleread(c.Ctx) //login里的
+	// rolename, _ = strconv.Atoi(role)
+	c.Data["Uname"] = uname
 	id := c.Input().Get("id")
 	// if len(id) == 0 {
 	// 	break
 	// }
-	category, _ := models.GetCategory(id)
+	category, label, _ := models.GetCategory(id)
 	if category.Title == "diary" {
 		c.TplName = "proddiary_view.tpl"
 	} else {
@@ -1246,6 +1146,7 @@ func (c *CategoryController) View_3() {
 	c.Data["CategoryPhase"] = categoryphase
 	c.Data["CategorySpec"] = categoryspec
 	c.Data["Category"] = category
+	c.Data["Label"] = label
 	c.Data["Chengguo"] = chengguo
 	c.Data["Length"] = len(chengguo)
 
@@ -1269,24 +1170,14 @@ func (c *CategoryController) View_3() {
 func (c *CategoryController) View_b() {
 	c.Data["IsLogin"] = checkAccount(c.Ctx)
 	c.Data["IsCategoryb"] = true
-	//2.取得客户端用户名
-	sess, _ := globalSessions.SessionStart(c.Ctx.ResponseWriter, c.Ctx.Request)
-	defer sess.SessionRelease(c.Ctx.ResponseWriter)
-	v := sess.Get("uname")
-	if v != nil {
-		c.Data["Uname"] = v.(string)
-	}
-	// ck, err := c.Ctx.Request.Cookie("uname")
-	// if err == nil {
-	// 	c.Data["Uname"] = ck.Value
-	// } else {
-	// 	beego.Error(err)
-	// }
+	uname, _, _ := checkRoleread(c.Ctx) //login里的
+	// rolename, _ = strconv.Atoi(role)
+	c.Data["Uname"] = uname
 	id := c.Input().Get("id")
 	// if len(id) == 0 {
 	// 	break
 	// }
-	category, _ := models.GetCategory(id)
+	category, label, _ := models.GetCategory(id)
 	if category.Title == "diary" {
 		c.TplName = "proddiary_view_b.tpl"
 	} else {
@@ -1302,6 +1193,7 @@ func (c *CategoryController) View_b() {
 	c.Data["CategoryPhase"] = categoryphase
 	c.Data["CategorySpec"] = categoryspec
 	c.Data["Category"] = category
+	c.Data["Label"] = label
 	c.Data["Chengguo"] = chengguo
 	c.Data["Length"] = len(chengguo)
 	// if err != nil {
@@ -1324,19 +1216,9 @@ func (c *CategoryController) View_b() {
 func (c *CategoryController) Category_prod_view() {
 	c.Data["IsLogin"] = checkAccount(c.Ctx)
 	c.Data["IsCategory"] = true
-	//2.取得客户端用户名
-	sess, _ := globalSessions.SessionStart(c.Ctx.ResponseWriter, c.Ctx.Request)
-	defer sess.SessionRelease(c.Ctx.ResponseWriter)
-	v := sess.Get("uname")
-	if v != nil {
-		c.Data["Uname"] = v.(string)
-	}
-	// ck, err := c.Ctx.Request.Cookie("uname")
-	// if err == nil {
-	// 	c.Data["Uname"] = ck.Value
-	// } else {
-	// 	beego.Error(err)
-	// }
+	uname, _, _ := checkRoleread(c.Ctx) //login里的
+	// rolename, _ = strconv.Atoi(role)
+	c.Data["Uname"] = uname
 	id := c.Input().Get("id")
 	// beego.Info(id)
 	title := c.Input().Get("title")
@@ -1351,7 +1233,7 @@ func (c *CategoryController) Category_prod_view() {
 	//由项目id获取所有成果
 	// chengguo, _ := models.GetTopicsbyparentid(id, true)
 	//取得成果类型id的专业parentid以及阶段parentid以及项目parentid才行
-	category, _ := models.GetCategory(id)
+	category, label, _ := models.GetCategory(id)
 	categoryproj, _ := models.GetCategoryProj(id)
 	categoryphase, _ := models.GetCategoryPhase(id)
 	categoryspec, _ := models.GetCategorySpec(id)
@@ -1360,6 +1242,7 @@ func (c *CategoryController) Category_prod_view() {
 	c.Data["CategoryPhase"] = categoryphase
 	c.Data["CategorySpec"] = categoryspec
 	c.Data["Category"] = category
+	c.Data["Label"] = label
 	// c.Data["Chengguo"] = chengguo
 	c.Data["Chengguo"] = topics
 	c.Data["Length"] = len(topics) //将这个结果写入数据库
@@ -1378,40 +1261,26 @@ func (c *CategoryController) Category_prod_view() {
 	}
 }
 
+//显示修改项目简介、封面的界面
 func (c *CategoryController) Modify() {
 	cid := c.Input().Get("cid")
-	//1.首先判断是否注册
-	if !checkAccount(c.Ctx) {
-		// port := strconv.Itoa(c.Ctx.Input.Port())
-		route := c.Ctx.Request.URL.String() //c.Ctx.Input.Site() + ":" + port +
-		// beego.Info(c.Ctx.Input.URL())
+	var rolename int
+	var uname string
+	//2.如果登录或ip在允许范围内，进行访问权限检查
+	uname, role, _ := checkRolewrite(c.Ctx) //login里的
+	rolename, _ = strconv.Atoi(role)
+	c.Data["Uname"] = uname
+	//3.由cid查询数据库中的项目名
+	var label1 string
+	category, label, err := models.GetCategory(cid)
+	for i, label2 := range label {
+		if i == 0 {
+			label1 = label2.Title
+		} else {
+			label1 = label1 + "," + label2.Title
+		}
+	}
 
-		c.Data["Url"] = route
-		c.Redirect("/login?url="+route, 302)
-		// c.Redirect("/login", 302)
-		return
-	}
-	//2.取得客户端用户名
-	sess, _ := globalSessions.SessionStart(c.Ctx.ResponseWriter, c.Ctx.Request)
-	defer sess.SessionRelease(c.Ctx.ResponseWriter)
-	v := sess.Get("uname")
-	if v != nil {
-		c.Data["Uname"] = v.(string)
-	}
-	// ck, err := c.Ctx.Request.Cookie("uname")
-	// if err == nil {
-	// 	c.Data["Uname"] = ck.Value
-	// } else {
-	// 	beego.Error(err)
-	// }
-	uname := v.(string) //ck.Value
-	//3.由cid查询数据库中的用户名
-	category, err := models.GetCategory(cid)
-	//4.取出用户的权限等级
-	role, _ := checkRole(c.Ctx) //login里的
-	// beego.Info(role)
-	//5.进行逻辑分析：
-	rolename, _ := strconv.ParseInt(role, 10, 64)
 	if rolename > 1 && uname != category.Author { //要么管理员，要么作者自己可以修改项目
 		// port := strconv.Itoa(c.Ctx.Input.Port())
 		route := c.Ctx.Request.URL.String() //c.Ctx.Input.Site() + ":" + port +
@@ -1422,7 +1291,7 @@ func (c *CategoryController) Modify() {
 	}
 
 	c.Data["IsLogin"] = checkAccount(c.Ctx)
-	c.Data["IsCategoryb"] = true
+	c.Data["IsCategory"] = true
 	c.TplName = "category_modify.tpl"
 
 	categorychengguo, err := models.GetCategoryChengguo(cid)
@@ -1452,6 +1321,132 @@ func (c *CategoryController) Modify() {
 	// }
 
 	c.Data["Category"] = category
+	c.Data["Label"] = label1
+	//由route截取文件名
+	Attachment := strings.Split(category.Route, "/")
+	s := len(Attachment)
+	name := Attachment[s-1]
+	c.Data["Filename"] = name
+	c.Data["Categoryjieduan"] = categoryjieduan
+	c.Data["Categoryzhuanye"] = categoryzhuanye
+	c.Data["Categorychengguo"] = categorychengguo
+
+	for _, v := range categoryjieduan {
+		switch v.Title {
+		case "A":
+			c.Data["A"] = true
+		case "B":
+			c.Data["B"] = true
+		case "C":
+			c.Data["C"] = true
+		case "D":
+			c.Data["D"] = true
+		case "E":
+			c.Data["E"] = true
+		case "F":
+			c.Data["F"] = true
+		case "G":
+			c.Data["G"] = true
+		case "L":
+			c.Data["L"] = true
+		}
+	}
+
+	for _, x := range categorychengguo {
+		switch x.Title {
+		case "FB":
+			c.Data["FB"] = true
+		case "FD":
+			c.Data["FD"] = true
+		case "FG":
+			c.Data["FG"] = true
+		case "FT":
+			c.Data["FT"] = true
+		case "FJ":
+			c.Data["FJ"] = true
+		case "FP":
+			c.Data["FP"] = true
+		case "Fdiary":
+			c.Data["Fdiary"] = true
+		}
+	}
+	for _, w := range categoryzhuanye {
+		switch w.Title {
+		case "1":
+			c.Data["1"] = true
+		case "2":
+			c.Data["2"] = true
+		case "3":
+			c.Data["3"] = true
+		case "4":
+			c.Data["4"] = true
+		case "5":
+			c.Data["5"] = true
+		case "6":
+			c.Data["6"] = true
+		case "7":
+			c.Data["7"] = true
+		case "8":
+			c.Data["8"] = true
+		case "9":
+			c.Data["9"] = true
+		}
+	}
+	// c.Data["Id"] = cid
+}
+
+//显示修改项目目录结构的界面
+func (c *CategoryController) ModifyFRM() {
+	cid := c.Input().Get("cid")
+	var rolename int
+	var uname, role string
+	//2.如果登录或ip在允许范围内，进行访问权限检查
+	uname, role, _ = checkRolewrite(c.Ctx) //login里的
+	rolename, _ = strconv.Atoi(role)
+	c.Data["Uname"] = uname
+	//3.由cid查询数据库中的用户名
+	category, label, err := models.GetCategory(cid)
+	if rolename > 1 && uname != category.Author { //要么管理员，要么作者自己可以修改项目
+		// port := strconv.Itoa(c.Ctx.Input.Port())
+		route := c.Ctx.Request.URL.String() //c.Ctx.Input.Site() + ":" + port +
+		c.Data["Url"] = route
+		c.Redirect("/roleerr?url="+route, 302)
+		// c.Redirect("/roleerr", 302)
+		return
+	}
+
+	c.Data["IsLogin"] = checkAccount(c.Ctx)
+	c.Data["IsCategory"] = true
+	c.TplName = "category_modifyfrm.tpl"
+
+	categorychengguo, err := models.GetCategoryChengguo(cid)
+	if err != nil {
+		beego.Error(err)
+		c.Redirect("/", 302)
+		return
+	}
+	categoryzhuanye, err := models.GetCategoryLeixing(cid)
+	if err != nil {
+		beego.Error(err)
+		c.Redirect("/", 302)
+		return
+	}
+	categoryjieduan, err := models.GetCategoryJieduan(cid)
+	if err != nil {
+		beego.Error(err)
+		c.Redirect("/", 302)
+		return
+	}
+
+	// category, err := models.GetCategory(cid)
+	// if err != nil {
+	// 	beego.Error(err)
+	// 	c.Redirect("/", 302)
+	// 	return
+	// }
+
+	c.Data["Category"] = category
+	c.Data["Label"] = label
 	//由route截取文件名
 	Attachment := strings.Split(category.Route, "/")
 	s := len(Attachment)
@@ -1526,6 +1521,7 @@ func (c *CategoryController) Modify() {
 
 }
 
+//修改项目提交方法
 func (c *CategoryController) ModifyCategory() {
 	// if !checkAccount(c.Ctx) {
 	// 	port := strconv.Itoa(c.Ctx.Input.Port())
@@ -1541,30 +1537,25 @@ func (c *CategoryController) ModifyCategory() {
 	cid := c.Input().Get("cid")
 	name := c.Input().Get("name")
 	number := c.Input().Get("number")
+	label := c.Input().Get("label")
 	// content := c.Input().Get("content")
-	content := c.Input().Get("editorValue") //test-editormd-html-code
+	// content := c.Input().Get("editorValue") //test-editormd-html-code
+	//取得上传之封面图片
+	route := c.Input().Get("route")
+	cover := c.Input().Get("editor_cover")
+	content := c.Input().Get("editor_property")
 	// image := c.Input().Get("image")
-	path := c.Input().Get("tempString")
+	// path := c.Input().Get("tempString")
 
 	// ck, err := c.Ctx.Request.Cookie("uname")
 	// if err != nil {
 	// 	beego.Error(err)
 	// }
 	// uname := ck.Value
-	//2.取得客户端用户名
-	sess, _ := globalSessions.SessionStart(c.Ctx.ResponseWriter, c.Ctx.Request)
-	defer sess.SessionRelease(c.Ctx.ResponseWriter)
-	v := sess.Get("uname")
-	if v != nil {
-		c.Data["Uname"] = v.(string)
-	}
-	// ck, err := c.Ctx.Request.Cookie("uname")
-	// if err == nil {
-	// 	c.Data["Uname"] = ck.Value
-	// } else {
-	// 	beego.Error(err)
-	// }
-	uname := v.(string) //ck.Value
+	uname, _, _ := checkRoleread(c.Ctx) //login里的
+	// rolename, _ = strconv.Atoi(role)
+	c.Data["Uname"] = uname
+
 	//保存上传的图片
 	//获取上传的文件，直接可以获取表单名称对应的文件名，不用另外提取
 	// _, h, err := c.GetFile("image")
@@ -1597,8 +1588,8 @@ func (c *CategoryController) ModifyCategory() {
 	// 	filesize, _ = FileSize(path1)
 	// 	filesize = filesize / 1000.0
 	// 	route = "/attachment/" + number + name + "/" + h.Filename
-	//存入数据库ModifyCategory(cid, name, number, content, path, route, uname string)
-	err := models.ModifyCategory(cid, name, number, content, "", path, "", uname)
+	//存入数据库cid, name, number, content, cover, path, route, uname
+	err := models.ModifyCategory(cid, name, number, label, content, cover, "", route, uname)
 	if err != nil {
 		beego.Error(err)
 	}
@@ -1610,8 +1601,41 @@ func (c *CategoryController) ModifyCategory() {
 	// 	}
 	// }
 	// c.Data["Uname"] = ck.Value
-	c.Redirect("/category", 301)
+	c.Redirect("/category?op=view&id="+cid, 301)
 	return
+}
+
+//显示修改目录名称
+
+//修改目录名称提交
+func (c *CategoryController) ModifyCategoryTitle() {
+	cid := c.Input().Get("cid") //项目id
+	id := c.Input().Get("pid")  //要修改的id
+	name := c.Input().Get("title")
+	//修改物理目录，
+	//修改id及其下级的title
+	idNum, err := strconv.ParseInt(id, 10, 64)
+	err = models.ModifyCategoryTitle(idNum, name)
+	// if err != nil {
+	// 	beego.Error(err)
+	// }
+	if err != nil {
+		beego.Error(err)
+	} else {
+		// c.Data["json"] = map[string]interface{}{
+		// 	"state":    "SUCCESS",
+		// 	"data":     "111",
+		// 	"original": "demo.jpg",
+		// }
+		// c.ServeJSON()
+		//返回值给ajax的data
+		data := name
+		c.Ctx.WriteString(data)
+	}
+	c.Redirect("/category/modifyfrm?cid="+cid, 301)
+	// return加这个return就初夏下面这个错误
+	// 2016/05/15 15:07:56 [CategoryModel.go:818][I] .\attachment\20……
+	// 2016/05/15 15:07:56 http: multiple response.WriteHeader calls
 }
 
 // func (c *TopicController) View() {

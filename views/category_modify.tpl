@@ -11,6 +11,9 @@
     <link rel="stylesheet" type="text/css" href="/static/fex-team-webuploader/css/webuploader.css">
 <!--引入JS-->
 <script type="text/javascript" src="/static/fex-team-webuploader/dist/webuploader.js"></script>
+<style type="text/css">
+ img{max-width:100%}
+ </style>
 </head>
 
 <body>
@@ -25,12 +28,15 @@
    <input type="hidden" id="categoryid" name="categoryid" value="{{.Category.Id}}"/>
    <input type="hidden" id="route" name="route" value=""/>
     <div class="form-group">
-      <label>项目名称</label>
-      <input id="name" class="form-control"  placeholder="Enter ProjectName" name="name" value="{{.Category.Title}}"></div>
-
-    <div class="form-group">
       <label>项目编号</label>
-      <input id="number" class="form-control"  placeholder="Enter ProjectNumber" name="number" value="{{.Category.Number}}"></div>
+      <input readonly="readonly" id="number" class="form-control"  placeholder="Enter ProjectNumber" name="number" value="{{.Category.Number}}"></div>
+    <div class="form-group">
+      <label>项目名称</label>
+      <input readonly="readonly" id="name" class="form-control"  placeholder="Enter ProjectName" name="name" value="{{.Category.Title}}"></div>
+    <div class="form-group">
+      <label>分类标签：</label>
+      <input id="label" class="form-control"  value="{{.Label}}" name="label"></div>
+    
 
     <label>封面文字</label>
     <!-- <div id="content" class="content" name="content">
@@ -38,8 +44,8 @@
     <!-- 用str2html不转义，就可以用uparse解析了 -->
     <!-- {{str2html .Category.Content}}</div>
     -->
-    <div id="editor_cover">
-      <script id="editor_cover" type="text/plain" style="height:500px;"></script>
+    <div id="editor_cover" name="editor_cover">
+      <script id="editor_cover" name="editor_cover" type="text/plain" style="height:500px;"></script>
     </div>
     <label>封面图片</label>
       <!-- <div> -->
@@ -50,7 +56,7 @@
           <!--用来存放item-->
           <div id="fileList" class="uploader-list"></div>
           <div id="filePicker">选择图片</div>
-       <img src="{{.Category.Route}}" width="800" align="middle">   
+       <img src="{{.Category.Route}}" align="middle">   
       </div>
       
     <label>项目简介:</label>
@@ -59,8 +65,8 @@
     <!-- 用str2html不转义，就可以用uparse解析了 -->
     <!-- {{str2html .Category.Content}}</div>
     -->
-    <div id="editor_property">
-      <script id="editor_property" type="text/plain" style="height:500px;"></script>
+    <div id="editor_property" name="editor_property">
+      <script id="editor_property" name="editor_property" type="text/plain" style="height:500px;"></script>
     </div>
 
     <input type="hidden" id="tempString" name="tempString"/>
@@ -73,7 +79,8 @@
 </div>
 
 <hr>
-        <!-- {{range $k,$v :=.Categoryjieduan}}
+<!--       <div class="col-lg-3">
+        {{range $k,$v :=.Categoryjieduan}}
           <li>
             <a href="#" aria-expanded="false"><i class="glyphicon glyphicon-stop"></i>&nbsp;{{.Title}} <span class="glyphicon arrow"></span></a>
             <ul aria-expanded="false">
@@ -93,10 +100,10 @@
               {{end}}
             </ul>
           </li>
-        {{end}} -->
+        {{end}}
+      </div> -->
 
-
-<div class="col-lg-12">
+<!-- <div class="col-lg-9">
   <table class="table table-striped">
     <thead>
       <tr>
@@ -165,7 +172,7 @@
 
     </tbody>
   </table>
-</div>
+</div> -->
 
 
 
@@ -175,6 +182,8 @@
 //实例化编辑器
 //议使用工厂方法getEditor创建和引用编辑器实例，如果在某个闭包下引用该编辑器，直接调用UE.ditor('editor')就能拿到相关的实例
 var ue1 = UE.getEditor('editor_cover');
+var ue2 = UE.getEditor('editor_property'); 
+
 //  setTimeout(function(){ uParse('#content', {
 //  'highlightJsUrl':'{/static/ueditor/third-party/SyntaxHighlighter/shCore.js',
 //  'highlightCssUrl':'/static/ueditor/third-party/SyntaxHighlighter/shCoreDefault.css'})
@@ -194,7 +203,7 @@ $(function(){
         });
 });
 
-var ue2 = UE.getEditor('editor_property');  
+ 
 ue2.addListener("ready", function () {
 uParse('.editor_property', {
     rootPath: '/static/ueditor/'
@@ -208,59 +217,18 @@ $(function(){
         ue2.setContent({{str2html .Category.Content}});
         });
 });
-// ue.ready(function () {
-//     function setContent(isAppendTo) {
-//         var arr = [];
-//         // arr.push("使用editor.setContent('欢迎使用ueditor')方法可以设置编辑器的内容");
-//         UE.getEditor('editor').setContent({{.Category.Content}} , isAppendTo);
-//         // alert(arr.join("\n"));
-//     };
-// });
-// document.getElementById()返回对拥有指定 id 的第一个对象的引用。
-// document.getElementsByName()返回带有指定名称的对象集合。
-// document.getElementsByTagName()返回带有指定标签名的对象集合。
-//弹出一个输入框，输入一段文字，可以提交 
-//添加同级 
-    function prom(id) {  
-        var name = prompt("请输入名称", ""); //将输入的内容赋给变量 name ，  
-        //这里需要注意的是，prompt有两个参数，前面是提示的话，后面是当对话框出来后，在对话框里的默认值  
-        if (name)//如果返回的有内容  
-        {  
-          var pid = $('#'+id).val();
-            // alert("欢迎您：" + name) 
-            $.ajax({
-                type:"post",//这里是否一定要用post？？？
-                url:"/add",
-                data: {pid:pid,title:name},
-                success:function(data,status){//数据提交成功时返回数据
-                  alert("添加“"+data+"”成功！(status:"+status+".)");
-                 }
-            });  
-        }  
-  
-    } 
- //弹出一个输入框，输入一段文字，可以提交
- //添加下级  
-    function prom1(id) {  
-        var name = prompt("请输入名称", ""); //将输入的内容赋给变量 name ，  
-        //这里需要注意的是，prompt有两个参数，前面是提示的话，后面是当对话框出来后，在对话框里的默认值  
-        if (name)//如果返回的有内容  
-        {  
-          // var pid = $('#'+id).val();
-            // alert("欢迎您：" + name) 
-            $.ajax({
-                type:"post",//这里是否一定要用post？？？
-                url:"/addj",
-                data: {pid:id,title:name},
-                success:function(data,status){//数据提交成功时返回数据
-                  alert("添加“"+data+"”成功！(status:"+status+".)");
-                 }
-            });  
-        }  
-  
-    } 
 
-// 图片上传demo
+/* 2.传入参数表,添加到已有参数表里 通过携带参数，实现不同的页面使用不同controllers*/
+    ue2.ready(function () {
+    ue2.addListener('focus', function () {//startUpload start-upload startUpload beforeExecCommand是在插入图片之前触发
+    ue2.execCommand('serverparam', {
+        "key":"diary",
+        "categoryid":{{.Category.Id}},
+    });
+});
+});
+
+// 图片上传demo——这个是添加封面的图片
 jQuery(function() {
       var a = document.getElementsByName("categoryid");
       a=a[0].value;
@@ -337,10 +305,9 @@ jQuery(function() {
     uploader.on( 'uploadSuccess', function( file,response ) {
         $( '#'+file.id ).addClass('upload-state-done');
         var json = eval(response);
-        alert(json.url);
+        // alert(json.url);
         // document.getElementBy("inputId").value = json.url;//原生
         $("#route").val(json.url);
-
         // $.ajax({
         //         success:function(data,status){//数据提交成功时返回数据
         //           alert(data);
@@ -364,19 +331,6 @@ jQuery(function() {
 });
 
 </script>
-
-<!--  // var valus = document.getElementsByName("aaa");
-  // if(a.length!=0)
-  // {
-  // var str = ""；
-  // for(var i=0;i<a.length;i++)  
-  // {
-  // if(a[i].checked)
-  // {
-  // str+= a[i].value;
-// }
-// }
-// } -->
 
 </body>
 </html>

@@ -14,13 +14,13 @@ type RoleController struct {
 	beego.Controller
 }
 
-func (this *RoleController) Index() {
+func (c *RoleController) Index() {
 	roles, count := m.GetRolelist(1, 100, "Id")
-	if this.IsAjax() {
-		// page, _ := this.GetInt64("page")
-		// page_size, _ := this.GetInt64("rows")
-		// sort := this.GetString("sort")
-		// order := this.GetString("order")
+	if c.IsAjax() {
+		// page, _ := c.GetInt64("page")
+		// page_size, _ := c.GetInt64("rows")
+		// sort := c.GetString("sort")
+		// order := c.GetString("order")
 		// if len(order) > 0 {
 		// 	if order == "desc" {
 		// 		sort = "-" + sort
@@ -31,76 +31,84 @@ func (this *RoleController) Index() {
 		if len(roles) < 1 {
 			roles = []orm.Params{}
 		}
-		this.Data["Json"] = &map[string]interface{}{"total": count, "rows": &roles}
-		this.ServeJSON()
+		c.Data["Json"] = &map[string]interface{}{"total": count, "rows": &roles}
+		c.ServeJSON()
 		return
 	} else {
-		// this.TplName = this.GetTemplatetype() + "/rbac/role.tpl"
-		this.Data["Roles"] = &roles
-		this.TplName = "role.tpl"
+		// c.TplName = c.GetTemplatetype() + "/rbac/role.tpl"
+		c.Data["Roles"] = &roles
+		c.TplName = "role.tpl"
 	}
 }
 
-func (this *RoleController) Roleerr() {
-	url := this.Input().Get("url")
-	this.Data["Url"] = url
-	this.TplName = "role_err.tpl"
+func (c *RoleController) Roleerr() {
+	// url := c.Input().Get("url")
+	url1 := c.Input().Get("url") //这里不支持这样的url，http://192.168.9.13/login?url=/topic/add?id=955&mid=3
+	url2 := c.Input().Get("mid")
+	var url string
+	if url2 == "" {
+		url = url1
+	} else {
+		url = url1 + "&mid=" + url2
+	}
+	c.Data["Url"] = url
+	c.TplName = "role_err.tpl"
 }
 
-func (this *RoleController) AddAndEdit() {
+func (c *RoleController) AddAndEdit() {
 	r := m.Role{}
-	if err := this.ParseForm(&r); err != nil {
+	if err := c.ParseForm(&r); err != nil {
 		//handle error
-		// this.Rsp(false, err.Error())
+		// c.Rsp(false, err.Error())
 		beego.Error(err.Error)
 		return
 	}
 	var id int64
 	var err error
-	Rid, _ := this.GetInt64("Id")
+	Rid, _ := c.GetInt64("Id")
 	if Rid > 0 {
 		id, err = m.UpdateRole(&r)
 	} else {
 		id, err = m.AddRole(&r)
 	}
 	if err == nil && id > 0 {
-		// this.Rsp(true, "Success")
+		// c.Rsp(true, "Success")
 		return
 	} else {
-		// this.Rsp(false, err.Error())
+		// c.Rsp(false, err.Error())
 		beego.Error(err.Error)
 		return
 	}
 
 }
 
-func (this *RoleController) DelRole() {
-	Id, _ := this.GetInt64("Id")
+func (c *RoleController) DelRole() {
+	Id, _ := c.GetInt64("Id")
 	status, err := m.DelRoleById(Id)
 	if err == nil && status > 0 {
-		// this.Rsp(true, "Success")
+		// c.Rsp(true, "Success")
 		return
 	} else {
-		// this.Rsp(false, err.Error())
+		// c.Rsp(false, err.Error())
 		beego.Error(err.Error)
 		return
 	}
 }
 
-func (this *RoleController) Getlist() {
+func (c *RoleController) Getlist() {
 	roles, _ := m.GetRolelist(1, 1000, "Id")
 	if len(roles) < 1 {
 		roles = []orm.Params{}
 	}
-	this.Data["json"] = &roles
-	this.ServeJSON()
+	c.Data["json"] = &roles
+	c.ServeJSON()
 	return
 }
 
-func (this *RoleController) AccessToNode() {
-	roleid, _ := this.GetInt64("Id")
-	if this.IsAjax() {
-		groupid, _ := this.GetInt64("group_id")
+func (c *RoleController) AccessToNode() {
+	roleid, _ := c.GetInt64("Id")
+	if c.IsAjax() {
+		groupid, _ := c.GetInt64("group_id")
 		nodes, count := m.GetNodelistByGroupid(groupid)
 		list, _ := m.GetNodelistByRoleId(roleid)
 		for i := 0; i < len(nodes); i++ {
@@ -118,44 +126,44 @@ func (this *RoleController) AccessToNode() {
 		if len(nodes) < 1 {
 			nodes = []orm.Params{}
 		}
-		this.Data["json"] = &map[string]interface{}{"total": count, "rows": &nodes}
-		this.ServeJSON()
+		c.Data["json"] = &map[string]interface{}{"total": count, "rows": &nodes}
+		c.ServeJSON()
 		return
 	} else {
 		grouplist := m.GroupList()
 		b, _ := json.Marshal(grouplist)
-		this.Data["grouplist"] = string(b)
-		this.Data["roleid"] = roleid
-		// this.TplName = this.GetTemplatetype() + "/rbac/accesstonode.tpl"
+		c.Data["grouplist"] = string(b)
+		c.Data["roleid"] = roleid
+		// c.TplName = c.GetTemplatetype() + "/rbac/accesstonode.tpl"
 	}
 
 }
 
-func (this *RoleController) AddAccess() {
-	roleid, _ := this.GetInt64("roleid")
-	group_id, _ := this.GetInt64("group_id")
+func (c *RoleController) AddAccess() {
+	roleid, _ := c.GetInt64("roleid")
+	group_id, _ := c.GetInt64("group_id")
 	err := m.DelGroupNode(roleid, group_id)
 	if err != nil {
-		// this.Rsp(false, err.Error())
+		// c.Rsp(false, err.Error())
 		beego.Error(err.Error)
 	}
-	ids := this.GetString("ids")
+	ids := c.GetString("ids")
 	nodeids := strings.Split(ids, ",")
 	for _, v := range nodeids {
 		id, _ := strconv.Atoi(v)
 		_, err := m.AddRoleNode(roleid, int64(id))
 		if err != nil {
-			// this.Rsp(false, err.Error())
+			// c.Rsp(false, err.Error())
 			beego.Error(err.Error)
 		}
 	}
-	// this.Rsp(true, "success")
+	// c.Rsp(true, "success")
 
 }
 
-func (this *RoleController) RoleToUserList() {
-	roleid, _ := this.GetInt64("Id")
-	if this.IsAjax() {
+func (c *RoleController) RoleToUserList() {
+	roleid, _ := c.GetInt64("Id")
+	if c.IsAjax() {
 		users, count := m.Getuserlist(1, 1000, "Id")
 		list, _ := m.GetUserByRoleId(roleid)
 		for i := 0; i < len(users); i++ {
@@ -168,22 +176,22 @@ func (this *RoleController) RoleToUserList() {
 		if len(users) < 1 {
 			users = []orm.Params{}
 		}
-		this.Data["json"] = &map[string]interface{}{"total": count, "rows": &users}
-		this.ServeJSON()
+		c.Data["json"] = &map[string]interface{}{"total": count, "rows": &users}
+		c.ServeJSON()
 		return
 	} else {
-		this.Data["roleid"] = roleid
-		// this.TplName = this.GetTemplatetype() + "/rbac/roletouserlist.tpl"
+		c.Data["roleid"] = roleid
+		// c.TplName = c.GetTemplatetype() + "/rbac/roletouserlist.tpl"
 	}
 }
 
-func (this *RoleController) AddRoleToUser() {
-	roleid, _ := this.GetInt64("Id")
-	ids := this.GetString("ids")
+func (c *RoleController) AddRoleToUser() {
+	roleid, _ := c.GetInt64("Id")
+	ids := c.GetString("ids")
 	userids := strings.Split(ids, ",")
 	err := m.DelUserRole(roleid)
 	if err != nil {
-		// this.Rsp(false, err.Error())
+		// c.Rsp(false, err.Error())
 		beego.Error(err.Error)
 	}
 	if len(ids) > 0 {
@@ -191,10 +199,10 @@ func (this *RoleController) AddRoleToUser() {
 			id, _ := strconv.Atoi(v)
 			_, err := m.AddRoleUser(roleid, int64(id))
 			if err != nil {
-				// this.Rsp(false, err.Error())
+				// c.Rsp(false, err.Error())
 				beego.Error(err.Error)
 			}
 		}
 	}
-	// this.Rsp(true, "success")
+	// c.Rsp(true, "success")
 }

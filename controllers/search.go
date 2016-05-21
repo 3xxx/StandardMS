@@ -10,6 +10,7 @@ type SearchController struct {
 	beego.Controller
 }
 
+//导航栏搜索
 func (c *SearchController) Get() { //search用的是get方法
 	tid := c.Input().Get("tuming")
 	c.Data["IsSearch"] = true
@@ -21,6 +22,28 @@ func (c *SearchController) Get() { //search用的是get方法
 	} else {
 		c.Data["Searchs"] = Searchs
 	}
+	//var err error
+	//	c.Data["Search"], err = models.GetAllSearchs()
+	//	if err != nil {
+	//		beego.Error(err)
+	//	}
+}
+
+//水利设计院本地搜索
+func (c *SearchController) Searchlocal() { //search用的是get方法
+	tid := c.Input().Get("name")
+	c.Data["IsSearch"] = true
+	c.Data["IsLogin"] = checkAccount(c.Ctx)
+	// c.TplName = "search.tpl"
+	Searchs, err := models.SearchTopics(tid, false)
+	if err != nil {
+		beego.Error(err.Error)
+	} else {
+		// c.Data["Searchs"] = Searchs
+		c.Data["json"] = Searchs //这里必须要是c.Data["json"]，其他c.Data["Data"]不行
+		c.ServeJSON()
+	}
+
 	//var err error
 	//	c.Data["Search"], err = models.GetAllSearchs()
 	//	if err != nil {

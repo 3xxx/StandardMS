@@ -19,10 +19,13 @@
   <form method="post" action="/category" enctype="multipart/form-data">
     <div class="form-group">
       <label>项目编号：</label>
-      <input id="number" class="form-control"  placeholder="例如“SL1999”。上传效果图之前必须先填写项目编号和项目名称" name="number"></div> 
+      <input id="number" class="form-control"  placeholder="例如 “SL1999”" name="number"></div> 
     <div class="form-group">
       <label>项目名称：</label>
-      <input id="name" class="form-control"  placeholder="例如“珠三角水资源配置工程”。上传效果图之前必须先填写项目编号和项目名称" name="name"></div>
+      <input id="name" class="form-control"  placeholder="例如 “珠三角水资源配置工程”" name="name"></div>
+      <div class="form-group">
+      <label>分类标签：</label>
+      <input id="label" class="form-control"  placeholder="例如 “供水工程,堤防工程,水库工程”，英文,号隔开。" name="label"></div>
     <!--<label>项目简介:</label>
 <div>
     <script id="editor" type="text/plain" style="height:500px;"></script> width:1024px; 

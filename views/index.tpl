@@ -1,16 +1,14 @@
 <!DOCTYPE html>
 {{template "header"}}
-
 <title>首页 - 水利设计CMS系统</title>
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+    <link rel="stylesheet" href="/static/Font-Awesome-4.4.0/css/font-awesome.min.css">
     <script type="text/javascript" charset="utf-8" src="/static/ueditor/ueditor.config.js"></script>
     <script type="text/javascript" charset="utf-8" src="/static/ueditor/ueditor.all.js"> </script>
     <!--建议手动加在语言，避免在ie下有时因为加载语言失败导致编辑器加载失败-->
     <!--这里加载的语言文件会覆盖你在配置项目里添加的语言类型，比如你在配置项目里配置的是英文，这里加载的中文，那最后就是中文-->
     <script type="text/javascript" charset="utf-8" src="/static/ueditor/lang/zh-cn/zh-cn.js"></script>
     <script src="/static/ueditor/ueditor.parse.js"></script>
-
-
 <!--         <script src="/static/editor.md/lib/marked.min.js"></script>
         <script src="/static/editor.md/lib/prettify.min.js"></script>
       
@@ -35,6 +33,7 @@ h1[id] {
       width: 100%;
       margin: 0 auto;
  }*/
+ img{max-width:100%}
 </style>
 <style type="text/css">
     /* Custom Styles */
@@ -79,10 +78,12 @@ h1[id] {
   <div class="container-fill">{{template "navbar" .}}</div>
 </div>
 
-<div class="container-fill">
+<!-- <div class="container-fill"> -->
   <!-- <div class="row">
   -->
-  <div class="col-xs-2" id="myScrollspy">
+ <div class="container">
+<!-- <div class="row">  -->
+  <div class="col-md-2 col-md-offset-1" id="myScrollspy">
     <ul class="nav nav-tabs nav-stacked" data-spy="affix" data-offset-top="50">
       <li class="active">
         <a href="#section-1"> <i class="glyphicon glyphicon-plane"></i>
@@ -96,11 +97,12 @@ h1[id] {
       </li>
       <li>
         <a href="#section-3">
-          <i class="glyphicon glyphicon-user"></i>
-          成果贡献者
+          <i class="fa fa-file-image-o"></i>
+          最新文章列表
         </a>
       </li>
-      <li>
+      <!-- <i class="fa fa-square">&nbsp;项目简介</i> -->
+<!--       <li>
         <a href="#section-4">
           <i class="glyphicon glyphicon-asterisk"></i>
           最多访问成果
@@ -111,11 +113,11 @@ h1[id] {
           <i class="glyphicon glyphicon-download-alt"></i>
           最多下载成果
         </a>
-      </li>
+      </li> -->
     </ul>
   </div>
 
-  <div class="col-lg-10" role="main">
+  <div class="col-md-8" role="main">
     <div class="bs-docs-section">
       <div class="page-header">
       <!-- <h2>{{.Website}}</h2> -->
@@ -126,19 +128,19 @@ h1[id] {
         </h1>
       </div>
       <ol>
-{{range $index, $elem := .Categories}}
-  {{if lt $index 20}}
+      {{range $index, $elem := .Categories}}
+        {{if lt $index 20}}
         <h3>
           <li>
             <a href="/category?op=view&id={{.Id}}">{{.Number}}{{.Title}}</a>
           </li>
         </h3>
         
-  <div class="content">
-  {{str2html .Cover}}
-  <!-- 项目简介如何截取html呢？ -->
-  </div>
-  <img src="{{.Route}}" width="800" align="middle">
+      <div class="content">
+      {{str2html .Cover}}
+        <!-- 项目简介如何截取html呢？ -->
+      </div>
+    <img src="{{.Route}}" align="middle">
    <!--  <div id="editormd-{{$index}}" name="test-editormd-view2" class="content">class="markdown-body editormd-html-preview"
        <textarea id="{{$index}}" style="display:none;">{{.Content}}</textarea> append-test
     </div> --> 
@@ -176,42 +178,64 @@ h1[id] {
                 });
             });
           </script> -->
+      {{end}}
+    {{end}}
+    </ol>
+    </div>
+    <hr>
 
-  {{end}}
-{{end}}
-</ol>
-</div>
-<hr>
-
-<div class="bs-docs-section">
+  <div class="bs-docs-section">
       <div class="page-header">
       <h1 id="section-2"> <i class="glyphicon glyphicon-star-empty"></i>
         最新成果列表
       </h1>
       </div>
+        <ol>
+        {{range $index, $elem := .Topics}}
+             {{if lt $index 20}}
+        <li>
+        <h4>
+          <a href="/topic/view_b/{{.Id}}">{{.Title}}</a>
+        </h4>
+        </li>
+        <h6 class="text-muted">
+        成果由{{.Author}}上传于{{dateformat .Created "2006-01-02 T 15:04:05"}}，共有次浏览，{{.ReplyCount}}个评论
+        </h6>
+          <!-- <div class="content"> -->
+          <!-- {{str2html .Content}} -->
+          <!-- 项目简介如何截取html呢？ -->
+          <!-- </div> -->
+        <!-- <p>{{.Content}}</p> -->
+        {{end}}
+        {{end}}
+      </ol>
+    </div>
 
-<ol>
-{{range $index, $elem := .Topics}}
-     {{if lt $index 20}}
-<li>
-<h4>
-  <a href="/topic/view_b/{{.Id}}">{{.Title}}</a>
-</h4>
-</li>
-<h6 class="text-muted">
-成果由{{.Author}}上传于{{dateformat .Created "2006-01-02 T 15:04:05"}}，共有{{.Views}}次浏览，{{.ReplyCount}}个评论
-</h6>
-  <!-- <div class="content"> -->
-  <!-- {{str2html .Content}} -->
-  <!-- 项目简介如何截取html呢？ -->
-  <!-- </div> -->
-<!-- <p>{{.Content}}</p> -->
-{{end}}
-    {{end}}
-</ol>
-</div>
+    <div class="bs-docs-section">
+      <div class="page-header">
+      <h1 id="section-3"> <i class="glyphicon glyphicon-star-empty"></i>
+        最新文章列表
+      </h1>
+      </div>
+<!--         <ol>
+        {{range $index, $elem := .Topics}}
+             {{if lt $index 20}}
+        <li>
+        <h4>
+          <a href="/topic/view_b/{{.Id}}">{{.Title}}</a>
+        </h4>
+        </li>
+        <h6 class="text-muted">
+        成果由{{.Author}}上传于{{dateformat .Created "2006-01-02 T 15:04:05"}}，共有{{.Views}}次浏览，{{.ReplyCount}}个评论
+        </h6>
+        {{end}}
+        {{end}}
+      </ol> -->
+    </div>
+
   </div>
 
+<!-- </div> -->
 </div>
 
 <script type="text/javascript">

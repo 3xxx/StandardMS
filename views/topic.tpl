@@ -1,29 +1,6 @@
  <!DOCTYPE html>
 {{template "header"}}
 <title>成果分类查看 - 档案共享系统</title>
-<!-- <style type="text/css">
-li:nth-child(odd){background-color:#eee; }/*隔行变色*/
-ul.disc {list-style-type: disc}
-ul.circle {list-style-type: circle}
-ul.square {list-style-type: square}
-ul.decimal {list-style-type: decimal}
-ul.decimal-leading-zero {list-style-type: decimal-leading-zero}
-ul.lower-roman {list-style-type: lower-roman}
-ul.upper-roman {list-style-type: upper-roman}
-ul.lower-alpha {list-style-type: lower-alpha}
-ul.upper-alpha {list-style-type: upper-alpha}
-ul.lower-greek {list-style-type: lower-greek}
-ul.lower-latin {list-style-type: lower-latin}
-ul.upper-latin {list-style-type: upper-latin}
-ul.hebrew {list-style-type: hebrew}
-ul.armenian {list-style-type: armenian}
-ul.georgian {list-style-type: georgian}
-ul.cjk-ideographic {list-style-type: cjk-ideographic}
-ul.hiragana {list-style-type: hiragana}
-ul.katakana {list-style-type: katakana}
-ul.hiragana-iroha {list-style-type: hiragana-iroha}
-ul.katakana-iroha {list-style-type: katakana-iroha}
-</style> -->
 <style>
 i#delete
 {
@@ -37,7 +14,6 @@ color:#DC143C;
   <div class="container-fill">{{template "navbar" .}}</div>
 </div>
 
-<!-- <form method="get" action="/topic" enctype="multipart/form-data"> -->
 <div class="col-lg-12">
   <h1>成果列表</h1>
   <table class="table table-striped">
@@ -99,7 +75,8 @@ color:#DC143C;
         <th>
           <a href="/topic/view_b/{{.Id}}"><i class="glyphicon glyphicon-download-alt"></i>下载</a>
           <a href="/topic/modify?tid={{.Id}}"><i class="glyphicon glyphicon-edit"></i>修改</a>
-          <a href="/topic/delete?tid={{.Id}}"><i id="delete" class="glyphicon glyphicon-remove-sign"></i>删除</a>
+          <!-- <a href="/topic/delete?tid={{.Id}}"><i id="delete" class="glyphicon glyphicon-remove-sign"></i>删除</a> -->
+          <a href="" id="{{.Id}}" onclick="deletetopic('{{.Id}}')"><i id="delete" class="glyphicon glyphicon-remove-sign"></i>删除</a>
         </th>
       </tr>
       {{end}}
@@ -181,6 +158,51 @@ color:#DC143C;
   //   return false;
   // });
 });
+
+  function deletetopic(id) {
+    if(confirm("确定删除吗？")){
+ $.ajax({
+                type:"post",
+                url:"/topic/delete",
+                data: {tid:id,url:window.location.href},//父级id
+                success:function(data,status){
+                  alert("删除“"+data+"”成功！(status:"+status+".)");
+                  // window.location=window.location
+                 }
+            });
+ // window.location.reload();这句可有可无？
+// window.location.href='findAllFoods.action';
+
+}else{
+return false;
+}
+}
+// alert(window.location.href);
+
+//保持页面滚动条位置
+window.onbeforeunload = function () { 
+var scrollPos; 
+if (typeof window.pageYOffset != 'undefined') { 
+scrollPos = window.pageYOffset; 
+} 
+else if (typeof document.compatMode != 'undefined' && 
+document.compatMode != 'BackCompat') { 
+scrollPos = document.documentElement.scrollTop; 
+} 
+else if (typeof document.body != 'undefined') { 
+scrollPos = document.body.scrollTop; 
+} 
+document.cookie = "scrollTop=" + scrollPos; //存储滚动条位置到cookies中 
+} 
+
+window.onload = function () { 
+if (document.cookie.match(/scrollTop=([^;]+)(;|$)/) != null) { 
+var arr = document.cookie.match(/scrollTop=([^;]+)(;|$)/); //cookies中不为空，则读取滚动条位置 
+document.documentElement.scrollTop = parseInt(arr[1]); 
+document.body.scrollTop = parseInt(arr[1]); 
+} 
+}
+
 </script>
 
 </body>

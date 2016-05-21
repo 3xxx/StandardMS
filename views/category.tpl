@@ -42,7 +42,7 @@ color:#DC143C;
           <th> {{printf "%d" $index}}</th><!-- {{$index}} -->
           <th><a href="/category?op=view&id={{.Id}}" id="number">{{.Number}}</a></th>
          <th><a href="/category?op=view&id={{.Id}}" id="name"><i class="glyphicon glyphicon-plane"></i>{{.Title}}</a></th>
-         <th> </th>
+         <th>{{.Label}}</th>
          <th>{{.Author}}</th>
          <th>{{.TopicCount}}</th>
          <th>{{dateformat .Created "2006-01-02 "}}</th>
@@ -50,7 +50,8 @@ color:#DC143C;
        <th>
          <!-- <a href="/category?op=view&id={{.Id}}">显示</a> -->
          <a href="/category/modify?cid={{.Id}}"><i class="glyphicon glyphicon-edit"></i>修改</a>
-         <a href="/category?op=del&id={{.Id}}"><i id="delete" class="glyphicon glyphicon-remove-sign"></i>删除</a>
+         <!-- <a href="/category?op=del&id={{.Id}}"><i id="delete" class="glyphicon glyphicon-remove-sign"></i>删除</a> -->
+         <a href="" id="{{.Id}}" onclick="deletecategory('{{.Id}}')"><i id="delete" class="glyphicon glyphicon-remove-sign"></i>删除</a>
        </th>
      </tr>
      {{end}}
@@ -131,6 +132,51 @@ color:#DC143C;
   //   return false;
   // });
 });
+
+ function deletecategory(id) {
+    if(confirm("确定删除吗？")){
+ $.ajax({
+                type:"post",
+                url:"/category/delete",
+                data: {cid:id,url:window.location.href},//父级id
+                success:function(data,status){
+                  alert("删除“"+data+"”成功！(status:"+status+".)");
+                  // window.location=window.location
+                 }
+            });
+ // window.location.reload();这句可有可无？
+// window.location.href='findAllFoods.action';
+
+}else{
+return false;
+}
+}
+// alert(window.location.href);
+
+//保持页面滚动条位置
+window.onbeforeunload = function () { 
+var scrollPos; 
+if (typeof window.pageYOffset != 'undefined') { 
+scrollPos = window.pageYOffset; 
+} 
+else if (typeof document.compatMode != 'undefined' && 
+document.compatMode != 'BackCompat') { 
+scrollPos = document.documentElement.scrollTop; 
+} 
+else if (typeof document.body != 'undefined') { 
+scrollPos = document.body.scrollTop; 
+} 
+document.cookie = "scrollTop=" + scrollPos; //存储滚动条位置到cookies中 
+} 
+
+window.onload = function () { 
+if (document.cookie.match(/scrollTop=([^;]+)(;|$)/) != null) { 
+var arr = document.cookie.match(/scrollTop=([^;]+)(;|$)/); //cookies中不为空，则读取滚动条位置 
+document.documentElement.scrollTop = parseInt(arr[1]); 
+document.body.scrollTop = parseInt(arr[1]); 
+} 
+}
+
 </script>
 </body>
 </html>

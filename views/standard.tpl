@@ -3,6 +3,11 @@
 <title>查阅规范和图集 - HydroCMS</title>
 <link rel="stylesheet" type="text/css" href="/static/fex-team-webuploader/css/webuploader.css">
 <script type="text/javascript" src="/static/fex-team-webuploader/dist/webuploader.js"></script>
+<style type="text/css">
+#footer{clear:both;height:150px;margin:0;padding:0;position:absolute;bottom:30px;width:100%;}
+#footerbox{margin:0;padding:0;clear:both;position:absolute;bottom:0px;width:100%;}
+.footer{width:980px;line-height:30px !important;margin:0 auto;padding:0;}
+</style>
 </head>
 
 <body>
@@ -109,36 +114,46 @@
 <!-- </div> -->
 </div>
 
- <div class="col-lg-6">
-  <h4>Copyright © 2016 HydroCMS</h4>
-   <p>
-     网站由 <i class="user icon"></i>
-     <a target="_blank" href="https://github.com/3xxx">@3xxx</a>
-     建设，并由
-     <a target="_blank" href="http://golang.org">golang</a>
-     和
-     <a target="_blank" href="http://beego.me">beego</a>
-     提供动力。
-   </p>
+<div id="footer">
+  <div class="col-lg-12">
+    <br>
+    <hr/>
+  </div>
 
-   <p>
-     请给 <i class="glyphicon glyphicon-envelope"></i>
-     <a class="email" href="mailto:qin.xc@gpdiwe.com">我们</a>
-     发送反馈信息或提交
-     <i class="tasks icon"></i>
-     <a target="_blank" href="https://github.com/3xxx/hydrocms/issues">网站问题</a>
-     。
-   </p>
- </div>
-<div class="col-lg-6">
- <h4 >更多项目</h4>
- <div >
-   <p><a href="https://github.com/3xxx/pipeline">管线分段设计工具</a></p>
-   <p><a href="https://github.com/3xxx/merit">技术人员价值管理系统</a></p>
- </div>
- </div>
+  <div class="col-lg-6">
+    <h4>Copyright © 2016 HydroCMS</h4>
+    <p>
+      网站由 <i class="user icon"></i>
+      <a target="_blank" href="https://github.com/3xxx">@3xxx</a>
+      建设，并由
+      <a target="_blank" href="http://golang.org">golang</a>
+      和
+      <a target="_blank" href="http://beego.me">beego</a>
+      提供动力。
+    </p>
+
+    <p>
+      请给 <i class="glyphicon glyphicon-envelope"></i>
+      <a class="email" href="mailto:qin.xc@gpdiwe.com">我们</a>
+      发送反馈信息或提交
+      <i class="tasks icon"></i>
+      <a target="_blank" href="https://github.com/3xxx/hydrocms/issues">网站问题</a>
+      。
+    </p>
+  </div>
+  <div class="col-lg-6">
+    <h4 >更多项目</h4>
+    <div >
+      <p>
+        <a href="https://github.com/3xxx/pipeline">管线分段设计工具</a>
+      </p>
+      <p>
+        <a href="https://github.com/3xxx/merit">技术人员价值管理系统</a>
+      </p>
+    </div>
+  </div>
 </div>
-
+</div>
 
 <script>
 // <button class="btn btn-primary" id="export">导出excel</button>

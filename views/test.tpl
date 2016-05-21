@@ -1,263 +1,210 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <title>CSS3垂直手风琴折叠菜单DEMO演示</title>
-  <link href="/static/Font-Awesome-4.4.0/css/font-awesome.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="/static/css/celanstyle.css">
-  <link rel="stylesheet" href="/static/css/cebianlan.css" media="screen" type="text/css" />
-<script type="text/javascript" src="/static/js/jquery-2.1.3.min.js"></script>
- <script type="text/javascript" src="/static/js/bootstrap.min.js"></script>
-<link rel="stylesheet" type="text/css" href="/static/css/bootstrap.min.css"/>
-</head>
-<!-- <link href="bootstrap.css" rel="stylesheet"> -->
-<!-- Required Javascript -->
-<!-- <script src="jquery.js"></script> -->
-<!-- <link rel="stylesheet" href="/static/editor.md/css/editormd.css" /> -->
+	<!DOCTYPE html>
+	{{template "header"}}
+	<html>
+	<head>
+	<meta charset="utf-8">
+	
+		<link rel="stylesheet" href="/static/css/bootstrap.min.css">
+		<link rel="stylesheet" href="/static/css/bootstrap-theme.min.css">
+	
+	</head>
 
-<body>
-<!-- <div style="text-align:center;clear:both">
-
-</div>
-
-  <ul id="accordion" class="accordion">
-    <li>
-      <div class="link"><i class="fa fa-paint-brush"></i>Diseño web<i class="fa fa-chevron-down"></i></div>
-      <ul class="submenu">
-        <li><a href="#">Photoshop</a></li>
-        <li><a href="#">HTML</a></li>
-        <li><a href="#">CSS</a></li>
-        <li><a href="#">Maquetacion web</a></li>
-      </ul>
-    </li>
-    <li>
-      <div class="link"><i class="fa fa-code"></i>Desarrollo front-end<i class="fa fa-chevron-down"></i></div>
-      <ul class="submenu">
-        <li><a href="#">Javascript</a></li>
-        <li><a href="#">jQuery</a></li>
-        <li><a href="#">Frameworks javascript</a></li>
-      </ul>
-    </li>
-    <li>
-      <div class="link"><i class="fa fa-mobile"></i>Diseño responsive<i class="fa fa-chevron-down"></i></div>
-      <ul class="submenu">
-        <li><a href="#">Tablets</a></li>
-        <li><a href="#">Dispositivos mobiles</a></li>
-        <li><a href="#">Medios de escritorio</a></li>
-        <li><a href="#">Otros dispositivos</a></li>
-      </ul>
-    </li>
-    <li><div class="link"><i class="fa fa-globe"></i>Posicionamiento web<i class="fa fa-chevron-down"></i></div>
-      <ul class="submenu">
-        <li><a href="#">Google</a></li>
-        <li><a href="#">Bing</a></li>
-        <li><a href="#">Yahoo</a></li>
-        <li><a href="#">Otros buscadores</a></li>
-      </ul>
-    </li>
-  </ul> -->
-  <!-- <script src="/static/js/cebianlan.js"></script> -->
-
-
-
-<aside class="accordion">
-<!-- <li>
-      <div class="link"><i class="fa fa-paint-brush"></i>Diseño web<i class="fa fa-chevron-down"></i></div> -->
-  <ul id="accordion" class="accordion">    
-      <li>
-<h1 class="link">
-  News <i class="fa fa-chevron-down"></i>
-</h1></li>
-
-  <div class="opened-for-codepen">
-
-    <h2>News Item #1</h2>
-    <div class="opened-for-codepen">
-      <h3>News Item #1a</h3>
-      <div>
-        <h4>News Subitem 1</h4>
-        <p>
-          Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,  quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-        </p>
-
-        <h4>News Subitem 2</h4>
-        <p>
-          Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,  quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-        </p>
-
-        <h4>News Subitem 3</h4>
-        <p>
-          Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,  quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-        </p>
+<!-- <button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal">
+  Launch demo modal
+</button> -->
+<button class="btn btn-primary" onclick="update()">添加同级</button>
+<a href="#myModal" >添加下级</a>
+<!-- Modal aria-hidden="true"aria-hidden="true"-->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" >
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" >&times;</button>
+        <h4 class="modal-title" id="myModalLabel">Modal title</h4>
       </div>
+      <div class="modal-body">
 
-      <h3>News Item #1b</h3>
-      <p>
-        Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,  quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-      </p>
+			<!-- <ul> -->
+				<span>姓名:</span>
+				<input id="name" type="text" name="personName"/>
+				<br>
+				<span>性别：</span>
+				<input id="p_man" type="radio" name="personSex" value="男"/>
+				<label for="p_man">男</label>
+				<input id="p_woman" type="radio" name="personSex" value="女"/>
+				<label for="p_woman">女</label>
+				<br>
+				<span>手机号码：</span>
+				<input id="phone" type="text" maxlength="11" name="personPhone"	/>
+				<span class="errorMeg" id="errorPhone"></span>
+				<br>
+				<span>邮箱：</span>
+				<input type="text" name="personMail" id="email" onblur="checkEmail()"/>
+				<span class="errorMeg" id="errorEmail"></span>
+				<br>
+				<span>地址：</span>
+				<input type="text" name="personAddress" />
+			<!-- </ul> -->
 
-      <h3>News Item #1c</h3>
-      <div class="opened-for-codepen">
-        <h4>News Subitem 1</h4>
-        <p>
-          Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,  quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">确定</button>
+        <!-- <button type="button" class="btn btn-primary" data-dismiss="modal">确定</button> -->
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
 
-        <h4>News Subitem 2</h4>
-        <p class="opened-for-codepen">
-          Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-        </p>
+<!-- <script src="/static/js/bootstrap.min.js"></script> -->
+
+	<script>
+    function prom(id) { 	
+    var pid = $('#name').val();
+    var pid = $(':radio').val();//选取所有 type="button" 的 <input> 元素 和 <button> 元素
+    alert("欢迎您：" + pid) 
+     } 
+
+
+
+
+
+	function update(){
+	// var tds=$(obj).parent().parent().find('td');
+	// $('#name').val(tds.eq(0).text());
+	$('#myModal').modal('show');
+
+   // $('#myModal').on('show.bs.modal', function () {  
+   //     alert("show");  
+   // });     
+// $('#myModal').on('shown.bs.modal', function () {  
+//        alert("shown");  
+//    });     
+$('#myModal').on('hide.bs.modal', function () { 
+var radio =$("input[type='radio']:checked").val();	
+alert("欢迎您：" + radio);
+       // alert("hide");  
+   });     
+// $('#myModal').on('hidden.bs.modal', function () {  
+//        alert("hidden");
+// $(this).removeData("bs.modal");  
+//    }); 
+
+
+	
+	}
+
+function showCommentBoxHistory(eventid) {  
+    // var id_ = eventid;  
+    // if(!eventid){  
+    //     var arr = new Array();  
+    //     if ($("input[name^='selectIDs_history[]']:checked").length == 0) {  
+    //         alert('请选择告警项!');  
+    //         return;  
+    //     }  
+    //     $("input[name^='selectIDs_history[]']:checked").each(function(index, element) {  
+    //         arr.push($(this).val());  
+    //     });  
+    //     id_ = arr.join(',');  
+    // }  
+    // $("#message").val("");  
+    // $("#ack_eventid").val(id_);  
+    $('#myModal').modal('show'); 
+    return true;
+} 
+
+	</script>
+
+
+
+
+<!-- <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title">Modal title</h4>
+      </div>
+      <div class="modal-body">
+        <p>One fine body&hellip;</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Save changes</button>
       </div>
     </div>
-
-    <h2>News Item #2</h2>
-    <p>
-      Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-    </p>
-
-    <h2>News Item #3</h2>
-    <div>
-      <h3>News Item #3a</h3>
-      <p>
-        Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,  quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-      </p>
-
-      <h3>News Item #3b</h3>
-      <p>
-        Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,  quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-      </p>
-    </div>
   </div>
-  
-  
-
-<li>
-  <h1 class="link">
-    Updates <i class="fa fa-chevron-down"></i>
-  </h1>
-  <div>
-    <h2>Update #1</h2>
-    <p>
-      Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,  quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-    </p>
-
-    <h2>Update #2</h2>
-    <p>
-      Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-    </p>
-
-    <h2>Update #3</h2>
-    <p>
-      Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-    </p>
-
-    <h2>Update #4</h2>
-    <p>
-      Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-    </p>
-  </div>
-</li>
+</div> -->
 
 
-<li>
-<h1 class="link">
-  Miscellaneous <i class="fa fa-chevron-down"></i>
-</h1>
+	<!-- <body>
+	<div class="d_table" id="d_table">
+	
+		<table class="table table-hover table-striped table-bordered">
+	
+	<thead>
+	<tr>
+	<th>姓名</th>
+	<th>性别</th>
+	<th>手机号码</th>
+	<th>邮箱</th>
+	<th>操作</th>
+	</tr>
+	</thead>
+	<tbody id="tbody">
 
-<div>
-<li>
-  <h2 class="link">Misc. #1<i class="fa fa-chevron-down"></i></h2>
-  
-  <p>
-    Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,  quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-  </p>
+	</tbody>
+	</table>
+	</div>
+	
+		<div class="modal fade" id="update" aria-hidden="true">
+	
+	<div class="modal-dialog">
+	<div class="modal-content">
+	
+		<form id="saveDeviceForm" action="saveDevice" method="post">
+	
+	<div class="modal-header">
+	
+		<button type="button" class="close" data-dismiss="modal">×</button>
+	
+	<h3>修改</h3>
+	</div>
+	<div class="modal-body">
+	<ul>
+	
+		<span>姓名:</span><input id="name" type="text" name="personName"/>
+	
+	<span>性别：</span>
+	
+		<input id="p_man" type="radio" name="personSex" value="男"/><label for="p_man">男</label>
+	
+	
+		<input id="p_woman" type="radio" name="personSex" value="女"/><label for="p_woman">女</label>
+	
+	
+	
+		<span>手机号码：</span><input id="phone" type="text" maxlength="11" name="personPhone"/><span class="errorMeg" id="errorPhone"></span>
+	
+	
+		<span>邮箱：</span><input type="text" name="personMail" id="email" onblur="checkEmail()"/><span class="errorMeg" id="errorEmail"></span>
+	
+	
+		<span>地址：</span><input type="text" name="personAddress" />
+	
+	</ul>
+	</div>
+	<div class="modal-footer">
+	
+		<a class="button" data-dismiss="modal" aria-hidden="true">取消</a>
+	
+	<a class="button" onclick="submitOK()">确定</a>
+	</div>
+	</form>
+	</div>
+	</div>
+	</div>
 
-  <h2>Misc. #2</h2>
-  <p>
-    Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-  </p>
-
-  <h2>Misc. #3</h2>
-  <div>
-    <h3>Misc. Item #1a</h3>
-    <div>
-      <h4>Misc. Subitem 1</h4>
-      <p>
-        Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,  quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-      </p>
-
-      <h4>Misc. Subitem 2</h4>
-      <p>
-        Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,  quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-      </p>
-    </div>
- 
-
-  </div>
-  </li>
-</div>
- </li> 
-</ul>
-</aside>
-
-<!-- <script src="/static/js/celan.js"></script> -->
-<script>
-$(function() {
-  var Accordion = function(el, multiple) {
-    this.el = el || {};
-    this.multiple = multiple || false;
-
-    // Variables privadas
-    var links = this.el.find('.link');
-    // Evento
-    links.on('click', {el: this.el, multiple: this.multiple}, this.dropdown)
-  }
-
-  Accordion.prototype.dropdown = function(e) {
-    var $el = e.data.el;
-      $this = $(this),
-      $next = $this.next();
-
-    $next.slideToggle();
-    $this.parent().toggleClass('open');//增加li class=open，然后利用这个open，将i的字体图标旋转180度
-
-    if (!e.data.multiple) {
-      $el.find('.submenu').not($next).slideUp().parent().removeClass('open');
-    };
-  } 
-
-  var accordion = new Accordion($('#accordion'), false);
-});
-
-
-var headers = ["H1","H2","H3","H4","H5","H6"];
-
-$(".accordion").click(function(e) {
-  var target = e.target,
-      name = target.nodeName.toUpperCase();
-  
-  if($.inArray(name,headers) > -1) {
-    var subItem = $(target).next();
-    
-    //slideUp all elements (except target) at current depth or greater
-    var depth = $(subItem).parents().length;
-    var allAtDepth = $(".accordion p, .accordion div").filter(function() {
-      if($(this).parents().length >= depth && this !== subItem.get(0)) {
-        return true; 
-      }
-    });
-    $(allAtDepth).slideUp("fast");
-    
-    //slideToggle target content and adjust bottom border if necessary
-    subItem.slideToggle("fast",function() {
-        // $(".accordion :visible:last").css("border-radius","0 0 10px 10px");
-    });
-    // $(target).css({"border-bottom-right-radius":"0", "border-bottom-left-radius":"0"});
-  }
-});
-  </script>
-
-
-
-</body>
-</html>
+	</body> -->
+	</html>
+	
+		

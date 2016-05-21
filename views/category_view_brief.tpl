@@ -13,6 +13,7 @@
   <script type="text/javascript" src="/static/js/jquery.tablesorter.js"></script>
   <link type="text/css" href="/static/css/bootstrap.min.css" rel="stylesheet" />
 <style type="text/css">
+img{max-width:100%}
 h3 {line-height: 150%;
   /*color: #DC143C;#000000*/
   color:#FFFFFF;
@@ -32,33 +33,30 @@ color:#DC143C;
 <body>
 <!-- <div class="navbar navba-default navbar-fixed-top">
 </div> -->
-
-<div class="container-fill">
+<div class="col-md-8 col-md-offset-2">
+<!-- <div class="container-fill"> -->
   <!-- 这里添加项目目录树显示 -->
 <!--   <h3> <font size="5">{{.CategoryPhase.Title}}</font>
     <font size="4"> » {{.CategorySpec.Title}} » </font>
     <font size="5">{{.Category.Title}}</font>
   </h3> -->
   <h2>项目简介</h2>
-<div class="panel panel-default">
-      <div class="panel-heading">
+<!-- <div class="panel panel-default"> -->
+      <!-- <div class="panel-heading">
          <h4 class="panel-title">
             <a data-toggle="collapse" data-parent="#accordion" 
                href="#collapseOne">
                隐藏/展开项目简介
             </a>
          </h4>
-      </div>
-      <div id="collapseOne" class="panel-collapse collapse in">
+      </div> -->
+      <!-- <div id="collapseOne" class="panel-collapse collapse in"> -->
   <div class="content">
   {{str2html .Category.Content}}
   <!-- 项目简介如何截取html呢？ -->
   </div>
-      </div>
-   </div> 
-
-
-
+      <!-- </div> -->
+   <!-- </div>  -->
   </div>
 
 <script>

@@ -7,6 +7,8 @@ import (
 )
 
 func init() {
+	beego.Router("/admin", &controllers.UserController{}, "*:Admin")
+
 	beego.Router("/category/uploadimages", &controllers.CategoryController{}, "*:Uploadimagesct")
 	beego.Router("/controller", &controllers.UeditorController{}, "*:ControllerUE")
 	// beego.Router("/controller", &controllers.UeditorController{}, "post:UploadImage")
@@ -58,16 +60,23 @@ func init() {
 	beego.Router("/catalog/import_xls_catalog", &controllers.CatalogController{}, "post:Import_Xls_Catalog")
 	beego.Router("/catalog/add", &controllers.CatalogController{}, "get:Get")
 	beego.Router("/catalog/view", &controllers.CatalogController{}, "get:View")
+	//添加一行目录
+	beego.Router("/catalog/post", &controllers.CatalogController{}, "post:Post")
+	//修改一条目录
+	beego.Router("/catalog/modifycatalog", &controllers.CatalogController{}, "post:ModifyCatalog")
+	//删除一条目录
+	beego.Router("/catalog/delete", &controllers.CatalogController{}, "post:Delete")
 
 	beego.Router("/login", &controllers.LoginController{})
 	beego.Router("/loginerr", &controllers.LoginController{}, "get:Loginerr")
+	//导航栏本地搜索
 	beego.Router("/search", &controllers.SearchController{})
+	//水利院本地搜索
+	beego.Router("/searchlocal", &controllers.SearchController{}, "post:Searchlocal")
 
 	beego.Router("/category", &controllers.CategoryController{}) //相当于get
-	//添加自定义目录
-	beego.Router("/category/userdefinedpost", &controllers.CategoryController{}, "post:UserdefinedPost")
-	//项目B显示路由
-	beego.Router("/category_b", &controllers.CategoryController{}, "get:Get_b")
+	//删除一个项目
+	beego.Router("/category/delete", &controllers.CategoryController{}, "post:Delete")
 	//添加项目视图第一步
 	beego.Router("/category/add", &controllers.CategoryController{}, "get:Add")
 	//添加项目视图第二步
@@ -76,10 +85,22 @@ func init() {
 	beego.Router("/category/post2", &controllers.CategoryController{}, "post:Post2")
 	//添加项目第二步上传封面图片
 	beego.Router("/category/addcoverphoto", &controllers.CategoryController{}, "post:AddCoverPhoto")
+	//删除部分目录
+	beego.Router("/category/deletecategory", &controllers.CategoryController{}, "get:DeleteCategory")
+	//显示隐藏category
+	beego.Router("/category/hidecategory", &controllers.CategoryController{}, "get:HideCategory")
+	beego.Router("/category/showcategory", &controllers.CategoryController{}, "get:ShowCategory")
+	//修改目录名称
+	beego.Router("/category/modifytitle", &controllers.CategoryController{}, "post:ModifyCategoryTitle")
 
-	//添加自定义目录
+	//添加自定义目录视图第一步
 	beego.Router("/category/add_b", &controllers.CategoryController{}, "get:Add_b")
-	//添加项目第一步方法提交 等等
+	//添加自定义目录第一步提交方法
+	beego.Router("/category/userdefinedpost", &controllers.CategoryController{}, "post:UserdefinedPost")
+	//自定义项目（B）显示路由
+	beego.Router("/category_b", &controllers.CategoryController{}, "get:Get_b")
+
+	//添加项目第一步方法提交post 等等
 	beego.AutoRouter(&controllers.CategoryController{}) //这句代替上句也行
 
 	beego.Router("/category/view", &controllers.CategoryController{}, "get:View")
@@ -89,6 +110,20 @@ func init() {
 	//iframe中的默认显示
 	beego.Router("/category/category_prod_view", &controllers.CategoryController{}, "post:Category_prod_view")
 	beego.Router("/category/modifycategory", &controllers.CategoryController{}, "post:ModifyCategory")
+
+	//删除文章中的附件delete必须用get，为什么？
+	beego.Router("/attachment/delete", &controllers.TopicController{}, "get:DeleteAttachment")
+
+	//wiki页面
+	beego.Router("/wiki", &controllers.WikiController{}) //get
+	//发表文章界面
+	beego.Router("/wiki/add", &controllers.WikiController{}, "get:Add")
+	//发表文章提交
+	beego.Router("/wiki/addwiki", &controllers.WikiController{}, "post:AddWiki")
+	//查看一个文章
+	beego.Router("/wiki/view/", &controllers.WikiController{}, "get:View")
+	beego.AutoRouter(&controllers.WikiController{})
+
 	//分页后修改成以下形式
 	beego.Router("/topic", &controllers.TopicController{}, "*:ListAllPosts")
 	// beego.Router("/topic/download", &controllers.TopicController{}, "get:Download")
@@ -105,10 +140,6 @@ func init() {
 	beego.Router("/topic/Topic_many_addbaidu", &controllers.TopicController{}, "*:Topic_many_addbaidu")
 	//快捷上传里的文件处理
 	beego.Router("/topic/topic_one_addstandard", &controllers.TopicController{}, "*:Topic_one_addstandard")
-
-	//删除文章中的附件delete必须用get，为什么？
-	beego.Router("/attachment/delete", &controllers.TopicController{}, "get:DeleteAttachment")
-
 	//http://localhost:8081/topic/add?id=717&mid=3
 	// case "3"://添加设代日记
 	// c.TplName = "topic_add3.html"
@@ -128,6 +159,9 @@ func init() {
 	beego.Router("/reply", &controllers.ReplyController{})
 	beego.Router("/reply/add", &controllers.ReplyController{}, "post:Add")
 	beego.Router("/reply/delete", &controllers.ReplyController{}, "get:Delete")
+	//添加删除wiki的评论
+	beego.Router("/reply/addwiki", &controllers.ReplyController{}, "post:AddWiki")
+	beego.Router("/reply/deletewiki", &controllers.ReplyController{}, "get:DeleteWiki")
 
 	beego.Router("/user/AddUser", &controllers.UserController{}, "*:AddUser")
 	beego.Router("/user/UpdateUser", &controllers.UserController{}, "*:UpdateUser")

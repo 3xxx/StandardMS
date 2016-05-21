@@ -47,34 +47,15 @@ func (c *SpiderController) GetSpider() {
 	// } else {
 	// 	sess.Set("username", r.Form["username"])
 	// }
-	//（4）获取当前的请求会话，并返回当前请求会话的对象
-	sess, _ := globalSessions.SessionStart(c.Ctx.ResponseWriter, c.Ctx.Request)
-	defer sess.SessionRelease(c.Ctx.ResponseWriter)
-	//（5）根据当前请求对象，设置一个session
-	// sess.Set("mySession", "qin.xc@gpdiwe.com;qq504284")
-	// c.Data["Website"] = "广东省水利电力勘测设计研究院■☆●施工预算分院"
-	//（6）从session中读取值
-	// c.Data["Email"] = sess.Get("mySession")
-	// c.Data["Website"] = "127.0.0.1:8080/hello"
-	// c.Data["Email"] = "astaxie@gmail.com"
-	// beego.Info(c.Ctx.Input.IP())
 
 	c.Data["IsSpider"] = true
 	c.TplName = "spider.tpl"
 	c.Data["IsLogin"] = checkAccount(c.Ctx) //大小写害死人！IsLogin
-	//2.取得客户端用户名
-	// sess, _ := globalSessions.SessionStart(c.Ctx.ResponseWriter, c.Ctx.Request)
-	// defer sess.SessionRelease(c.Ctx.ResponseWriter)
-	v := sess.Get("uname")
-	if v != nil {
-		c.Data["Uname"] = v.(string)
-	}
-	// ck, err := c.Ctx.Request.Cookie("uname")
-	// if err != nil {
-	// 	beego.Error(err)
-	// } else {
-	// 	c.Data["Uname"] = ck.Value
-	// }
+	// var rolename int
+	var uname string
+	//2.如果登录或ip在允许范围内，进行访问权限检查
+	uname, _, _ = checkRoleread(c.Ctx) //login里的
+	c.Data["Uname"] = uname
 
 	// c.Data["Id"] = c.Ctx.Input.Param(":id")
 	spidertopic, err := models.GetSpiderTopic()

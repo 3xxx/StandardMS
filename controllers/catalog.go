@@ -22,29 +22,10 @@ type CatalogController struct {
 
 // 显示所有目录
 func (c *CatalogController) Get() {
-	//1.首先判断是否注册
-	if !checkAccount(c.Ctx) {
-		// port := strconv.Itoa(c.Ctx.Input.Port())//c.Ctx.Input.Site() + ":" + port +
-		route := c.Ctx.Request.URL.String()
-		c.Data["Url"] = route
-		c.Redirect("/login?url="+route, 302)
-		// c.Redirect("/login", 302)
-		return
-	}
-	//2.取得客户端用户名
-	sess, _ := globalSessions.SessionStart(c.Ctx.ResponseWriter, c.Ctx.Request)
-	defer sess.SessionRelease(c.Ctx.ResponseWriter)
-	v := sess.Get("uname")
-	if v != nil {
-		c.Data["Uname"] = v.(string) //uname := v.(string)
-	}
-	// ck, err := c.Ctx.Request.Cookie("uname")
-	// if err == nil {
-	//
-	// } else {
-	// 	beego.Error(err)
-	// }
-
+	//2.如果登录或ip在允许范围内，进行访问权限检查
+	uname, _, _ := checkRoleread(c.Ctx) //login里的
+	c.Data["Uname"] = uname
+	// rolename, _ = strconv.Atoi(role)
 	c.Data["IsCatalog"] = true
 	c.Data["IsLogin"] = checkAccount(c.Ctx)
 
@@ -61,29 +42,8 @@ func (c *CatalogController) Get() {
 
 //显示一个类型Id下的目录
 func (c *CatalogController) View() {
-	//1.首先判断是否注册
-	// if !checkAccount(c.Ctx) {
-	// 	port := strconv.Itoa(c.Ctx.Input.Port())
-	// 	route := c.Ctx.Input.Site() + ":" + port + c.Ctx.Input.URL()
-	// 	c.Data["Url"] = route
-	// 	c.Redirect("/login?url="+route, 302)
-	// 	// c.Redirect("/login", 302)
-	// 	return
-	// }
-	//2.取得客户端用户名
-	sess, _ := globalSessions.SessionStart(c.Ctx.ResponseWriter, c.Ctx.Request)
-	defer sess.SessionRelease(c.Ctx.ResponseWriter)
-	v := sess.Get("uname")
-	if v != nil {
-		c.Data["Uname"] = v.(string)
-	}
-	// ck, err := c.Ctx.Request.Cookie("uname")
-	// if err == nil {
-	// 	 = ck.Value
-	// } else {
-	// 	beego.Error(err)
-	// }
-
+	uname, _, _ := checkRoleread(c.Ctx) //login里的
+	c.Data["Uname"] = uname
 	c.Data["IsCatalog"] = true
 	c.Data["IsLogin"] = checkAccount(c.Ctx)
 
@@ -97,6 +57,7 @@ func (c *CatalogController) View() {
 	} else {
 		c.Data["Catalogs"] = catalogs
 		c.Data["Length"] = len(catalogs)
+		c.Data["CategoryId"] = cid
 	}
 }
 
@@ -125,29 +86,52 @@ func (c *CatalogController) Add() { //这个作废，用上面的get
 	// c.Data["Id"] = id
 }
 
-// //添加目录，即插入一条目录
-// func (c *CatalogController) Post() {
-// 	if !checkAccount(c.Ctx) {
-// 		c.Redirect("/login", 302)
-// 		return
-// 	}
-// 	//解析表单
-// 	tid := c.Input().Get("tid") //教程里漏了这句，导致修改总是变成添加文章
-// 	beego.Info(tid)
-// 	title := c.Input().Get("title")
-// 	tnumber := c.Input().Get("tnumber")
-// 	beego.Info(tnumber)
-// 	// content := c.Input().Get("content")
-// 	// category := c.Input().Get("category")
-// 	// categoryid := c.Input().Get("categoryid")
+//添加目录，即插入一条目录
+func (c *CatalogController) Post() {
+	uname, _, _ := checkRolewrite(c.Ctx) //login里的
+	c.Data["Uname"] = uname
+	// rolename, _ = strconv.Atoi(role)
+	// 	if rolename > 2 {
+	// 		port := strconv.Itoa(c.Ctx.Input.Port())
+	// 			route = c.Ctx.Input.Site() + ":" + port + c.Ctx.Input.URL()
+	// 			c.Data["Url"] = route
+	// 			c.Redirect("/roleerr?url="+route, 302)
+	// 			return
+	// 	}
+	var catalog m.Catalog
+	catalog.Tnumber = c.Input().Get("Tnumber")
+	catalog.Name = c.Input().Get("Name")
+	catalog.Drawn = c.Input().Get("Drawn")
+	catalog.Designd = c.Input().Get("Designd")
+	catalog.Checked = c.Input().Get("Checked")
+	catalog.Emamined = c.Input().Get("Emamined")
+	catalog.Verified = c.Input().Get("Verified")
+	catalog.Approved = c.Input().Get("Approved")
+	catalog.Data = c.Input().Get("Data")
+	catalog.DesignStage = c.Input().Get("DesignStage")
+	catalog.Section = c.Input().Get("Section")
+	catalog.Projec = c.Input().Get("Projec")
+	pid := c.Input().Get("ParentId")
+	parentid, _ := strconv.ParseInt(pid, 10, 64)
+	catalog.ParentId = parentid
+	catalog.Created = time.Now()
+	catalog.Updated = time.Now()
+	catalog.Views = 0
+	catalog.Author = uname
+	_, err := m.SaveCatalog(catalog)
+	if err != nil {
+		beego.Error(err)
+	} else {
+		data := "ok!"
+		c.Ctx.WriteString(data)
+	}
 
-// 	err := models.ModifyCatalog(tid, title, tnumber)
-
-// 	if err != nil {
-// 		beego.Error(err)
-// 	}
-// 	c.Redirect("/catalog", 302)
-// }
+	// err := models.ModifyCatalog(tid, title, tnumber)
+	// if err != nil {
+	// 	beego.Error(err)
+	// }
+	// c.Redirect("/catalog", 302)
+}
 
 // func (c *CatalogController) AddCatalog() {
 // 	if !checkAccount(c.Ctx) {
@@ -250,80 +234,66 @@ func (c *CatalogController) Add() { //这个作废，用上面的get
 // 	c.Data["IsLogin"] = checkAccount(c.Ctx)
 // }
 
-// //修改一条目录
-// func (c *CatalogController) ModifyCatalog() { //一对多模式,向文章中追加附件
-// 	//解析表单
-// 	tid := c.Input().Get("tid") //教程里漏了这句，导致修改总是变成添加文章
-// 	// title := c.Input().Get("title")
-// 	// tnumber := c.Input().Get("tnumber")
-// 	// content := c.Input().Get("content")
-// 	category := c.Input().Get("category")
-// 	categoryid := c.Input().Get("categoryid")
+//修改一条目录
+func (c *CatalogController) ModifyCatalog() {
+	uname, _, _ := checkRolewrite(c.Ctx) //login里的
+	c.Data["Uname"] = uname
+	var catalog m.Catalog
+	catalog.Tnumber = c.Input().Get("Tnumber")
+	catalog.Name = c.Input().Get("Name")
+	catalog.Drawn = c.Input().Get("Drawn")
+	catalog.Designd = c.Input().Get("Designd")
+	catalog.Checked = c.Input().Get("Checked")
+	catalog.Emamined = c.Input().Get("Emamined")
+	catalog.Verified = c.Input().Get("Verified")
+	catalog.Approved = c.Input().Get("Approved")
+	catalog.Data = c.Input().Get("Data")
+	catalog.DesignStage = c.Input().Get("DesignStage")
+	catalog.Section = c.Input().Get("Section")
+	catalog.Projec = c.Input().Get("Projec")
+	cid := c.Input().Get("CatalogId")
+	// catalogid, _ := strconv.ParseInt(cid, 10, 64)
+	var id string
+	if cid != "" {
+		id = string(cid[3:len(cid)])
+		// beego.Info(id)
+	}
+	catalog.Created = time.Now()
+	catalog.Updated = time.Now()
+	catalog.Views = 0
+	catalog.Author = uname
+	err := m.ModifyCatalog(id, catalog)
+	if err != nil {
+		beego.Error(err)
+	} else {
+		data := "ok!"
+		c.Ctx.WriteString(data)
+	}
+}
 
-// 	//获取文件保存路径，有了categoryid可以求出整个路径
-// 	//取得成果类型id的专业parentid以及阶段parentid以及项目parentid才行
-// 	categoryproj, err := models.GetCategoryProj(categoryid)
-// 	categoryphase, err := models.GetCategoryPhase(categoryid)
-// 	categoryspec, err := models.GetCategorySpec(categoryid)
-// 	// category, err := models.GetCategory(categoryid)
-// 	if err != nil {
-// 		beego.Error(err)
-// 		// c.Redirect("/", 302)//这里注释掉，否则在图纸页面无法进入添加页面，因为传入的id为空，导致err发生
-// 		return
-// 	}
-// 	//获取上传的文件
-// 	_, h, err := c.GetFile("image")
-// 	if err != nil {
-// 		beego.Error(err)
-// 	}
-// 	var attachment string
-// 	var path string
-// 	var filesize int64
-// 	if h != nil {
-// 		//保存附件
-// 		attachment = h.Filename
-// 		beego.Info(attachment)
-// 		path = ".\\attachment\\" + categoryproj.Number + " " + categoryproj.Title + "\\" + categoryphase.Title + "\\" + categoryspec.Title + "\\" + category + "\\" + h.Filename
+//删除一条目录
+func (c *CatalogController) Delete() {
+	//2.如果登录或ip在允许范围内，进行访问权限检查
+	uname, _, _ := checkRolewrite(c.Ctx) //login里的
+	// rolename, _ = strconv.Atoi(role)
+	c.Data["Uname"] = uname
+	//取得用户名
 
-// 		// path := c.Input().Get("url")  //存文件的路径
-// 		// path = path[3:]
-// 		// path = "./attachment" + "/" + h.Filename
-// 		// f.Close()                                             // 关闭上传的文件，不然的话会出现临时文件不能清除的情况
-// 		err = c.SaveToFile("image", path) //.Join("attachment", attachment)) //存文件    WaterMark(path)    //给文件加水印
-// 		if err != nil {
-// 			beego.Error(err)
-// 		}
-// 		filesize, _ = FileSize(path)
-// 		filesize = filesize / 1000.0
-// 	}
-
-// 	route := "/attachment/" + categoryproj.Number + " " + categoryproj.Title + "/" + categoryphase.Title + "/" + categoryspec.Title + "/" + category + "/" + h.Filename
-
-// 	size := strconv.FormatInt(filesize, 10)
-// 	err = models.AddAttachment(attachment, size, path, route, tid)
-// 	beego.Info(attachment)
-// 	// } else {
-// 	// err = models.ModifyCatalog(tid, title, tnumber, category, categoryid, content, attachment)
-
-// 	// }
-// 	if err != nil {
-// 		beego.Error(err)
-// 	}
-// 	// c.Redirect("/Catalog", 302)
-// }
-
-// //删除一条目录
-// func (c *CatalogController) Delete() { //应该显示警告
-// 	if !checkAccount(c.Ctx) {
-// 		c.Redirect("/login", 302)
-// 		return
-// 	}
-// 	err := models.DeletCatalog(c.Input().Get("tid")) //(c.Ctx.Input.Param("0"))
-// 	if err != nil {
-// 		beego.Error(err)
-// 	}
-// 	c.Redirect("/Catalog", 302) //这里增加Catalog
-// }
+	// if rolename > 2 && uname != username {
+	cid := c.Input().Get("CatalogId")
+	var id string
+	if cid != "" {
+		id = string(cid[3:len(cid)])
+		beego.Info(id)
+	}
+	err := m.DeletCatalog(id)
+	if err != nil {
+		beego.Error(err)
+	} else {
+		data := "ok!"
+		c.Ctx.WriteString(data)
+	}
+}
 
 // func (c *CatalogController) DeleteAll() {
 // 	if !checkAccount(c.Ctx) {
@@ -347,13 +317,11 @@ func (c *CatalogController) Add() { //这个作废，用上面的get
 //上传excel文件，导入到数据库
 //引用来自category的查看成果类型里的成果
 func (c *CatalogController) Import_Xls_Catalog() {
-
 	//解析表单
 	// c.Data["IsLogin"] = checkAccount(c.Ctx)
 	// id := c.Input().Get("id")
 	// path := c.Input().Get("path")
 	// filename := c.Input().Get("filename")
-
 	//获取上传的文件
 	_, h, err := c.GetFile("excel")
 	if err != nil {
@@ -367,7 +335,6 @@ func (c *CatalogController) Import_Xls_Catalog() {
 		// attachment = h.Filename
 		// beego.Info(attachment)
 		path = ".\\attachment\\" + h.Filename
-
 		// path := c.Input().Get("url")  //存文件的路径
 		// path = path[3:]
 		// path = "./attachment" + "/" + h.Filename
@@ -401,13 +368,11 @@ func (c *CatalogController) Import_Xls_Catalog() {
 	} else {
 		beego.Error(err)
 	}
-
 	// ck, err := c.Ctx.Request.Cookie("uname")
 	//
 	// if err == nil {
 	// 	uname = ck.Value
 	// }
-
 	// route := "/attachment/" + categoryproj.Number + " " + categoryproj.Title + "/" + categoryphase.Title + "/" + categoryspec.Title + "/" + category + "/" + h.Filename
 	//Catalogid := c.Input().Get("Catalogid")
 	var catalog m.Catalog
@@ -420,43 +385,119 @@ func (c *CatalogController) Import_Xls_Catalog() {
 	if err != nil {
 		beego.Error(err)
 	}
+	j := 0
 	for _, sheet := range xlFile.Sheets {
-		// for i := 1; i <= len(xlFile.Sheets); i++ {
-		for _, row := range sheet.Rows {
-			// for j := 2; j < 7; j += 5 {
-			j := 1
-			catalog.Tnumber, _ = row.Cells[j].String()
-			catalog.Name, _ = row.Cells[j+1].String()
-			catalog.Drawn, _ = row.Cells[j+2].String()
-			catalog.Designd, _ = row.Cells[j+3].String()
-			catalog.Checked, _ = row.Cells[j+4].String()
-			catalog.Emamined, _ = row.Cells[j+5].String()
-			catalog.Verified, _ = row.Cells[j+6].String()
-			catalog.Approved, _ = row.Cells[j+7].String()
-			catalog.Data, _ = row.Cells[j+8].String()
-			catalog.DesignStage, _ = row.Cells[j+9].String()
-			catalog.Section, _ = row.Cells[j+10].String()
-			catalog.Projec, _ = row.Cells[j+11].String()
-			catalog.Created = time.Now()
-			catalog.Updated = time.Now()
-			catalog.Views = 0
-			catalog.Author = uname
-			_, err := m.SaveCatalog(catalog)
-			if err != nil {
-				beego.Error(err)
+		for i, row := range sheet.Rows { //行数,第一行从0开始
+			if i != 0 { //忽略第一行
+				if len(row.Cells) >= 2 { //总列数，从1开始
+					catalog.Tnumber, err = row.Cells[j+1].String() //第一列从0开始
+					if err != nil {
+						beego.Error(err)
+					}
+				}
+				if len(row.Cells) >= 3 {
+					catalog.Name, err = row.Cells[j+2].String()
+					if err != nil {
+						beego.Error(err)
+					}
+				}
+				if len(row.Cells) >= 4 {
+					catalog.Drawn, _ = row.Cells[j+3].String()
+					if err != nil {
+						beego.Error(err)
+					}
+				}
+				if len(row.Cells) >= 5 {
+					catalog.Designd, _ = row.Cells[j+4].String()
+					if err != nil {
+						beego.Error(err)
+					}
+				}
+				if len(row.Cells) >= 6 {
+					catalog.Checked, _ = row.Cells[j+5].String()
+					if err != nil {
+						beego.Error(err)
+					}
+				}
+				if len(row.Cells) >= 7 {
+					catalog.Emamined, _ = row.Cells[j+6].String()
+					if err != nil {
+						beego.Error(err)
+					}
+				}
+				if len(row.Cells) >= 8 {
+					catalog.Verified, _ = row.Cells[j+7].String()
+					if err != nil {
+						beego.Error(err)
+					}
+				}
+				if len(row.Cells) >= 9 {
+					catalog.Approved, _ = row.Cells[j+8].String()
+					if err != nil {
+						beego.Error(err)
+					}
+				}
+				if len(row.Cells) >= 10 {
+					catalog.Data, _ = row.Cells[j+9].String()
+					if err != nil {
+						beego.Error(err)
+					}
+				}
+				if len(row.Cells) >= 11 {
+					catalog.DesignStage, _ = row.Cells[j+10].String()
+					if err != nil {
+						beego.Error(err)
+					}
+				}
+				if len(row.Cells) >= 12 {
+					catalog.Section, _ = row.Cells[j+11].String()
+					if err != nil {
+						beego.Error(err)
+					}
+				}
+				if len(row.Cells) >= 13 {
+					catalog.Projec, _ = row.Cells[j+12].String()
+					if err != nil {
+						beego.Error(err)
+					}
+				}
+				catalog.Created = time.Now()
+				catalog.Updated = time.Now()
+				catalog.Views = 0
+				catalog.Author = uname
+				_, err := m.SaveCatalog(catalog)
+				if err != nil {
+					beego.Error(err)
+				}
+				// roleid, _ := strconv.ParseInt(row.Cells[j+4].String(), 10, 64)
+				// _, err = m.AddRoleUser(roleid, uid)
+				// if err != nil {
+				// 	beego.Error(err)
+				// }
+				// }
+				// for _, cell := range row.Cells {
+				// 	fmt.Printf("%s\n", cell.String())
 			}
-			// roleid, _ := strconv.ParseInt(row.Cells[j+4].String(), 10, 64)
-			// _, err = m.AddRoleUser(roleid, uid)
-			// if err != nil {
-			// 	beego.Error(err)
-			// }
-			// }
-			// for _, cell := range row.Cells {
-			// 	fmt.Printf("%s\n", cell.String())
-
-			// }
 		}
 	}
 	c.TplName = "catalog.tpl"
-	c.Redirect("/catalog/view?id="+id1, 302)
+	// c.Redirect("/catalog/view?id="+id1, 302)
 }
+
+// PrepareInsert
+// 用于一次 prepare 多次 insert 插入，以提高批量插入的速度。
+// var users []*User
+// ...
+// qs := o.QueryTable("user")
+// i, _ := qs.PrepareInsert()
+// for _, user := range users {
+//     id, err := i.Insert(user)
+//     if err == nil {
+//         ...
+//     }
+// }
+// PREPARE INSERT INTO user (`name`, ...) VALUES (?, ...)
+// EXECUTE INSERT INTO user (`name`, ...) VALUES ("slene", ...)
+// EXECUTE ...
+// ...
+// i.Close() // 别忘记关闭 statement

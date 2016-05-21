@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"github.com/astaxie/beego"
+	"github.com/astaxie/beego/logs"
 	"quick/models"
 	//（1）导入session包
 	// "encoding/json"
@@ -95,7 +96,12 @@ func (c *MainController) Get() {
 
 	// c.Data["Website"] = "127.0.0.1:8080/hello"
 	// c.Data["Email"] = "astaxie@gmail.com"
-	beego.Info(c.Ctx.Input.IP())
+	logs := logs.NewLogger(1000)
+	logs.SetLogger("file", `{"filename":"log/test.log"}`)
+	logs.EnableFuncCallDepth(true)
+	logs.Info(c.Ctx.Input.IP())
+	logs.Close()
+	// beego.Info(Getiprole(c.Ctx.Input.IP()))
 	c.Data["IsHome"] = true
 	c.TplName = "index.tpl"
 	c.Data["IsLogin"] = checkAccount(c.Ctx) //大小写害死人！IsLogin
@@ -105,6 +111,8 @@ func (c *MainController) Get() {
 	v := sess.Get("uname")
 	if v != nil {
 		c.Data["Uname"] = v.(string) //ck.Value
+	} else {
+		c.Data["Uname"] = c.Ctx.Input.IP()
 	}
 	// ck, err := c.Ctx.Request.Cookie("uname")
 	// if err != nil {
@@ -112,12 +120,14 @@ func (c *MainController) Get() {
 	// } else {
 	// 	c.Data["Uname"] = ck.Value
 	// }
+	//下面这个没用了吧
 	c.Data["Id"] = c.Ctx.Input.Param(":id")
 	topics, err := models.GetAllTopics(c.Input().Get("cate"), true)
 	if err != nil {
 		beego.Error(err)
 	}
 	c.Data["Topics"] = topics
+
 	categories, err := models.GetAllCategories()
 	if err != nil {
 		beego.Error(err)
@@ -137,8 +147,8 @@ func (c *MainController) Get() {
 	// }
 
 }
-func (c *MainController) Post() {
 
+func (c *MainController) Post() {
 	c.Data["IsHome"] = true
 	c.TplName = "index.tpl"
 	c.Data["IsLogin"] = checkAccount(c.Ctx) //大小写害死人！IsLogin
@@ -149,9 +159,7 @@ func (c *MainController) Post() {
 	//     Ctx  *context.Context
 	//     Data map[interface{}]interface{}
 	//下面的Ctx是因为beego的Controller方法里写好了Ctx  *context.Context
-
 	// 	type Context
-
 	// type Context struct {
 	//     Input          *BeegoInput
 	//     Output         *BeegoOutput

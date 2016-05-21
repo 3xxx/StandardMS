@@ -12,9 +12,6 @@ import (
 	// "quick/models"
 )
 
-//func Init() {
-//	models.RegisterDB()
-//}
 func main() {
 	//开启orm调试模式
 	orm.Debug = true

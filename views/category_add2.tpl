@@ -27,10 +27,15 @@
   <input type="hidden" id="categoryid" name="categoryid" value="{{.Category.Id}}"/>
   <input type="hidden" id="route" name="route" value=""/>
     <div class="form-group">
+    <div class="form-group">
+      <label>项目编号</label>
+      <input readonly="readonly" id="number" class="form-control"  placeholder="Enter ProjectNumber" name="number" value="{{.Category.Number}}"></div>
+    <label>项目名称</label>
+      <input readonly="readonly" id="name" class="form-control"  placeholder="Enter ProjectName" name="name" value="{{.Category.Title}}"></div>
       <label>封面文字：</label>
-      <div>
-        <script id="editor_cover" name="editor_cover" type="text/plain" style="height:500px;width:1024px;"></script> <!-- 如果不定义那么，则默认为editorValue    --> 
-      </div>
+      <div id="editor_cover" name="editor_cover"><!-- name放这里才有效 -->
+      <script id="editor_cover" name="editor_cover" type="text/plain" style="height:500px;"></script>
+    </div>
 
       <label>封面图片：</label>
       <!-- <div> -->
@@ -45,10 +50,9 @@
 
     
       <label>项目简介（特性）:</label>
-      <div>
-        <script id="editor_property" name="editor_property" type="text/plain" style="height:500px;width:1024px;" ></script> <!--   -->
-      </div>
-   </div> 
+      <div id="editor_property" name="editor_property"><!-- name放这里才有效 -->
+      <script id="editor_property" name="editor_property" type="text/plain" style="height:500px;"></script>
+    </div>
 
 <hr>
 
@@ -70,40 +74,17 @@
 var ue1 = UE.getEditor('editor_cover');
 // var ue2 = UE.getEditor('editor_photo');没有这个，所以总是出现Cannot read property 'offsetWidth' of null
 var ue3 = UE.getEditor('editor_property');
-/* 1.传入函数,命令里执行该函数得到参数表,添加到已有参数表里 */
-ue1.ready(function () {
-// ue1.addListener('focus', function () {
-     var name = $('#name').val();
-     var number = $('#number').val();
-    ue1.execCommand('serverparam', {
-        "number":number,
-        'name': name,
-    });
-// });
-});
-// ue2.ready(function () {
-// // ue2.addListener('focus', function () {
-//      var name = $('#name').val();
-//      var number = $('#number').val();
-//     ue2.execCommand('serverparam', {
-//         "number":number,
-//         'name': name,
-//     });
-// // });
-// });
-ue3.ready(function () {
-// ue3.addListener('focus', function () {
-     var name = $('#name').val();
-     var number = $('#number').val();
+/* 2.传入参数表,添加到已有参数表里 通过携带参数，实现不同的页面使用不同controllers*/
+    ue3.ready(function () {
+    ue3.addListener('focus', function () {//startUpload start-upload startUpload beforeExecCommand是在插入图片之前触发
     ue3.execCommand('serverparam', {
-        "number":number,
-        'name': name,
+        "key":"diary",
+        "categoryid":{{.Category.Id}},
     });
-// });
+});
 });
 
-
-// 图片上传demo
+  // 图片上传demo—这个是添加封面的图片
 jQuery(function() {
       var a = document.getElementsByName("categoryid");
       a=a[0].value;
@@ -180,10 +161,9 @@ jQuery(function() {
     uploader.on( 'uploadSuccess', function( file,response ) {
         $( '#'+file.id ).addClass('upload-state-done');
         var json = eval(response);
-        alert(json.url);
+        // alert(json.url);
         // document.getElementBy("inputId").value = json.url;//原生
         $("#route").val(json.url);
-
         // $.ajax({
         //         success:function(data,status){//数据提交成功时返回数据
         //           alert(data);
@@ -204,7 +184,39 @@ jQuery(function() {
     uploader.on( 'uploadComplete', function( file ) {
         $( '#'+file.id ).find('.progress').remove();
     });
-});
+});  
+/* 1.传入函数,命令里执行该函数得到参数表,添加到已有参数表里 */
+// ue1.ready(function () {//这个没有用吧
+// ue1.addListener('focus', function () {
+     // var name = $('#name').val();
+     // var number = $('#number').val();
+    // ue1.execCommand('serverparam', {
+        // "number":number,
+        // 'name': name,
+    // });
+// });
+// });
+// ue2.ready(function () {
+// // ue2.addListener('focus', function () {
+//      var name = $('#name').val();
+//      var number = $('#number').val();
+//     ue2.execCommand('serverparam', {
+//         "number":number,
+//         'name': name,
+//     });
+// // });
+// });
+// ue3.ready(function () {//这个没有用吧
+// ue3.addListener('focus', function () {
+     // var name = $('#name').val();
+     // var number = $('#number').val();
+    // ue3.execCommand('serverparam', {
+        // "number":number,
+        // 'name': name,
+    // });
+// });
+// });
+
 </script>
 
 </body>

@@ -15,6 +15,9 @@
 <title>注册 - 水利设计CMS系统</title>
 </head>
 <body>
+<div class="navbar navba-default navbar-fixed-top">
+  <div class="container-fill">{{template "navbar" .}}</div>
+</div>
 <!-- <div class="container" style="width:500px"> -->
 <div id="content" class="col-md-8 col-md-offset-2">
 <!--   <form method="POST" action="/login">

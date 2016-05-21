@@ -8,7 +8,7 @@ import (
 	"github.com/astaxie/beego/context"
 	// "net/url"
 	"quick/models"
-	// "strconv"
+	"strconv"
 	// "github.com/astaxie/beego/session"
 )
 
@@ -98,9 +98,15 @@ func (c *LoginController) Get() {
 }
 
 func (c *LoginController) Loginerr() {
-	url := c.Input().Get("url")
-	// port := strconv.Itoa(c.Ctx.Input.Port())
-	// url := c.Ctx.Input.Site() + ":" + port + c.Ctx.Request.URL.String()
+	// url := c.Input().Get("url")
+	url1 := c.Input().Get("url") //这里不支持这样的url，http://192.168.9.13/login?url=/topic/add?id=955&mid=3
+	url2 := c.Input().Get("mid")
+	var url string
+	if url2 == "" {
+		url = url1
+	} else {
+		url = url1 + "&mid=" + url2
+	}
 	c.Data["Url"] = url
 	// beego.Info(url)
 	c.TplName = "loginerr.html"
@@ -205,6 +211,7 @@ func (c *LoginController) Post() {
 	// }
 }
 
+//检查是否登录或ip在预设允许范围内
 func checkAccount(ctx *context.Context) bool {
 	var user models.User
 	//（4）获取当前的请求会话，并返回当前请求会话的对象
@@ -213,15 +220,15 @@ func checkAccount(ctx *context.Context) bool {
 	defer sess.SessionRelease(ctx.ResponseWriter)
 	v := sess.Get("uname")
 	if v == nil {
-		return false
-		//     this.SetSession("asta", int(1))
-		//     this.Data["num"] = 0
+		role1 := Getiprole(ctx.Input.IP())
+		if role1 != 0 {
+			return true
+		} else {
+			return false
+		}
 	} else {
-		//     this.SetSession("asta", v.(int)+1)
-		//     this.Data["num"] = v.(int)
-
 		user.Username = v.(string)
-		v = sess.Get("pwd")
+		v = sess.Get("pwd")        //没必要检查密码吧，因为只有登录了才产生session，才能获取用户名
 		user.Password = v.(string) //ck.Value
 		err := models.ValidateUser(user)
 		if err == nil {
@@ -230,42 +237,57 @@ func checkAccount(ctx *context.Context) bool {
 			return false
 		}
 	}
-	// this.TplName = "index.tpl"
-
-	// ck, err := ctx.Request.Cookie("uname")
-	// if err != nil {
-	// 	return false
-	// }
-
-	//ck.Value
-
-	// ck, err = ctx.Request.Cookie("pwd")
-	// if err != nil {
-	// 	return false
-	// }
-
-	// return beego.AppConfig.String("uname") == uname &&
-	// 	beego.AppConfig.String("pwd") == pwd
 }
 
-func checkRole(ctx *context.Context) (role string, err error) { //这里返回用户的role
+//访问（读取）权限检查
+func checkRoleread(ctx *context.Context) (uname, role string, err error) { //这里返回用户的role
+	var user models.User
+	var roles []*models.Role
 	//（4）获取当前的请求会话，并返回当前请求会话的对象
 	sess, _ := globalSessions.SessionStart(ctx.ResponseWriter, ctx.Request)
 	defer sess.SessionRelease(ctx.ResponseWriter)
 	v := sess.Get("uname")
+	if v != nil {
+		user.Username = v.(string) //ck.Value
+		roles, _, err = models.GetRoleByUsername(user.Username)
+		if err == nil {
+			return v.(string), roles[0].Title, err //这里修改Name改为title就对了
+		} else {
+			return v.(string), "5", err
+		}
+	} else {
+		role1 := Getiprole(ctx.Input.IP())
+		if role1 != 0 {
+			return ctx.Input.IP(), strconv.Itoa(role1), nil
+		} else {
+			return ctx.Input.IP(), "5", nil
+		}
+
+	}
+}
+
+//写权限检查——只能是登录用户
+func checkRolewrite(ctx *context.Context) (uname, role string, err error) { //这里返回用户的role
+	var user models.User
+	var roles []*models.Role
+	//（4）获取当前的请求会话，并返回当前请求会话的对象
+	sess, _ := globalSessions.SessionStart(ctx.ResponseWriter, ctx.Request)
+	defer sess.SessionRelease(ctx.ResponseWriter)
+	v := sess.Get("uname")
+	if v != nil {
+		user.Username = v.(string) //ck.Value
+		roles, _, err = models.GetRoleByUsername(user.Username)
+		if err == nil {
+			return v.(string), roles[0].Title, err //这里修改Name改为title就对了
+		} else {
+			return v.(string), "5", err
+		}
+	} else {
+		return "", "5", err
+	}
 	// ck, err := ctx.Request.Cookie("uname")
 	// if err != nil {
-	// 	return "", err
 	// }
-	var user models.User
-	user.Username = v.(string) //ck.Value
-	var roles []*models.Role
-	roles, _, err = models.GetRoleByUsername(user.Username)
-	if err == nil {
-		return roles[0].Title, err //这里修改Name改为title就对了
-	} else {
-		return "", err
-	}
 }
 
 // func checkRole(ctx *context.Context) (roles []*models.Role, err error) {

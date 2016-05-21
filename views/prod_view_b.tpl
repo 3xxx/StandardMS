@@ -201,17 +201,17 @@ $("#export").click(function(){//这里应该用button的id来区分按钮的哪�
     
     <th><input type="checkbox" id="jd" name="checkbox" value="{{.Id}}"/>{{$index}}</th>
     <th>
-      <a href="/topic/view_b/{{.Id}}">{{substr .Tnumber 0 15}}</a>
+      <a href="/topic/view_b/{{.Id}}" title={{.Title}} target="_blank">{{substr .Tnumber 0 15}}</a>
     </th>
     <th>
-      <a href="/topic/view_b/{{.Id}}" title="{{.Title}}">{{substr .Title 0 15}}</a>
+      <a href="/topic/view_b/{{.Id}}" title={{.Title}} target="_blank">{{substr .Title 0 15}}</a>
     </th>
     <th>{{dateformat .Updated "2006-01-02"}}</th>
     <th>{{.Views}}</th>
     <th>{{.ReplyCount}}</th>
     <th>
-      <a href="/topic/view_b/{{.Id}}">下载</a>
-      <a href="/topic/modify?tid={{.Id}}">修改</a>
+      <a href="/topic/view_b/{{.Id}}" title={{.Title}} target="_blank">下载</a>
+      <a href="/topic/modify?tid={{.Id}}" target="_blank">修改</a>
       <a href="/topic/delete?tid={{.Id}}">删除</a>
     </th>
     <!--<th>
