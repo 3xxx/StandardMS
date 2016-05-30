@@ -431,6 +431,48 @@ func AdduserdefinedCategory(name, number, label, content, cover string, path2, p
 	return id, nil
 }
 
+//添加一个自定义目录
+func AdduserdefinedCategoryOne(name, pid, radio, uname string) (id int64, err error) {
+	o := orm.NewOrm()
+	pidNum, err := strconv.ParseInt(pid, 10, 64)
+	if err != nil {
+		return 0, err
+	}
+	//如果是图文模式Graphicmode为true
+	if radio == "Fdiary" {
+		cate := &Category{
+			Title:         name,
+			Author:        uname,
+			ParentId:      pidNum,
+			Created:       time.Now(),
+			Updated:       time.Now(),
+			Isshow:        true,
+			Graphicmode:   true,
+			Isuserdefined: true,
+		}
+		_, err = o.Insert(cate)
+		if err != nil {
+			return 0, err
+		}
+	} else {
+		cate := &Category{
+			Title:         name,
+			Author:        uname,
+			ParentId:      pidNum,
+			Created:       time.Now(),
+			Updated:       time.Now(),
+			Isshow:        true,
+			Graphicmode:   false,
+			Isuserdefined: true,
+		}
+		_, err = o.Insert(cate)
+		if err != nil {
+			return 0, err
+		}
+	}
+	return id, err
+}
+
 //修改项目——也是第二步添加封面、简介的提交方法，共用
 func ModifyCategory(cid, name, number, label, content, cover, path, route, uname string) error {
 	cidNum, err := strconv.ParseInt(cid, 10, 64)
@@ -500,7 +542,7 @@ func ModifyCategory(cid, name, number, label, content, cover, path, route, uname
 	return nil
 }
 
-//缺少删除成果和附件，以及物理目录
+//仅仅删除项目数据库
 func DelCategory(id string) error { //应该显示警告
 	cid, err := strconv.ParseInt(id, 10, 64)
 	if err != nil {
@@ -508,7 +550,7 @@ func DelCategory(id string) error { //应该显示警告
 	}
 	o := orm.NewOrm()
 
-	//先删成果分类
+	//先删成果专业
 	var posts []Category                                                        //详见beego手册的All的示例
 	_, err = o.QueryTable("Category").Filter("parentid", cid).All(&posts, "Id") //获取阶段
 	for _, v := range posts {
@@ -524,7 +566,7 @@ func DelCategory(id string) error { //应该显示警告
 		}
 	}
 
-	//再删专业分类
+	//再删文档类型
 	// var posts []Category //详见beego手册的All的示例
 	_, err = o.QueryTable("Category").Filter("parentid", cid).All(&posts, "Id")
 	for _, w := range posts {
@@ -537,7 +579,6 @@ func DelCategory(id string) error { //应该显示警告
 	}
 
 	//再删阶段分类
-
 	// var posts []Category //详见beego手册的All的示例
 	_, err = o.QueryTable("Category").Filter("parentid", cid).All(&posts, "Id")
 	for _, w := range posts {
@@ -554,51 +595,112 @@ func DelCategory(id string) error { //应该显示警告
 
 //删除category部分目录结构
 func DeleteCategory(id int64) error { //应该在controllers中显示警告
+	var tid, cid, cid1, cid2 string
 	o := orm.NewOrm()
 	// Read 默认通过查询主键赋值，可以使用指定的字段进行查询：
 	// user := User{Name: "slene"}
 	// err = o.Read(&user, "Name")
 	category := Category{Id: id}
 	if o.Read(&category) == nil {
-		_, err := o.Delete(&category) //删除阶段
+		_, err := o.Delete(&category) //删除本级（最上级是阶段）
 		if err != nil {
 			return err
 		}
 	}
-	//查询下级
-	var categories []Category
+
+	//查询下级，如果有下级
+	var categories []Category //categories是分类
 	_, err := o.QueryTable("Category").Filter("parentid", id).All(&categories, "Id")
 	if err != nil {
+		//应该在这里删除本级
+		//再删除成果
+		cid = strconv.FormatInt(id, 10)
+		topics, _ := GetTopicsbyparentid(cid, true)
+		for _, w := range topics {
+			tid = strconv.FormatInt(w.Id, 10)
+			err = DeletTopic(tid)
+			if err != nil {
+				beego.Error(err)
+			}
+		}
+		//再删除物理目录
+		_, diskdirectory, err := GetCategoryUrl(cid)
+		if err != nil {
+			beego.Error(err)
+		}
+		err = os.RemoveAll(diskdirectory)
+		if err != nil {
+			beego.Error(err)
+		}
+
 		return err
-	} else {
+	} else { //如果有下级（文档分类）
 		_, err = o.QueryTable("Category").Filter("parentid", id).Delete() //删除类型
 		// _, err := o.Delete(&categories)
 		if err != nil {
 			return err
 		}
-		for _, v := range categories {
+		for _, v := range categories { //循环分类
 			var categories1 []Category
 			_, err = o.QueryTable("Category").Filter("parentid", v.Id).All(&categories1, "Id")
-			if err != nil {
+			if err != nil { //如果没有下级专业了，则说明是分类，进行删除成果
+				//再删除成果
+				cid1 = strconv.FormatInt(v.Id, 10)
+				topics, _ := GetTopicsbyparentid(cid1, true)
+				for _, w := range topics {
+					tid = strconv.FormatInt(w.Id, 10)
+					err = DeletTopic(tid)
+					if err != nil {
+						beego.Error(err)
+					}
+				}
+				//再删除物理目录
+				_, diskdirectory, err := GetCategoryUrl(cid1)
+				if err != nil {
+					beego.Error(err)
+				}
+				err = os.RemoveAll(diskdirectory)
+				if err != nil {
+					beego.Error(err)
+				}
 				return err
-			} else {
+			} else { //如果有下级（专业）
 				_, err = o.QueryTable("Category").Filter("parentid", v.Id).Delete() //删除专业
 				// _, err := o.Delete(&categories1)
 				if err != nil {
 					return err
 				}
-				// for _, w := range categories1 {
-				// 	var categories2 []Category
-				// 	_, err = o.QueryTable("Category").Filter("parentid", w.Id).All(&categories2, "Id")
-				// 	if err != nil {
-				// 		return err
-				// 	} else {
-				// 		_, err = o.QueryTable("Category").Filter("parentid", w.Id).Delete() //删除价值内容
-				// 		if err != nil {
-				// 			return err
-				// 		}
-				// 	}
-				// }
+				for _, w := range categories1 {
+					//再删除成果
+					cid2 = strconv.FormatInt(w.Id, 10)
+					topics, _ := GetTopicsbyparentid(cid2, true)
+					for _, ww := range topics {
+						tid = strconv.FormatInt(ww.Id, 10)
+						err = DeletTopic(tid)
+						if err != nil {
+							beego.Error(err)
+						}
+					}
+					//再删除物理目录
+					_, diskdirectory, err := GetCategoryUrl(cid2)
+					if err != nil {
+						beego.Error(err)
+					}
+					err = os.RemoveAll(diskdirectory)
+					if err != nil {
+						beego.Error(err)
+					}
+					// var categories2 []Category
+					// _, err = o.QueryTable("Category").Filter("parentid", w.Id).All(&categories2, "Id")
+					// if err != nil {
+					// 	return err
+					// } else {
+					// 	_, err = o.QueryTable("Category").Filter("parentid", w.Id).Delete() //删除价值内容
+					// 	if err != nil {
+					// 		return err
+					// 	}
+					// }
+				}
 			}
 		}
 	}
@@ -1156,14 +1258,14 @@ func GetCategoryChengguo(id string) ([]*Category, error) {
 		return nil, err
 	}
 	//这里循环取出子目录
-	//取出成果分类
+	//取出阶段
 	var posts []Category                                                          //详见beego手册的All的示例
 	_, err = o.QueryTable("Category").Filter("parentid", idNum).All(&posts, "Id") //获取阶段
 	for _, v := range posts {
-		var postss []Category //详见beego手册的All的示例
+		var postss []Category //详见beego手册的All的示例——取出文档类型
 		_, err = o.QueryTable("Category").Filter("parentid", v.Id).All(&postss, "Id")
 		for _, w := range postss {
-			// var cates []Category //这句导致无法赋值
+			// var cates []Category //这句导致无法赋值——取出专业
 			_, err = o.QueryTable("Category").Filter("parentid", w.Id).All(&cates2)
 			// 给mySlice后面添加另一个数组切片
 			cates = append(cates, cates2...)
@@ -1176,7 +1278,7 @@ func GetCategoryChengguo(id string) ([]*Category, error) {
 	return cates, err
 }
 
-//由项目id取出所有文件类型
+//由项目id取出所有文档类型
 func GetCategoryLeixing(id string) ([]*Category, error) {
 	o := orm.NewOrm()
 	cates := make([]*Category, 0) //创建一个初始元素个数为0的数组切片，元素初始值为0

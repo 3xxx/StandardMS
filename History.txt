@@ -1,0 +1,5 @@
+                       HydroCMS revision history
+
+1, HydroCMS 1.0 (June 1, 2016)
+  +) Initial public released edition
+  *) Fixed bug of 

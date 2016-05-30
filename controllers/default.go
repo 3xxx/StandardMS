@@ -16,7 +16,7 @@ var globalSessions *session.Manager
 
 //（3）在初始化“全局session mananger对象”
 func init() {
-	globalSessions, _ = session.NewManager("memory", `{"cookieName":"gosessionid", "enableSetCookie,omitempty": true, "gclifetime":3600, "maxLifetime": 3600, "secure": false, "sessionIDHashFunc": "sha1", "sessionIDHashKey": "", "cookieLifeTime": 3600, "providerConfig": ""}`)
+	globalSessions, _ = session.NewManager("memory", `{"cookieName":"gosessionid", "enableSetCookie,omitempty": true, "gclifetime":36000, "maxLifetime": 36000, "secure": false, "sessionIDHashFunc": "sha1", "sessionIDHashKey": "", "cookieLifeTime": 36000, "providerConfig": ""}`)
 	go globalSessions.GC()
 	// globalSessions, _ = session.NewManager("memory", `{"cookieName":"gosessionid","gclifetime":3600}`)
 	// go globalSessions.GC()
@@ -133,6 +133,15 @@ func (c *MainController) Get() {
 		beego.Error(err)
 	}
 	c.Data["Categories"] = categories
+	//查出所有图文category，并查出其中的topic
+	//标准目录下，category的三级名字是 设计/修改通知单——要找到所有下级
+	//自定义目录下，category的graphicmode是true
+
+	graphictopics, err := models.GetAllGraphicTopics()
+	if err != nil {
+		beego.Error(err)
+	}
+	c.Data["Graphictopics"] = graphictopics
 	//c.Ctx.Output.Download("database/1.txt", "1.txt")
 	//试验控制器数据赋值
 	// ss := []string{"a", "b", "c"}
@@ -217,6 +226,16 @@ func (c *MainController) Post() {
 	// fmt.Println(js)
 
 }
+
+// type Person1 struct {
+// 	name string
+// 	age  int
+// }
+
+//为*Person添加String()方法，便于输出
+// func (topic *models.Topic) String() string {
+// 	return fmt.Sprintf("( %s,%d )", topic.Title, topic.Updated)
+// }
 
 //下面这个例题也过时了
 // func login(w http.ResponseWriter, r *http.Request) {

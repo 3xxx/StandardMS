@@ -165,8 +165,8 @@ func (c *CategoryController) Get() {
 	// 	}
 	// 	c.Redirect("/category", 301)
 	// 	return
-
-	case "view": //http://127.0.0.1/category?op=view&id=2726这个view是整个项目查看
+	//http://127.0.0.1/category?op=view&id=2726这个view是整个项目查看
+	case "view":
 		c.Data["IsLogin"] = checkAccount(c.Ctx)
 		c.Data["IsCategory"] = true
 		c.TplName = "category_view.html"
@@ -353,17 +353,21 @@ func (c *CategoryController) Get() {
 	}
 }
 
-//删除项目
+//删除项目数据库——删除项目中的成果(删除附件)——删除物理目录
 func (c *CategoryController) Delete() {
+
 	url := c.Input().Get("url")
 	var rolename int
 	var uname string
+	var tid string
 	//2.如果登录或ip在允许范围内，进行访问权限检查
 	uname, role, _ := checkRolewrite(c.Ctx) //login里的
 	rolename, _ = strconv.Atoi(role)
 	c.Data["Uname"] = uname
 	//2.取得Id
+
 	id := c.Input().Get("cid")
+
 	// if filetype != "pdf" && filetype != "jpg" && filetype != "diary" {
 	if rolename > 1 { //&& uname != category.Author
 		// port := strconv.Itoa(c.Ctx.Input.Port())//c.Ctx.Input.Site() + ":" + port +
@@ -373,19 +377,41 @@ func (c *CategoryController) Delete() {
 		// c.Redirect("/roleerr", 302)
 		return
 	}
-	// }
-	err := models.DelCategory(id)
+	//由cid取得topic及attachment
+	category, _, err := models.GetCategory(id) //由分类id取出本身（项目名称等）
+	if err != nil {
+		beego.Error(err)
+	}
+	//删除数据库中的成果（和附件）
+	// beego.Info(category.Title)
+	topics, err := models.GetAllTopics(category.Title, false)
+	//这个放删除项目后面不行，因为是用的是title，models里还需要转换成categoryid
+	for _, w := range topics {
+		// beego.Info(w)
+		// beego.Info(w.Id)
+		tid = strconv.FormatInt(w.Id, 10)
+		err = models.DeletTopic(tid)
+		if err != nil {
+			beego.Error(err)
+		}
+	}
+	//删除物理目录
+	// func RemoveAll(path string) errorRemoveAll删除path指定的文件，或目录及它包含的任何下级对象。它会尝试删除所有东西，除非遇到错误并返回。如果path指定的对象不存在，RemoveAll会返回nil而不返回错误。
+	err = os.RemoveAll(".\\attachment\\" + category.Number + category.Title + "\\")
+	if err != nil {
+		beego.Error(err)
+	}
+	// 删除数据库中的项目
+	err = models.DelCategory(id)
 	if err != nil {
 		beego.Error(err)
 	} else {
 		data := "ok!"
 		c.Ctx.WriteString(data)
 	}
+	// err :=os.MkdirAll(".\\attachment\\"+number+" "+name+"\\"
 	// return               //Handler crashed with error can't find templatefile in the path:topiccontroller/delete.tpl
 	c.Redirect(url, 302) //这里增加topic
-	//删除目录
-	// func RemoveAll(path string) errorRemoveAll删除path指定的文件，或目录及它包含的任何下级对象。它会尝试删除所有东西，除非遇到错误并返回。如果path指定的对象不存在，RemoveAll会返回nil而不返回错误。
-
 	// c.Redirect("/category", 301)
 	// return
 }
@@ -725,17 +751,23 @@ func (c *CategoryController) AddCoverPhoto() {
 	//    url     : "图片地址"        // 上传成功时才返回
 }
 
-//删除项目结构中的项目——删除下级——删除下级中的成果
+//删除项目结构中的项目——删除下级——删除下级中的成果——删除硬盘目录
 func (c *CategoryController) DeleteCategory() {
 	cid := c.Input().Get("cid") //项目id
 	id := c.Input().Get("id")   //要删除的id
 	idNum, err := strconv.ParseInt(id, 10, 64)
-	err = models.DeleteCategory(idNum)
+	err = models.DeleteCategory(idNum) //删除本级和下级
 	if err != nil {
 		beego.Error(err)
 	}
+	// err = models.DelCategory(id)
+	// if err != nil {
+	// 	beego.Error(err)
+	// } else {
+	// 	data := "ok!"
+	// 	c.Ctx.WriteString(data)
+	// }
 	c.Redirect("/category/modifyfrm?cid="+cid, 301)
-
 }
 
 //显示项目结构中的项目
@@ -1605,8 +1637,6 @@ func (c *CategoryController) ModifyCategory() {
 	return
 }
 
-//显示修改目录名称
-
 //修改目录名称提交
 func (c *CategoryController) ModifyCategoryTitle() {
 	cid := c.Input().Get("cid") //项目id
@@ -1632,10 +1662,45 @@ func (c *CategoryController) ModifyCategoryTitle() {
 		data := name
 		c.Ctx.WriteString(data)
 	}
-	c.Redirect("/category/modifyfrm?cid="+cid, 301)
+	c.Redirect("/category/modifyfrm?cid="+cid, 301) //这个有用
 	// return加这个return就初夏下面这个错误
 	// 2016/05/15 15:07:56 [CategoryModel.go:818][I] .\attachment\20……
 	// 2016/05/15 15:07:56 http: multiple response.WriteHeader calls
+}
+
+//添加一级目录
+func (c *CategoryController) UserdefinedPostOne() {
+	c.Data["IsLogin"] = checkAccount(c.Ctx)
+	c.Data["IsCategory"] = true
+	name := c.Input().Get("title")
+	pid := c.Input().Get("pid") //要添加目录的父id
+	cid := c.Input().Get("cid") //项目id
+	radio := c.Input().Get("radiostring")
+	//由cid查出diskdirectory，category
+	_, diskdirectory, err := models.GetCategoryUrl(pid)
+	if err != nil {
+		beego.Error(err)
+	}
+	err = os.MkdirAll(diskdirectory+name, 0777)
+	if err != nil {
+		beego.Error(err)
+	}
+
+	uname, _, _ := checkRoleread(c.Ctx) //login里的
+	// rolename, _ = strconv.Atoi(role)
+	c.Data["Uname"] = uname
+	//存入数据库
+	_, err = models.AdduserdefinedCategoryOne(name, pid, radio, uname)
+	if err != nil {
+		beego.Error(err)
+	} else {
+		data := "OK!"
+		c.Ctx.WriteString(data)
+	}
+	// id1 := strconv.FormatInt(id, 10)
+	//项目id
+	c.Redirect("/category/modifyfrm?cid="+cid, 301)
+	// return
 }
 
 // func (c *TopicController) View() {

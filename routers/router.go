@@ -7,7 +7,17 @@ import (
 )
 
 func init() {
-	beego.Router("/admin", &controllers.UserController{}, "*:Admin")
+	//管理员界面
+	//首先是登录
+	beego.Router("/admin", &controllers.AdminController{}, "*:Admin")
+	// beego.Router("/admin/UI/icons.html", &controllers.AdminController{}, "*:Admin")
+	// beego.Router("/admin/*", &controllers.AdminController{})
+	beego.AutoRouter(&controllers.AdminController{})
+	//日历管理
+	//用户管理：批量导入用户，用户权限修改，用户分组管理，密码重置md5码用户名
+	//修改配置文件：ip地址段权限，扫描主机，
+	//日志查看
+	//数据备份
 
 	beego.Router("/category/uploadimages", &controllers.CategoryController{}, "*:Uploadimagesct")
 	beego.Router("/controller", &controllers.UeditorController{}, "*:ControllerUE")
@@ -102,7 +112,7 @@ func init() {
 
 	//添加项目第一步方法提交post 等等
 	beego.AutoRouter(&controllers.CategoryController{}) //这句代替上句也行
-
+	//显示项目中所有成果
 	beego.Router("/category/view", &controllers.CategoryController{}, "get:View")
 	beego.Router("/category/viewbrief", &controllers.CategoryController{}, "get:ViewBrief")
 	//项目B模式显示指定成果类型里的成果
@@ -110,6 +120,8 @@ func init() {
 	//iframe中的默认显示
 	beego.Router("/category/category_prod_view", &controllers.CategoryController{}, "post:Category_prod_view")
 	beego.Router("/category/modifycategory", &controllers.CategoryController{}, "post:ModifyCategory")
+	//添加自定义目录中的一级
+	beego.Router("/category/userdefinedpostone", &controllers.CategoryController{}, "post:UserdefinedPostOne")
 
 	//删除文章中的附件delete必须用get，为什么？
 	beego.Router("/attachment/delete", &controllers.TopicController{}, "get:DeleteAttachment")
@@ -167,9 +179,11 @@ func init() {
 	beego.Router("/user/UpdateUser", &controllers.UserController{}, "*:UpdateUser")
 	beego.Router("/user/deluser", &controllers.UserController{}, "*:DelUser")
 	beego.Router("/user/index", &controllers.UserController{}, "*:Index")
+	//管理员修改用户资料
 	beego.Router("/user/view", &controllers.UserController{}, "get:View")
 	beego.Router("/user/view/*", &controllers.UserController{}, "get:View")
 	beego.Router("/user/importexcel", &controllers.UserController{}, "post:ImportExcel")
+	//用户登录后查看自己的资料
 	beego.Router("/user/getuserbyusername", &controllers.UserController{}, "get:GetUserByUsername")
 
 	beego.Router("/role/AddAndEdit", &controllers.RoleController{}, "*:AddAndEdit")

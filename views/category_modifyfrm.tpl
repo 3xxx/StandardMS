@@ -184,10 +184,10 @@
 
       </div>
       <div class="modal-footer">
-        <!-- <button type="button" class="btn btn-default" data-dismiss="modal">确定</button> -->
-        <!-- <button type="button" class="btn btn-primary">Save changes</button> -->
+        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+        <button type="button" class="btn btn-primary" onclick="update()">Save changes</button>
         <!-- <a class="button" data-dismiss="modal" aria-hidden="true">取消</a> -->
-                <a class="button" onclick="update()">确定</a>
+         <!-- <a class="button" onclick="update()">确定</a> -->
       </div>
     </div><!-- /.modal-content onclick="prom()"-->
   </div><!-- /.modal-dialog -->
@@ -198,28 +198,23 @@
 
 //添加同级 
     function prom(id) {
+        var th1="<input id='cid' type='hidden' name='cid' value='" +id+"'/>"
+        $(".modal-body").append(th1);
       // $('#myModal').modal('show');
       $('#myModal').modal({
         show:true,
         backdrop:'static'
         });
-      $('#myModal').on('hide.bs.modal', function () { 
-        var radio =$("input[type='radio']:checked").val();  
-        alert("您选择的是："+ radio + "。抱歉！添加功能暂时不提供。");
-        $('#myModal').removeData("bs.modal"); // 移除数据 
-         }); 
-        // if (cname)
-        // {  
-        //   // var pid = $('#'+id).val();//父级id
-        //     $.ajax({
-        //         type:"post",
-        //         url:"/category/post",
-        //         data: {pid:id,title:cname},//父级id
-        //         success:function(data,status){
-        //           alert("添加“"+data+"”成功！(status:"+status+".)");
-        //          }
-        //     });  
-        // } 
+
+      // var radio =$("input[type='radio']:checked").val();
+      // var categoryName = $('#cname').val();
+      // $('#myModal').on('hide.bs.modal', function () {  
+        // alert("您选择的是："+ radio +categoryName+ "。抱歉！添加功能暂时不提供。");
+        // $('#myModal').removeData("bs.modal"); // 移除数据 
+         // });
+        // radio=undefined
+        // categoryName=undefined
+
       // $('#myModal').on('hidden.bs.modal', function () { 
        // var radio =$("input[type='radio']:checked").val();  
         // alert("您选择的是：" + radio + "。抱歉！添加功能暂时不提供。");
@@ -229,10 +224,28 @@
       // });  
     } 
   function update(){
+      var radio =$("input[type='radio']:checked").val();
+      var categoryName = $('#cname').val();
+      var parentid = $('#cid').val();
+      var categoryid = $('#categoryid').val();
+      // $('#myModal').on('hide.bs.modal', function () {  
+         if (categoryName)
+        {  
+            $.ajax({
+                type:"post",
+                url:"/category/userdefinedpostone",
+                data: {pid:parentid,cid:categoryid,title:categoryName,radiostring:radio},//父级id
+                success:function(data,status){
+                  alert("添加“"+data+"”成功！(status:"+status+".)");
 
-alert("欢迎您：");
-
-   } 
+                 }
+            });  
+        } 
+        // $(function(){$('#myModal').modal('hide')}); 
+          $('#myModal').modal('hide');
+          // "/category/modifyfrm?cid="+cid
+          window.location.reload();//刷新页面
+  } 
 
    //修改名称
     function prom1(id) {
@@ -259,9 +272,9 @@ alert("欢迎您：");
                   alert("添加“"+data+"”成功！(status:"+status+".)");
                  }
             });  
-        }  
+        } 
+        // 这个可以自动刷新，不知道为何 
     } 
-
 
  //弹出一个输入框，输入一段文字，可以提交
  //添加下级  

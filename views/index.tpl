@@ -199,7 +199,7 @@ h1[id] {
         </h4>
         </li>
         <h6 class="text-muted">
-        成果由{{.Author}}上传于{{dateformat .Created "2006-01-02 T 15:04:05"}}，共有次浏览，{{.ReplyCount}}个评论
+        成果由{{.Author}}上传于{{dateformat .Created "2006-01-02 T 15:04:05"}}，共有{{.Views}}次浏览，{{.ReplyCount}}个评论
         </h6>
           <!-- <div class="content"> -->
           <!-- {{str2html .Content}} -->
@@ -216,9 +216,10 @@ h1[id] {
       <h1 id="section-3"> <i class="glyphicon glyphicon-star-empty"></i>
         最新文章列表
       </h1>
+
       </div>
-<!--         <ol>
-        {{range $index, $elem := .Topics}}
+        <ol>
+        {{range $index, $elem := .Graphictopics}}
              {{if lt $index 20}}
         <li>
         <h4>
@@ -230,7 +231,7 @@ h1[id] {
         </h6>
         {{end}}
         {{end}}
-      </ol> -->
+      </ol>
     </div>
 
   </div>

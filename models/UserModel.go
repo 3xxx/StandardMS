@@ -26,7 +26,7 @@ type User struct {
 	Status        int       `orm:"default(2)" form:"Status" valid:"Range(1,2)"`
 	Lastlogintime time.Time `orm:"null;type(datetime)" form:"-"`
 	Createtime    time.Time `orm:"type(datetime);auto_now_add" `
-	Roles         []*Role   `orm:"rel(m2m)"`
+	Roles         []*Role   `orm:"rel(m2m)"` //用户和权限是多对一的关系。
 }
 
 // Id            int64
@@ -156,7 +156,7 @@ func checkUser(u *User) (err error) {
 
 /************************************************************/
 
-//get user list
+//get user list——没有取到权限，为何？
 func Getuserlist(page int64, page_size int64, sort string) (users []orm.Params, count int64) {
 	o := orm.NewOrm()
 	user := new(User)
@@ -168,6 +168,8 @@ func Getuserlist(page int64, page_size int64, sort string) (users []orm.Params, 
 		offset = (page - 1) * page_size
 	}
 	qs.Limit(page_size, offset).OrderBy(sort).Values(&users)
+	//顺带把权限也取出来，不具备这个功能。只能一个个查权限
+	//用户和权限是多对一的关系。
 	count, _ = qs.Count()
 	return users, count
 }

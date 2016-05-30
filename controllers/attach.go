@@ -55,7 +55,7 @@ func (c *AttachController) Get() {
 		c.Data["Uname"] = uname
 
 		//3.由路径查询数据库中的用户名
-		username, err := models.GetattatchAuthor(route)
+		username, err := models.GetattachAuthor(route)
 		if err != nil {
 			beego.Error(err)
 		}
@@ -74,7 +74,7 @@ func (c *AttachController) Get() {
 		rolename, _ = strconv.Atoi(role)
 		c.Data["Uname"] = uname
 		//3.由路径查询数据库中的用户名
-		username, err := models.GetattatchAuthor(route)
+		username, err := models.GetattachAuthor(route)
 		if err != nil {
 			beego.Error(err)
 		}

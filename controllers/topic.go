@@ -1045,9 +1045,21 @@ func (c *TopicController) View() {
 	// }
 	//这里是通过文章的id获得文章及上级目录情况
 	topicproj, err := models.GetTopicProj(c.Ctx.Input.Param("0"))
+	if err != nil {
+		beego.Error(err)
+	}
 	topicphase, err := models.GetTopicPhase(c.Ctx.Input.Param("0"))
+	if err != nil {
+		beego.Error(err)
+	}
 	topicspec, err := models.GetTopicSpec(c.Ctx.Input.Param("0"))
+	if err != nil {
+		beego.Error(err)
+	}
 	_, topicchengguo, err := models.GetTopicChengguo(c.Ctx.Input.Param("0"))
+	if err != nil {
+		beego.Error(err)
+	}
 	if topicchengguo.Title == "diary" { //这里已经作废
 		c.TplName = "diary_view1.html"
 	} else {
@@ -1093,9 +1105,21 @@ func (c *TopicController) View_b() {
 	c.Data["Uname"] = uname
 	//这里是通过文章的id获得文章及上级目录情况
 	topicproj, err := models.GetTopicProj(c.Ctx.Input.Param("0"))
+	if err != nil {
+		beego.Error(err)
+	}
 	topicphase, err := models.GetTopicPhase(c.Ctx.Input.Param("0"))
+	if err != nil {
+		beego.Error(err)
+	}
 	topicspec, err := models.GetTopicSpec(c.Ctx.Input.Param("0"))
+	if err != nil {
+		beego.Error(err)
+	}
 	_, topicchengguo, err := models.GetTopicChengguo(c.Ctx.Input.Param("0"))
+	if err != nil {
+		beego.Error(err)
+	}
 	if topicchengguo.Title == "diary" { //这个已经作废
 		c.TplName = "diary_view1_b.html"
 	} else {
@@ -1397,7 +1421,7 @@ func (c *TopicController) ModifyTopic() { //一对多模式,向文章中追加�
 	// c.Redirect("/topic", 302)
 }
 
-//删除文章
+//删除文章——删除附件——删除物理成果
 func (c *TopicController) Delete() { //应该显示警告
 	url := c.Input().Get("url")
 
@@ -1442,6 +1466,7 @@ func (c *TopicController) Delete() { //应该显示警告
 }
 
 //删除文章中的附件，保持页面不跳转怎么办？
+//删除物理文件
 func (c *TopicController) DeleteAttachment() { //应该显示警告
 	//2.取得文章的作者
 	topic, _, err := models.GetTopic(c.Input().Get("tid"))
@@ -1594,6 +1619,7 @@ func (c *TopicController) ExportToExcel() {
 	// c.Data["Chengguo"] = chengguo
 }
 
+//删除成果数据库内容——删除附件——删除物理文件
 func (c *TopicController) DeleteAll() {
 	var rolename int
 	var uname string
@@ -1703,6 +1729,7 @@ func (c *TopicController) DownloadAll() {
 	// c.Redirect("/category/view_b?id="+cid, 302) //这句多余，因为做不到。会出现http: multiple response.WriteHeader calls
 }
 
+//分页显示所有文章
 func (c *TopicController) ListAllPosts() {
 	c.Data["IsTopic"] = true
 	c.TplName = "topic.tpl"

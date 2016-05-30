@@ -17,6 +17,7 @@ import (
 	"github.com/astaxie/beego/orm"
 	// "github.com/astaxie/beego/validation"
 	_ "github.com/mattn/go-sqlite3"
+	"sort"
 )
 
 //const (
@@ -58,6 +59,29 @@ type Attachment struct {
 	Updated       time.Time `orm:"index","auto_now;type(datetime)"`
 	Views         int64     `orm:"index"`
 	Author        string
+}
+
+//struct排序
+type graphictopics []*Topic
+
+func (list graphictopics) Len() int {
+	return len(list)
+}
+
+func (list graphictopics) Less(i, j int) bool {
+	if list[i].Updated.After(list[j].Updated) {
+		return true
+	} else if list[i].Updated.Before(list[j].Updated) {
+		return false
+	} else {
+		return list[i].Title < list[j].Title
+	}
+}
+
+func (list graphictopics) Swap(i, j int) {
+	var temp *Topic = list[i]
+	list[i] = list[j]
+	list[j] = temp
 }
 
 func init() {
@@ -276,11 +300,12 @@ func DeletTopic(tid string) error { //应该在controllers中显示警告
 			_, err = o.Update(cate)
 		}
 	}
-	_, err = o.Delete(&topic) //这句为何重复？
+	// _, err = o.Delete(&topic) //这句为何重复？
 	return err
 }
 
 //缺少排序，由项目名称获取项目下所有成果，如果没有项目名称，则获取所有成果
+//应该是由项目id取得所有成果
 func GetAllTopics(cate string, isDesc bool) ([]*Topic, error) {
 	o := orm.NewOrm()
 	topics := make([]*Topic, 0)
@@ -294,11 +319,44 @@ func GetAllTopics(cate string, isDesc bool) ([]*Topic, error) {
 			return nil, err
 		}
 		id := strconv.FormatInt(category.Id, 10)
-		categoryid, _ := GetCategoryChengguo(id) //由项目id获得所有成果分类
+		categoryid, _ := GetCategoryChengguo(id) //由项目id获得所有项目专业
 		//因为这里的categoryid有很多组，所以要用range才行
 		for _, v := range categoryid {
 			id = strconv.FormatInt(v.Id, 10)
-			topics2, _ := GetTopicsbyparentid(id, true) //由成果分类获得所有成果
+			topics2, _ := GetTopicsbyparentid(id, true) //由项目专业id获得所有成果
+			topics = append(topics, topics2...)
+		}
+		// var err error
+		// if isDesc {
+		// 	// if len(cate) > 0 {
+		// 	// 	qs = qs.Filter("Title", cate) //这里取回GetCategoryChengguo
+		// 	// }
+		// 	_, err = qs.OrderBy("-created").All(&topics)
+	} else {
+		_, err = qs.OrderBy("-created").All(&topics)
+	}
+	return topics, err
+}
+
+//由项目id取得所有成果:任何级别下。——还没改
+func GetAllTopics2(cate string, isDesc bool) ([]*Topic, error) {
+	o := orm.NewOrm()
+	topics := make([]*Topic, 0)
+	qs := o.QueryTable("topic")
+	var err error
+	if len(cate) > 0 {
+		qs := o.QueryTable("Category")
+		category := new(Category)
+		err = qs.Filter("Title", cate).One(category) //由项目名称获得项目id
+		if err != nil {
+			return nil, err
+		}
+		id := strconv.FormatInt(category.Id, 10)
+		categoryid, _ := GetCategoryChengguo(id) //由项目id获得所有项目专业
+		//因为这里的categoryid有很多组，所以要用range才行
+		for _, v := range categoryid {
+			id = strconv.FormatInt(v.Id, 10)
+			topics2, _ := GetTopicsbyparentid(id, true) //由项目专业id获得所有成果
 			topics = append(topics, topics2...)
 		}
 		// var err error
@@ -675,7 +733,7 @@ func TopicCount(id, count int64) (err error) {
 }
 
 //根据路由获取category表的author
-func GetattatchAuthor(route string) (uname string, err error) {
+func GetattachAuthor(route string) (uname string, err error) {
 	o := orm.NewOrm()
 	var attachment Attachment
 	// category := new(Category) //第一种这种形式的category，这种不能返回one的author
@@ -702,4 +760,42 @@ func GetattatchAuthor(route string) (uname string, err error) {
 	// o := orm.NewOrm()
 	// o.Read(&user, "Id")
 	// return user
+}
+
+func GetAllGraphicTopics() ([]*Topic, error) {
+	o := orm.NewOrm()
+	categories := make([]*Category, 0)
+	categories1 := make([]*Category, 0)
+	categories2 := make([]*Category, 0)
+	topics := make([]*Topic, 0)
+	qs := o.QueryTable("Category")
+	var err error
+
+	_, err = qs.Filter("Title", "文章/设代日记").All(&categories) //取得所有标准目录中的文章
+	if err != nil {
+		return nil, err
+	}
+	//再循环取出下级
+	for _, v := range categories {
+		_, err = qs.Filter("ParentId", v.Id).All(&categories1)
+		for _, w := range categories1 {
+			cid := strconv.FormatInt(w.Id, 10)
+			topics2, _ := GetTopicsbyparentid(cid, true) //由项目专业id获得所有成果
+			topics = append(topics, topics2...)
+		}
+	}
+	//取出所有自定义目录模式为graphicmode为true的
+	_, err = qs.Filter("Graphicmode", true).All(&categories2) //取得所有标准目录中的文章
+	if err != nil {
+		return nil, err
+	}
+	for _, ww := range categories2 {
+		cid1 := strconv.FormatInt(ww.Id, 10)
+		topics3, _ := GetTopicsbyparentid(cid1, true) //由项目专业id获得所有成果
+		topics = append(topics, topics3...)
+	}
+	//对topics进行时间排序_不知道是否有效
+	pList := graphictopics(topics)
+	sort.Sort(pList)
+	return pList, err
 }

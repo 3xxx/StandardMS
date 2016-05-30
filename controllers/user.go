@@ -49,7 +49,6 @@ func init() {
 			Iprolemaps[i] = v
 		}
 	}
-
 	f.Close()
 }
 
@@ -61,7 +60,7 @@ func (c *UserController) Index() {
 	var rolename int
 	var uname string
 	//2.如果登录或ip在允许范围内，进行访问权限检查
-	uname, role, _ := checkRoleread(c.Ctx) //login里的
+	uname, role, _ := checkRolewrite(c.Ctx) //login里的
 	if role != "0" {
 		rolename, _ = strconv.Atoi(role)
 		c.Data["Uname"] = uname
@@ -101,7 +100,8 @@ func (c *UserController) Index() {
 		// tree := c.GetTree()
 		// c.Data["tree"] = &tree
 		c.Data["Users"] = &users
-		c.TplName = "user.tpl"
+		c.TplName = "AdminLTE/users_import.html"
+		// c.TplName = "user.tpl"
 		// if c.GetTemplatetype() != "easyui" {
 		// c.Layout = c.GetTemplatetype() + "/public/layout.tpl"
 		// }
@@ -111,26 +111,31 @@ func (c *UserController) Index() {
 }
 
 func (c *UserController) View() {
+	var rolename int
 	// c.Data["IsCategory"] = true
 	// c.TplName = "category.tpl"
 	c.Data["IsLogin"] = checkAccount(c.Ctx)
-	//2.取得客户端用户名
-	sess, _ := globalSessions.SessionStart(c.Ctx.ResponseWriter, c.Ctx.Request)
-	defer sess.SessionRelease(c.Ctx.ResponseWriter)
-	v := sess.Get("uname")
-	if v != nil {
-		c.Data["Uname"] = v.(string)
+	//2.如果登录或ip在允许范围内，进行访问权限检查
+	uname, role, _ := checkRolewrite(c.Ctx) //login里的
+	if role != "0" {
+		rolename, _ = strconv.Atoi(role)
+		c.Data["Uname"] = uname
+	} else {
+		port := strconv.Itoa(c.Ctx.Input.Port())
+		route := c.Ctx.Input.Site() + ":" + port + c.Ctx.Input.URL()
+		c.Data["Url"] = route
+		c.Redirect("/login?url="+route, 302)
+		return
 	}
-	// ck, err := c.Ctx.Request.Cookie("uname")
-	// if err != nil {
-	// 	beego.Error(err)
-	// } else {
-	// 	c.Data["Uname"] = ck.Value
-	// }
-	// userid, _ := c.GetInt64("Id")
-	// id := c.Ctx.Input.Param("0")这里为何无效？？？？这个需要routers中设置AutoRouter
-	// beego.Info(id)
-	// userid, _ := strconv.ParseInt(id, 10, 64)
+	// if filetype != "pdf" && filetype != "jpg" && filetype != "diary" {
+	if rolename > 1 { //&& uname != category.Author
+		// port := strconv.Itoa(c.Ctx.Input.Port())//c.Ctx.Input.Site() + ":" + port +
+		route := c.Ctx.Request.URL.String()
+		c.Data["Url"] = route
+		c.Redirect("/roleerr?url="+route, 302)
+		// c.Redirect("/roleerr", 302)
+		return
+	}
 
 	userid, _ := strconv.ParseInt(c.Input().Get("useid"), 10, 64)
 	// beego.Info(userid)
@@ -161,7 +166,8 @@ func (c *UserController) View() {
 	c.Data["User"] = user
 	c.Data["Role"] = list
 	// c.Data["Users"] = &users
-	c.TplName = "admin_user_view.tpl"
+	c.TplName = "AdminLTE/user_view.html"
+	// c.TplName = "admin_user_view.tpl"
 	// c.TplName = c.GetTemplatetype() + "/rbac/roletouserlist.tpl"
 	// }
 }
@@ -272,24 +278,33 @@ func (c *UserController) DelUser() {
 }
 
 func (c *UserController) GetUserByUsername() {
+	var rolename int
 	// 	c.Data["IsCategory"] = true
 	// c.TplName = "category.tpl"
-	c.Data["IsLogin"] = checkAccount(c.Ctx)
-	//2.取得客户端用户名
-	sess, _ := globalSessions.SessionStart(c.Ctx.ResponseWriter, c.Ctx.Request)
-	defer sess.SessionRelease(c.Ctx.ResponseWriter)
-	v := sess.Get("uname")
-	if v != nil {
-		c.Data["Uname"] = v.(string)
-	}
-	// ck, err := c.Ctx.Request.Cookie("uname")
-	// if err != nil {
-	// 	beego.Error(err)
-	// } else {
-	// 	c.Data["Uname"] = ck.Value
-	// }
 	username := c.Input().Get("username")
-	// beego.Info(userid)
+	c.Data["IsLogin"] = checkAccount(c.Ctx)
+	//2.如果登录或ip在允许范围内，进行访问权限检查
+	uname, role, _ := checkRolewrite(c.Ctx) //login里的
+	if role != "0" {
+		rolename, _ = strconv.Atoi(role)
+		c.Data["Uname"] = uname
+	} else {
+		port := strconv.Itoa(c.Ctx.Input.Port())
+		route := c.Ctx.Input.Site() + ":" + port + c.Ctx.Input.URL()
+		c.Data["Url"] = route
+		c.Redirect("/login?url="+route, 302)
+		return
+	}
+	// if filetype != "pdf" && filetype != "jpg" && filetype != "diary" {
+	if rolename > 1 && uname != username { //&& uname != category.Author
+		// port := strconv.Itoa(c.Ctx.Input.Port())//c.Ctx.Input.Site() + ":" + port +
+		route := c.Ctx.Request.URL.String()
+		c.Data["Url"] = route
+		c.Redirect("/roleerr?url="+route, 302)
+		// c.Redirect("/roleerr", 302)
+		return
+	}
+
 	user := m.GetUserByUsername(username)
 	list, _, _ := m.GetRoleByUsername(username)
 	c.Data["User"] = user
@@ -300,7 +315,6 @@ func (c *UserController) GetUserByUsername() {
 //上传excel文件，导入到数据库
 //引用来自category的查看成果类型里的成果
 func (c *UserController) ImportExcel() {
-
 	//解析表单
 	// c.Data["IsLogin"] = checkAccount(c.Ctx)
 	// id := c.Input().Get("id")
