@@ -3,11 +3,13 @@
 <title>查阅规范和图集 - HydroCMS</title>
 <link rel="stylesheet" type="text/css" href="/static/fex-team-webuploader/css/webuploader.css">
 <script type="text/javascript" src="/static/fex-team-webuploader/dist/webuploader.js"></script>
+
+<!-- 让footer固定在页面底部
 <style type="text/css">
 #footer{clear:both;height:150px;margin:0;padding:0;position:absolute;bottom:30px;width:100%;}
 #footerbox{margin:0;padding:0;clear:both;position:absolute;bottom:0px;width:100%;}
 .footer{width:980px;line-height:30px !important;margin:0 auto;padding:0;}
-</style>
+</style> -->
 </head>
 
 <body>

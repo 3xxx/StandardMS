@@ -11,6 +11,7 @@
 	<script src="bootstrap/js/respond.min.js"></script>
 	<script src="bootstrap/js/html5.js"></script>
 	<![endif]-->
+	
 <script type="text/javascript" src="/static/js/jquery-2.1.3.min.js"></script>
 <script type="text/javascript" src="/static/js/bootstrap.min.js"></script>
 <script type="text/javascript" src="/static/js/jquery.tablesorter.js"></script> 

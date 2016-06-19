@@ -1,6 +1,6 @@
  <!DOCTYPE html>
 {{template "header"}}
-<title>Wiki列表 - 档案共享系统</title>
+<title>Wiki列表 - 水利设计CMS系统</title>
 <style>
 i#delete
 {

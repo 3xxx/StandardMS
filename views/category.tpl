@@ -42,7 +42,14 @@ color:#DC143C;
           <th> {{printf "%d" $index}}</th><!-- {{$index}} -->
           <th><a href="/category?op=view&id={{.Id}}" id="number">{{.Number}}</a></th>
          <th><a href="/category?op=view&id={{.Id}}" id="name"><i class="glyphicon glyphicon-plane"></i>{{.Title}}</a></th>
-         <th>{{.Label}}</th>
+         <th>
+          {{range $k1,$v1 :=$.Label}}
+          {{if eq $elem.Id $v1.Category.Id}}
+          <a href="/category?op=viewlabel&label={{.Title}}" ><span class="label label-info">{{.Title}}</span></a>
+          {{end}}
+          {{end}}
+
+         </th>
          <th>{{.Author}}</th>
          <th>{{.TopicCount}}</th>
          <th>{{dateformat .Created "2006-01-02 "}}</th>

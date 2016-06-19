@@ -8,14 +8,13 @@
     <!--这里加载的语言文件会覆盖你在配置项目里添加的语言类型，比如你在配置项目里配置的是英文，这里加载的中文，那最后就是中文-->
     <script type="text/javascript" charset="utf-8" src="/static/ueditor/lang/zh-cn/zh-cn.js"></script>
     <script src="/static/ueditor/ueditor.parse.js"></script>
-<!-- <meta http-equiv="Content-Type" content="text/html;charset=utf-8"> -->
-<!-- <link type="text/css" href="/static/css/bootstrap.min.css" rel="stylesheet" /> -->
-<!-- <script type="text/javascript" src="/static/js/jquery-2.1.3.min.js"></script> -->
-<!-- <script type="text/javascript" src="/static/js/bootstrap.min.js"></script> -->
+    <!-- <link href="/static/ueditor/third-party/video-js/video1-js.min.css" rel="stylesheet"> -->
+    <!-- <script src="/static/ueditor/third-party/video-js/video.min.js"></script> -->
 <style type="text/css">
   img{max-width:100%}
 </style>
 </head>
+
 <body>
 <div class="navbar navba-default navbar-fixed-top">
   <div class="container-fill">{{template "navbar" .}}</div>
@@ -24,7 +23,7 @@
   <h2>
     {{.Wiki.Title}}
     <!--下面这个.Tid是Wiki.go的view里直接传过来的-->
-    <a href="/Wiki/modify?tid={{.Tid}}" class="btn btn-default" target="_blank">修改成果</a>
+    <a href="/wiki/modify?tid={{.Tid}}" class="btn btn-default" target="_blank">修改wiki</a>
   </h2>
     <div class="content">
   {{str2html .Wiki.Content}}
@@ -95,6 +94,10 @@
     //议使用工厂方法getEditor创建和引用编辑器实例，如果在某个闭包下引用该编辑器，直接调用UE.getEditor('editor')就能拿到相关的实例
     // var ue = UE.getEditor('container');
     var ue = UE.getEditor('container', {
+    autoHeightEnabled: true,
+    autoFloatEnabled: true
+    });  
+        
     // toolbars: [
     //     ['fullscreen', 'source', 'undo', 'redo', 'bold']
     // ],
@@ -111,10 +114,10 @@
     //         'inserttable', 'deletetable', 'insertparagraphbeforetable', 'insertrow', 'deleterow', 'insertcol', 'deletecol', 'mergecells', 'mergeright', 'mergedown', 'splittocells', 'splittorows', 'splittocols', 'charts', '|',
     //         'print', 'preview', 'searchreplace', 'help', 'drafts'
     //     ]],
-    autoHeightEnabled: true,
-    autoFloatEnabled: true
-});
+
 /* 2.传入参数表,添加到已有参数表里 通过携带参数，实现不同的页面使用不同controllers*/
+//startUpload start-upload startUpload beforeExecCommand是在插入图片之前触发
+
     ue.ready(function () {
     ue.addListener('focus', function () {//startUpload start-upload startUpload beforeExecCommand是在插入图片之前触发
     var title = $('#title').val();

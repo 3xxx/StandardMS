@@ -31,6 +31,24 @@ h3 {line-height: 150%;
   padding: 0;
   font-family: Georgia, Palatino, serif;
   }
+  h3 a {color: inherit;}/*h3标签里面的a标签继承父级颜色*/
+  /*h3 a:hover {color: #000000;}*/
+/*a:link { 
+color:#FF0000; 
+text-decoration:underline; 
+} 
+a:visited { 
+color:#00FF00; 
+text-decoration:none; 
+} 
+a:hover { 
+color:#000000; 
+text-decoration:none; 
+} 
+a:active { 
+color:#FFFFFF; 
+text-decoration:none; 
+} */
    h4{
       color: #DC143C;
   font-family: georgia, palatino, "New Century Schoolbook",
@@ -58,7 +76,8 @@ h3 {line-height: 150%;
 
 <div class="col-md-8 col-md-offset-2">
 <!-- 这里添加项目目录树显示color="#A52A2A" -->
-<h3><font size="5" >{{.TopicProj.Title}}</font><font size="4"> » {{.TopicPhase.Title}}</font><font size="4"> » {{.TopicSpec.Title}}» </font><font size="5"> {{.TopicChengguo.Title}}</font></h3>
+<h3><font size="5" ><a href="/category?op=view&id={{.TopicPhase.Id}}">
+{{.TopicProj.Title}}</font><font size="4"></a> » {{.TopicPhase.Title}}</font><font size="4"> » {{.TopicSpec.Title}}» </font><font size="5"> {{.TopicChengguo.Title}}</font></h3>
   <h2>
     {{.Topic.Title}}
     <!--下面这个.Tid是topic.go的view里直接传过来的-->

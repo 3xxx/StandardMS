@@ -1,7 +1,7 @@
 {{define "navbar"}}
 <nav class="navbar navbar-default">
   <!-- /.navbar-collapse 前后必须用这个nav包裹起来！否则没有高亮显示-->
-  <div class="container-fluid">
+  <!-- <div class="container-fluid"> -->
     <!-- /.container-fluid -->
     <!-- Brand and toggle get grouped for better mobile display -->
 
@@ -72,6 +72,6 @@
       </ul>
     </div>
 
-  </div>
+  <!-- </div> -->
 </nav>
 {{end}}

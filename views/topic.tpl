@@ -1,6 +1,6 @@
  <!DOCTYPE html>
 {{template "header"}}
-<title>成果分类查看 - 档案共享系统</title>
+<title>成果 - 水利设计CMS系统</title>
 <style>
 i#delete
 {

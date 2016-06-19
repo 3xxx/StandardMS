@@ -1,6 +1,6 @@
  <!DOCTYPE html>
 {{template "header"}}
-<title>成果分类查看 - 水利设计CMS系统</title>
+<title>成果查看 - 水利设计CMS系统</title>
 <!-- <style type="text/css">
 li:nth-child(odd){background-color:#eee; }/*隔行变色*/
 ul.disc {list-style-type: disc}

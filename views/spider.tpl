@@ -37,9 +37,10 @@ ul.nav li ul{float:left;margin:0;padding:0;}*/
 
 /*#top{background-color:#fff;background-image:url(images/topbck.gif);background-repeat:repeat-x;height:34px;}*/
 
+/*让footer固定在页面底部
 #footer{clear:both;height:150px;margin:0;padding:0;position:absolute;bottom:30px;width:100%;}
 #footerbox{margin:0;padding:0;clear:both;position:absolute;bottom:0px;width:100%;}
-.footer{width:980px;line-height:30px !important;margin:0 auto;padding:0;}
+.footer{width:980px;line-height:30px !important;margin:0 auto;padding:0;}*/
 
 #button{
   width:100px;
@@ -103,6 +104,8 @@ ul.nav li ul{float:left;margin:0;padding:0;}*/
           </tbody>
         </table>
   </div>
+
+
 <div class="col-lg-12"> 
 <br>
 <hr/>
@@ -153,6 +156,8 @@ ul.nav li ul{float:left;margin:0;padding:0;}*/
     </div>
   </div>
 </div> 
+
+</div>  
 <!-- <div id="footerbox">这个也行。
     <div class="footer">
         <a href="http://www.cnblogs.com/chenyuming507950417/">助你软件工作室</a>&nbsp;&nbsp;&nbsp; 二十八年，我用青春修行&nbsp;&nbsp;&nbsp; &copy; Copyright
