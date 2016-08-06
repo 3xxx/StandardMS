@@ -10,12 +10,34 @@ import (
 	"quick/models"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type Uploadimage struct {
 	url     string
 	message string
 	success int
+}
+
+type Categorydefine struct { //在category基础上加上label
+	Id              int64
+	ParentId        int64
+	Uid             int64
+	Title           string
+	Number          string
+	Content         string
+	Cover           string
+	Route           string //封面图片的链接地址
+	Created         time.Time
+	Updated         time.Time
+	Views           int64
+	Author          string //这个改成uid代替
+	TopicCount      int64  //`form:"-"`
+	TopicLastUserId int64  //`form:"-"`
+	Isshow          bool
+	Graphicmode     bool   //true表示图文模式
+	Isuserdefined   bool   //是否自定义
+	Label           string //[]*models.Label
 }
 
 type CategoryController struct {
@@ -308,6 +330,7 @@ func (c *CategoryController) Get() {
 		logs.Info(c.Ctx.Input.IP() + " " + "ViewCategory")
 		logs.Close()
 	default: //即http://127.0.0.1/category
+		// c.EnableRender = false
 		c.Data["IsCategory"] = true
 		c.TplName = "category.tpl"
 		c.Data["IsLogin"] = checkAccount(c.Ctx)
@@ -335,12 +358,61 @@ func (c *CategoryController) Get() {
 		// p := pagination.NewPaginator(c.Ctx.Request, 10, 9)
 		// beego.Info(p.Offset())   0
 		// fetch the next 20 posts
-		categories, err = models.ListCategoriesByOffsetAndLimit(paginator.Offset(), categoriesPerPage)
+		categories, labels, err := models.ListCategoriesByOffsetAndLimit(paginator.Offset(), categoriesPerPage)
 		if err != nil {
 			beego.Error(err)
 		}
+
+		//循环获取每个category的label——这个方法太慢，取消
+		// var label1 string
+		// slice1 := make([]Categorydefine, 0)
+		// for i1, _ := range categories {
+		// 	cid := strconv.FormatInt(categories[i1].Id, 10)
+		// 	_, label, err := models.GetCategory(cid) //由成果id取出成果
+		// 	// _, numbers, marks, err := models.GetMeritTopic(0, categories[i1].Id)
+		// 	if err != nil {
+		// 		beego.Error(err)
+		// 	}
+		// 	//3.由cid查询数据库中的项目名
+		// 	for i, label2 := range label {
+		// 		if i == 0 {
+		// 			label1 = label2.Title
+		// 		} else {
+		// 			label1 = label1 + "," + label2.Title
+		// 		}
+		// 	}
+		// 	aa := make([]Categorydefine, 1)
+		// 	aa[0].Id = categories[i1].Id //这里用for i1,v1,然后用v1.Id一样的意思
+		// 	aa[0].ParentId = categories[i1].ParentId
+		// 	aa[0].Uid = categories[i1].Uid
+		// 	aa[0].Title = categories[i1].Title
+		// 	aa[0].Number = categories[i1].Number
+		// 	aa[0].Content = categories[i1].Content
+		// 	aa[0].Cover = categories[i1].Cover
+		// 	aa[0].Route = categories[i1].Route
+		// 	aa[0].Created = categories[i1].Created
+		// 	aa[0].Updated = categories[i1].Updated
+		// 	aa[0].Views = categories[i1].Views
+		// 	aa[0].Author = categories[i1].Author
+		// 	aa[0].TopicCount = categories[i1].TopicCount
+		// 	aa[0].TopicLastUserId = categories[i1].TopicLastUserId
+		// 	aa[0].Isshow = categories[i1].Isshow
+		// 	aa[0].Graphicmode = categories[i1].Graphicmode
+		// 	aa[0].Isuserdefined = categories[i1].Isuserdefined
+		// 	aa[0].Label = label1
+		// 	slice1 = append(slice1, aa...)
+		// }
+		// c.Data["Category"] = slice1
 		c.Data["Category"] = categories
+		c.Data["Label"] = labels
 		c.Data["paginator"] = paginator
+
+		// c.EnableRender = false
+		// c.Data["json"] = categories
+		// c.Data["json1"] = labels //换名不行，只支持一组
+		// c.ServeJSON()
+		// c.Ctx.WriteString("hello")
+
 		logs := logs.NewLogger(1000)
 		logs.SetLogger("file", `{"filename":"log/test.log"}`)
 		logs.EnableFuncCallDepth(true)
@@ -353,37 +425,178 @@ func (c *CategoryController) Get() {
 	}
 }
 
+//这个给UI用
+func (c *CategoryController) CategoryUi() {
+	c.EnableRender = false
+	c.Data["IsCategory"] = true
+	// c.TplName = "category.tpl"
+	c.Data["IsLogin"] = checkAccount(c.Ctx)
+	uname, _, _ := checkRoleread(c.Ctx) //login里的
+	c.Data["Uname"] = uname
+	categories, err := models.GetAllCategories()
+	if err != nil {
+		beego.Error(err)
+	}
+	count := len(categories)
+	count1 := strconv.Itoa(count)
+	count2, err := strconv.ParseInt(count1, 10, 64)
+	if err != nil {
+		beego.Error(err)
+	}
+	c.Data["Length"] = len(categories)
+
+	categoriesPerPage := 20
+	paginator := pagination.SetPaginator(c.Ctx, categoriesPerPage, count2)
+
+	categories, labels, err := models.ListCategoriesByOffsetAndLimit(paginator.Offset(), categoriesPerPage)
+	if err != nil {
+		beego.Error(err)
+	}
+	c.Data["Category"] = categories
+	c.Data["Label"] = labels
+	c.Data["paginator"] = paginator
+
+	// c.EnableRender = false
+	c.Data["json"] = categories
+	// c.Data["json1"] = labels //换名不行，只支持一组
+	c.ServeJSON()
+	// c.Ctx.WriteString("hello")
+
+	logs := logs.NewLogger(1000)
+	logs.SetLogger("file", `{"filename":"log/test.log"}`)
+	logs.EnableFuncCallDepth(true)
+	logs.Info(c.Ctx.Input.IP() + " " + "ViewCategory")
+	logs.Close()
+}
+
+//这个给UI用
+func (c *CategoryController) CategoryViewUi() {
+	c.EnableRender = false
+	c.Data["IsLogin"] = checkAccount(c.Ctx)
+	c.Data["IsCategory"] = true
+	// c.TplName = "category_view.html"
+
+	var uname string
+	//2.如果登录或ip在允许范围内，进行访问权限检查
+	uname, _, _ = checkRoleread(c.Ctx) //login里的
+	c.Data["Uname"] = uname
+
+	id := c.Input().Get("id")
+	// if len(id) == 0 {
+	// 	break
+	// }
+	category, label, err := models.GetCategory(id) //由分类id取出本身（项目名称等）
+	if err != nil {
+		beego.Error(err)
+	}
+	// beego.Info(category.Title)
+	topics, err := models.GetAllTopics(category.Title, false)
+	categorychengguo, _ := models.GetCategoryChengguo(id)
+	categoryzhuanye, _ := models.GetCategoryLeixing(id)
+	categoryjieduan, _ := models.GetCategoryJieduan(id)
+	// if err != nil {
+	// 	beego.Error(err)
+	// 	c.Redirect("/", 302)
+	// 	return
+	// }
+	c.Data["Category"] = category
+	c.Data["Label"] = label
+	c.Data["Categorychengguo"] = categorychengguo
+	c.Data["Categoryzhuanye"] = categoryzhuanye
+	c.Data["Categoryjieduan"] = categoryjieduan
+	c.Data["Tid"] = id //教程中用的是圆括号，导致错误topic.go:52: cannot call non-function c.Controller.Ctx.Input.Params (type map[string]string)
+	//教程第8章开头有修改
+	c.Data["json"] = categoryjieduan
+	// c.Data["json1"] = labels //换名不行，只支持一组
+	c.ServeJSON()
+	//下面引自index
+	c.Data["Id"] = c.Ctx.Input.Param(":id")
+	c.Data["Topics"] = topics
+	categories, err := models.GetAllCategories() //这个没有用吧
+	if err != nil {
+		beego.Error(err)
+	}
+	c.Data["Categories"] = categories
+	logs := logs.NewLogger(1000)
+	logs.SetLogger("file", `{"filename":"log/test.log"}`)
+	logs.EnableFuncCallDepth(true)
+	logs.Info(c.Ctx.Input.IP() + " " + "ViewCategory" + " " + category.Title)
+	logs.Close()
+}
+
+//ui文档类型——下文虽然是专业，实际上是类型
+func (c *CategoryController) CategoryView1Ui() {
+	c.EnableRender = false
+	c.Data["IsLogin"] = checkAccount(c.Ctx)
+	c.Data["IsCategory"] = true
+	// c.TplName = "category_view.html"
+
+	var uname string
+	//2.如果登录或ip在允许范围内，进行访问权限检查
+	uname, _, _ = checkRoleread(c.Ctx) //login里的
+	c.Data["Uname"] = uname
+
+	id := c.Input().Get("id")
+
+	categoryzhuanye, _ := models.GetCategoryLeixing(id)
+
+	c.Data["json"] = categoryzhuanye
+	c.ServeJSON()
+
+}
+
+//ui专业——下文虽然是chengguo，但是实际上是专业
+func (c *CategoryController) CategoryView2Ui() {
+	c.EnableRender = false
+	c.Data["IsLogin"] = checkAccount(c.Ctx)
+	c.Data["IsCategory"] = true
+
+	var uname string
+	//2.如果登录或ip在允许范围内，进行访问权限检查
+	uname, _, _ = checkRoleread(c.Ctx) //login里的
+	c.Data["Uname"] = uname
+
+	id := c.Input().Get("id")
+	categorychengguo, _ := models.GetCategoryChengguo(id)
+	c.Data["json"] = categorychengguo
+	c.ServeJSON()
+}
+
 //删除项目数据库——删除项目中的成果(删除附件)——删除物理目录
 func (c *CategoryController) Delete() {
-
-	url := c.Input().Get("url")
+	cid := c.Input().Get("cid")
 	var rolename int
 	var uname string
-	var tid string
 	//2.如果登录或ip在允许范围内，进行访问权限检查
 	uname, role, _ := checkRolewrite(c.Ctx) //login里的
+	// beego.Info(uname) = nil
 	rolename, _ = strconv.Atoi(role)
+	// beego.Info(rolename)=5
 	c.Data["Uname"] = uname
-	//2.取得Id
-
-	id := c.Input().Get("cid")
-
-	// if filetype != "pdf" && filetype != "jpg" && filetype != "diary" {
-	if rolename > 1 { //&& uname != category.Author
-		// port := strconv.Itoa(c.Ctx.Input.Port())//c.Ctx.Input.Site() + ":" + port +
-		route := c.Ctx.Request.URL.String()
+	//3.由cid查询数据库中的项目名
+	var label1 string
+	category, label, err := models.GetCategory(cid)
+	// beego.Info(category.Author)=admin
+	for i, label2 := range label {
+		if i == 0 {
+			label1 = label2.Title
+		} else {
+			label1 = label1 + "," + label2.Title
+		}
+	}
+	if rolename > 1 && uname != category.Author { //要么管理员，要么作者自己可以修改项目
+		// port := strconv.Itoa(c.Ctx.Input.Port())
+		route := c.Ctx.Request.URL.String() //c.Ctx.Input.Site() + ":" + port +
 		c.Data["Url"] = route
 		c.Redirect("/roleerr?url="+route, 302)
 		// c.Redirect("/roleerr", 302)
 		return
 	}
-	//由cid取得topic及attachment
-	category, _, err := models.GetCategory(id) //由分类id取出本身（项目名称等）
-	if err != nil {
-		beego.Error(err)
-	}
+	url := c.Input().Get("url")
+	var tid string
+	//2.如果登录或ip在允许范围内，进行访问权限检查
+	// 2016-7-31既未登录，IP也不在范围内，可能出现错误。
 	//删除数据库中的成果（和附件）
-	// beego.Info(category.Title)
 	topics, err := models.GetAllTopics(category.Title, false)
 	//这个放删除项目后面不行，因为是用的是title，models里还需要转换成categoryid
 	for _, w := range topics {
@@ -402,9 +615,11 @@ func (c *CategoryController) Delete() {
 		beego.Error(err)
 	}
 	// 删除数据库中的项目
-	err = models.DelCategory(id)
+	err = models.DelCategory(cid)
 	if err != nil {
 		beego.Error(err)
+		// data := "权限不够，请登录！"
+		// c.Ctx.WriteString(data)
 	} else {
 		data := "ok!"
 		c.Ctx.WriteString(data)

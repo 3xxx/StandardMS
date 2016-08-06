@@ -762,6 +762,7 @@ func GetattachAuthor(route string) (uname string, err error) {
 	// return user
 }
 
+//取出所有文章——给default里首页用——首页应该加一个more……
 func GetAllGraphicTopics() ([]*Topic, error) {
 	o := orm.NewOrm()
 	categories := make([]*Category, 0)

@@ -48,6 +48,7 @@ type Library struct {
 	Content  string    `orm:"sie(5000)"`
 	Created  time.Time `orm:"index","auto_now_add;type(datetime)"`
 	Updated  time.Time `orm:"index","auto_now;type(datetime)"`
+	Execute  string    //执行时间
 }
 
 //附件,attachment 和 Standard 是 ManyToOne 关系，也就是 ForeignKey 为 Standard
@@ -199,4 +200,16 @@ func GetAllStandards() ([]*Standard, error) {
 	_, err = qs.OrderBy("-created").All(&standards)
 	// _, err := qs.All(&cates)
 	return standards, err
+}
+
+//由法规名称精确搜索有效版本库
+func SearchLiabraryName(Name string) (*Library, error) {
+	o := orm.NewOrm()
+	library := new(Library)
+	qs := o.QueryTable("library")
+	err := qs.Filter("title", Name).One(library)
+	if err != nil {
+		return nil, err
+	}
+	return library, err
 }

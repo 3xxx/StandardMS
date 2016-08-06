@@ -1075,13 +1075,16 @@ func GetCategoriesbylabel(title string) ([]*Category, error) {
 }
 
 //取出分页的项目
-func ListCategoriesByOffsetAndLimit(set, categoriesPerPage int) ([]*Category, error) {
+func ListCategoriesByOffsetAndLimit(set, categoriesPerPage int) ([]*Category, []*Label, error) {
 	o := orm.NewOrm()
 	categories := make([]*Category, 0)
+	labels := make([]*Label, 0)
 	qs := o.QueryTable("category")
 	var err error
 	_, err = qs.Filter("ParentId", 0).Limit(categoriesPerPage, set).OrderBy("-created").All(&categories)
-	return categories, err
+	qs1 := o.QueryTable("label")
+	_, err = qs1.All(&labels)
+	return categories, labels, err
 }
 
 //由用户名取得分类：项目
@@ -1608,4 +1611,24 @@ func GetCategoryUrl(id string) (url, diskdirectory string, err error) {
 		}
 	}
 	return url, diskdirectory, err
+}
+
+func SearchCategories(categoryname string, isDesc bool) ([]*Category, []*Label, error) {
+	o := orm.NewOrm()
+	categories := make([]*Category, 0)
+	qs := o.QueryTable("category")
+	qs1 := o.QueryTable("label")
+	var err error
+	if isDesc {
+		if len(categoryname) > 0 {
+			qs = qs.Filter("Title__contains", categoryname) //这里取回
+		}
+		_, err = qs.OrderBy("-created").All(&categories)
+	} else {
+		_, err = qs.Filter("Title__contains", categoryname).OrderBy("-created").All(&categories)
+		//o.QueryTable("user").Filter("name", "slene").All(&users)
+	}
+	labels := make([]*Label, 0)
+	_, err = qs1.All(&labels)
+	return categories, labels, err
 }

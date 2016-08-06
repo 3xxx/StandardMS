@@ -252,6 +252,7 @@ func (c *TopicController) AddTopic() { //这个是否作废？？
 	// c.Redirect("/topic", 302)
 }
 
+//这个作废
 func (c *TopicController) Topic_many_add() { //一对多模式
 	//解析表单
 	tid := c.Input().Get("tid") //教程里漏了这句，导致修改总是变成添加文章
@@ -343,6 +344,7 @@ func (c *TopicController) Topic_many_add() { //一对多模式
 	// c.Redirect("/topic", 302)
 }
 
+//这个作废
 func (c *TopicController) Topic_one_add() { //一对一模式
 	//解析表单
 	tid := c.Input().Get("tid") //教程里漏了这句，导致修改总是变成添加文章
@@ -576,9 +578,11 @@ func (c *TopicController) Topic_many_addbaidu() { //一对多模式
 		filesize, _ = FileSize(path)
 		filesize = filesize / 1000.0
 	}
+	//下面这个没用，一对多肯定会输入编号和名称的
 	if title == "" || tnumber == "" {
 		//将附件的编号和名称写入数据库
-		filename1, filename2 := SubStrings(attachment)
+		_, filename1, filename2, _, _, _, _ := Record(attachment)
+		// filename1, filename2 := SubStrings(attachment)
 		if filename1 == "" {
 			filename1 = filename2 //如果编号为空，则用文件名代替，否则多个编号为空导致存入数据库唯一性检查错误
 		}
@@ -633,7 +637,7 @@ func (c *TopicController) Topic_one_addbaidu() { //一对一模式
 	category := c.Input().Get("category")
 	// beego.Info(category)
 	categoryid := c.Input().Get("categoryid")
-	beego.Info(categoryid)
+	// beego.Info(categoryid)
 	//获取文件保存路径，有了categoryid可以求出整个路径
 	//取得成果类型id的专业parentid以及阶段parentid以及项目parentid才行
 	// categoryproj, err := models.GetCategoryProj(categoryid)
@@ -678,7 +682,8 @@ func (c *TopicController) Topic_one_addbaidu() { //一对一模式
 	}
 	if title == "" || tnumber == "" {
 		//将附件的编号和名称写入数据库
-		filename1, filename2 := SubStrings(attachment)
+		_, filename1, filename2, _, _, _, _ := Record(attachment)
+		// filename1, filename2 := SubStrings(attachment)
 		//当2个文件都取不到filename1的时候，数据库里的tnumber的唯一性检查出错。
 		// beego.Info(filename1)
 		// beego.Info(filename2)
@@ -1277,6 +1282,7 @@ func (c *TopicController) ViewDiary1() {
 	c.Data["IsLogin"] = checkAccount(c.Ctx)
 }
 
+//修改文章页面
 func (c *TopicController) Modify() { //这个也要登陆验证
 	tid := c.Input().Get("tid")
 
@@ -1335,6 +1341,7 @@ func (c *TopicController) Modify() { //这个也要登陆验证
 	c.Data["TopicChengguo"] = topicchengguo
 }
 
+//提交文章修改
 func (c *TopicController) ModifyTopic() { //一对多模式,向文章中追加附件
 	//解析表单
 	tid := c.Input().Get("tid") //教程里漏了这句，导致修改总是变成添加文章
@@ -1764,9 +1771,23 @@ func (c *TopicController) ListAllPosts() {
 	if err != nil {
 		beego.Error(err)
 	}
+	//这里根据上面取得的分页topics，取出这页的成果对应的所有项目
+	// slice1 := make([]models.Category, 0)
+	// for _, v := range topics {
+	// 	tid := strconv.FormatInt(v.Id, 10)
+	// 	category, err := models.GetTopicProj(tid)
+	// 	if err != nil {
+	// 		beego.Error(err)
+	// 	}
+	// beego.Info(category.Title)
+	// 	aa := make([]models.Category, 1)
+	// 	aa[0].Author = category.Title//这句出错，不知何故runtime error: invalid memory address or nil pointer dereference
+	// 	slice1 = append(slice1, aa...)
+	// }
+	// c.Data["Categories"] = slice1
 	c.Data["Topics"] = topics
-	c.Data["paginator"] = paginator
 
+	c.Data["paginator"] = paginator
 	logs := logs.NewLogger(1000)
 	logs.SetLogger("file", `{"filename":"log/test.log"}`)
 	logs.EnableFuncCallDepth(true)

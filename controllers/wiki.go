@@ -93,7 +93,7 @@ func (c *WikiController) Add() { //参考下面的 modify,这个add是wiki/add
 	var uname string
 	//2.如果登录或ip在允许范围内，进行访问权限检查
 	uname, role, _ := checkRoleread(c.Ctx) //login里的,这里故意用read
-	beego.Info(role)
+	// beego.Info(role)
 	rolename, _ = strconv.Atoi(role)
 	c.Data["Uname"] = uname
 
@@ -108,20 +108,6 @@ func (c *WikiController) Add() { //参考下面的 modify,这个add是wiki/add
 	c.Data["IsLogin"] = checkAccount(c.Ctx)
 	c.Data["IsWiki"] = true
 	c.TplName = "wiki_add.tpl"
-}
-
-func (c *WikiController) Post() { //这个post属于wiki_modify.html提交修改。
-	//解析表单
-	tid := c.Input().Get("tid") //教程里漏了这句，导致修改总是变成添加文章
-	title := c.Input().Get("title")
-	//其实这里只修改title, tnumber,和content
-	content := c.Input().Get("editorValue")
-	err := models.ModifyWiki(tid, title, content)
-	// }
-	if err != nil {
-		beego.Error(err)
-	}
-	c.Redirect("/wiki/view/"+tid, 302) //回到修改后的文章
 }
 
 //这个提交添加wiki的方法
@@ -331,8 +317,10 @@ func (c *WikiController) View() {
 	logs.Close()
 }
 
+//修改wiki页面
 func (c *WikiController) Modify() { //这个也要登陆验证
 	tid := c.Input().Get("tid")
+	beego.Info(tid)
 	//2.取得文章的作者
 	wiki, err := models.GetWiki(tid)
 	if err != nil {
@@ -362,8 +350,24 @@ func (c *WikiController) Modify() { //这个也要登陆验证
 	c.Data["IsWiki"] = true
 }
 
+func (c *WikiController) Post() { //这个post属于wiki_modify.html提交修改。
+	//解析表单
+	tid := c.Input().Get("tid") //教程里漏了这句，导致修改总是变成添加文章
+	title := c.Input().Get("title")
+	//其实这里只修改title, tnumber,和content
+	content := c.Input().Get("editorValue")
+	err := models.ModifyWiki(tid, title, content)
+	// }
+	if err != nil {
+		beego.Error(err)
+	}
+	c.Redirect("/wiki/view/"+tid, 302) //回到修改后的文章
+}
+
 //删除文章
 func (c *WikiController) Delete() { //应该显示警告
+	url := c.Input().Get("url")
+	c.Data["IsWiki"] = true
 	//2.取得文章的作者
 	wiki, err := models.GetWiki(c.Input().Get("tid"))
 	if err != nil {
@@ -376,6 +380,8 @@ func (c *WikiController) Delete() { //应该显示警告
 	//2.如果登录或ip在允许范围内，进行访问权限检查
 	uname, role, _ := checkRoleread(c.Ctx) //login里的
 	rolename, _ = strconv.Atoi(role)
+	// beego.Info(rolename)=5
+	// beego.Info(wiki.Author)=127.0.0.1
 	c.Data["Uname"] = uname
 	if rolename > 2 && uname != wiki.Author { //
 		// port := strconv.Itoa(c.Ctx.Input.Port())//c.Ctx.Input.Site() + ":" + port +
@@ -388,8 +394,11 @@ func (c *WikiController) Delete() { //应该显示警告
 	err = models.DeletWiki(c.Input().Get("tid")) //(c.Ctx.Input.Param("0"))
 	if err != nil {
 		beego.Error(err)
+	} else { //没有这个返回值，会出现错误提示。wsasend: An established connection was aborted by the software in your host machine
+		data := wiki.Title
+		c.Ctx.WriteString(data)
 	}
-	c.Redirect("/wiki", 302) //这里增加wiki
+	c.Redirect(url, 302) //这里增加wiki
 }
 
 //删除文章中的附件，保持页面不跳转怎么办？

@@ -11,13 +11,16 @@ import (
 	// "log"
 	// "math/rand"
 	// "os"
+	"github.com/astaxie/beego"
 	"path"
 	"regexp"
 	// "strconv"
+	// "fmt"
 	"strings"
 	// "time"
 )
 
+//分离图号图名
 func Record(filenameWithSuffix string) (Suffix, FileNumber, FileName, ProNumber, ProJiduan, ProLeixing, ProZhuanye string) {
 	FileSuffix := path.Ext(filenameWithSuffix) //只留下后缀名
 	LengthSuffix := len([]rune(FileSuffix))
@@ -39,8 +42,9 @@ func Record(filenameWithSuffix string) (Suffix, FileNumber, FileName, ProNumber,
 	r, _ := regexp.Compile(`[[:upper:]]{2}[0-9]+[[:upper:]\.0-9]+[-][0-9]+[-][0-9]+[\p{Han} \(\)\/~]`)
 	//这个结构体有很多方法。这里是类似我们前面看到的一个匹配测试。
 	// fmt.Println(r.MatchString(filenameOnly))
+	lengthname := len([]rune(filenameOnly))
 	if r.MatchString(filenameOnly) { //如果符合正则表达式
-		lengthname := len([]rune(filenameOnly))
+
 		// 查找连续2个的大写字母
 		// reg := regexp.MustCompile(`[[:upper:]]{2}`)
 		// fmt.Printf("大写字母%q\n", reg.FindAllString(filenameOnly, -1))
@@ -195,6 +199,37 @@ func Record(filenameWithSuffix string) (Suffix, FileNumber, FileName, ProNumber,
 			// }
 			//二级专业代码
 		}
+	} else { //2016-6-29增加，如果不符合表达式，比如：05水利科技.pdf
+		blankloc := UnicodeIndex(filenameOnly, " ") // 查找空格这个字符的位置
+		if blankloc == 0 {                          //如果没有空格,                                                   //如果没有空格，则用正则表达式获取编号
+			re, _ := regexp.Compile("[^a-zA-Z0-9-.~]") //应该用查找连续的数字
+			loc := re.FindStringIndex(filenameOnly)
+			if loc != nil { //如果有编号——如果没文件名？？？？？
+				FileNumber = SubString(filenameOnly, 0, loc[0])
+				// fmt.Println("文件编号：", FileNumber)
+				FileName = SubString(filenameOnly, loc[0], lengthname-loc[0])
+				// fmt.Println("文件名：", FileName)
+			} else { //如果没有编号
+				FileNumber = filenameOnly
+				// fmt.Println("文件编号：", FileNumber)
+				FileName = filenameOnly
+				// fmt.Println("文件名：", filenameOnly)
+			}
+		} else { //如果有空格
+			re, _ := regexp.Compile("[^a-zA-Z0-9-.~]")
+			loc := re.FindStringIndex(filenameOnly)
+			if loc != nil { //如果有编号
+				FileNumber = SubString(filenameOnly, 0, loc[0])
+				// fmt.Println("文件编号：", FileNumber)
+				FileName = SubString(filenameOnly, loc[0], lengthname-loc[0])
+				// fmt.Println("文件名：", FileName)
+			} else { //如果没有编号
+				FileNumber = filenameOnly
+				// fmt.Println("文件编号：", FileNumber)
+				FileName = filenameOnly
+				// fmt.Println("文件名：", filenameOnly)
+			}
+		}
 	}
 	return Suffix, FileNumber, FileName, ProNumber, ProJiduan, ProLeixing, ProZhuanye
 }
@@ -243,7 +278,7 @@ func SplitStandardName(filenameWithSuffix string) (Category, Categoryname, FileN
 		FileNumber = SubString(filenameOnly, kongge+1, jianhao-kongge-1)
 		// fmt.Printf("%q\n", FileNumber)
 		//获取分类
-		Categoryname = SubString(filenameOnly, 0, kongge-1)
+		Categoryname = SubString(filenameOnly, 0, kongge) //2016-7-16将kongge-1改为kongge
 		Category = SubString(filenameOnly, 0, 2)
 		switch Category {
 		case "GB":
@@ -334,9 +369,9 @@ func SplitStandardName(filenameWithSuffix string) (Category, Categoryname, FileN
 			//		reg = regexp.MustCompile(`[\P{Han}]+`)
 			// FileNumber = FileNumber
 			lengthNumber := len([]rune(FileNumber))
-			FileName = SubString(filenameOnly, lengthNumber+1, lengthname)
+			FileName = SubString(filenameOnly, lengthNumber, lengthname)
 		} else { //有空格
-			FileNumber = SubString(filenameOnly, 0, blankloc-1)
+			FileNumber = SubString(filenameOnly, 0, blankloc)
 			FileName = SubString(filenameOnly, blankloc+1, lengthname)
 		}
 		Category = "Atlas"
@@ -346,6 +381,7 @@ func SplitStandardName(filenameWithSuffix string) (Category, Categoryname, FileN
 }
 
 //分离上面结果中FileNumber的分类GB和编号50268
+//用于搜索
 func SplitStandardFileNumber(filenumber string) (Category, Categoryname, Number string) {
 	r, _ := regexp.Compile(`[a-zA-Z]+\s[0-9A-Za-z\.]+[-][0-9]+`)
 	if r.MatchString(filenumber) { //如果符合正则表达式
@@ -421,6 +457,8 @@ func SplitStandardFileNumber(filenumber string) (Category, Categoryname, Number 
 	return Category, Categoryname, Number
 }
 
+//下面这个没什么用了吧，用record代替
+//对于01水电院企业标准.pdf如何办呢，所以最简单是取得第一个汉字的位置即可
 func SubStrings(filenameWithSuffix string) (substr1, substr2 string) {
 	fileSuffix := path.Ext(filenameWithSuffix) //只留下后缀名
 	//	fmt.Println("fileSuffix=", fileSuffix)     //fileSuffix= .go
@@ -438,10 +476,11 @@ func SubStrings(filenameWithSuffix string) (substr1, substr2 string) {
 		re, _ := regexp.Compile("[^a-zA-Z0-9-~]") //2016-1-11日拟修改DZ122D.5-10-15~15.dwg
 		loc := re.FindStringIndex(filenameOnly)
 		// fmt.Println(str[loc[0]:loc[1]])
-		// fmt.Println(loc[0])
+		beego.Info(loc[0])
 		if loc != nil {
 			end = loc[0]
 			fulleFilename1 = SubString(filenameOnly, 0, end)
+			beego.Info(fulleFilename1)
 			end = end - 1
 		} else {
 			fulleFilename1 = filenameOnly

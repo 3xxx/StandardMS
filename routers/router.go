@@ -80,7 +80,10 @@ func init() {
 	beego.Router("/login", &controllers.LoginController{})
 	beego.Router("/loginerr", &controllers.LoginController{}, "get:Loginerr")
 	//导航栏本地搜索
-	beego.Router("/search", &controllers.SearchController{})
+	// beego.Router("/search", &controllers.SearchController{})——这个相当于get
+	beego.Router("/searchcategory", &controllers.SearchController{}, "get:SearchCategory")
+	beego.Router("/searchproduction", &controllers.SearchController{}, "get:SearchProduction")
+	beego.Router("/searchwiki", &controllers.SearchController{}, "get:SearchWiki")
 	//水利院本地搜索
 	beego.Router("/searchlocal", &controllers.SearchController{}, "post:Searchlocal")
 
@@ -112,6 +115,13 @@ func init() {
 
 	//添加项目第一步方法提交post 等等
 	beego.AutoRouter(&controllers.CategoryController{}) //这句代替上句也行
+	//ui用
+	beego.Router("/categoryui", &controllers.CategoryController{}, "get:CategoryUi")
+	//ui取得侧栏
+	beego.Router("/categoryviewui", &controllers.CategoryController{}, "get:CategoryViewUi")
+	beego.Router("/categoryview1ui", &controllers.CategoryController{}, "get:CategoryView1Ui")
+	beego.Router("/categoryview2ui", &controllers.CategoryController{}, "get:CategoryView2Ui")
+
 	//显示项目中所有成果
 	beego.Router("/category/view", &controllers.CategoryController{}, "get:View")
 	beego.Router("/category/viewbrief", &controllers.CategoryController{}, "get:ViewBrief")
@@ -134,6 +144,10 @@ func init() {
 	beego.Router("/wiki/addwiki", &controllers.WikiController{}, "post:AddWiki")
 	//查看一个文章
 	beego.Router("/wiki/view/", &controllers.WikiController{}, "get:View")
+	//删除wiki
+	beego.Router("/wiki/delete", &controllers.WikiController{}, "post:Delete")
+	//修改一个文章
+	// beego.Router("/wiki/modify", &controllers.WikiController{}, "get:Modify")
 	beego.AutoRouter(&controllers.WikiController{})
 
 	//分页后修改成以下形式
@@ -202,6 +216,9 @@ func init() {
 	beego.Router("/standard/standard_one_addbaidu", &controllers.StandardController{}, "post:Standard_one_addbaidu")
 	beego.Router("/standard/importlibrary", &controllers.StandardController{}, "post:ImportLibrary")
 
+	beego.Router("/legislation", &controllers.LegislationController{}, "*:Index")
+	beego.Router("/legislation/checklist", &controllers.LegislationController{}, "*:Checklist")
+
 	//app.conf中要设置DirectoryIndex = true是否开启静态目录的列表显示，默认不显示目录，返回 403 错误
 	beego.SetStaticPath("/m", "models")
 	beego.SetStaticPath("/v", "views")
@@ -213,6 +230,7 @@ func init() {
 	// 作为静态文件：beego.SetStaticPath("/attachment", "attachment")
 	//beego.Router("/attachment/:all", &controllers.AttachController{})
 	beego.Router("/attachment/*", &controllers.AttachController{})
+	beego.SetStaticPath("/attachment/wiki", "attachment/wiki")
 	// *全匹配方式 //匹配 /download/ceshi/file/api.json :splat=file/api.json
 
 }

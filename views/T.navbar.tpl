@@ -30,13 +30,32 @@
       <li {{if .IsStandard}}class="active"{{end}}>
         <a href="/standard">规范</a>
       </li>
+      <li {{if .IsLegis}}class="active"{{end}}>
+        <a href="/legislation">对标</a>
+      </li>
     </ul>
 
-    <form class="navbar-form navbar-left" role="search" method="get" action="/search">
+{{if .IsCategory}}
+    <form class="navbar-form navbar-left" role="search" method="get" action="/searchcategory">
       <div class="form-group">
-        <input id="tuming" type="text" class="form-control"  class="search-query span2" placeholder="Search local" name="tuming"></div>
+        <input id="category" type="text" class="form-control"  class="search-query span2" placeholder="Search Project" name="categoryname"></div>
       <button type="submit" class="btn btn-default">Submit</button>
     </form>
+{{end}}    
+{{if .IsTopic}}
+    <form class="navbar-form navbar-left" role="search" method="get" action="/searchproduction">
+      <div class="form-group">
+        <input id="production" type="text" class="form-control"  class="search-query span2" placeholder="Search Production" name="topic"></div>
+      <button type="submit" class="btn btn-default">Submit</button>
+    </form>
+{{end}}
+{{if .IsWiki}}
+    <form class="navbar-form navbar-left" role="search" method="get" action="/searchwiki">
+      <div class="form-group">
+        <input id="wiki" type="text" class="form-control"  class="search-query span2" placeholder="Search Wiki" name="wikiname"></div>
+      <button type="submit" class="btn btn-default">Submit</button>
+    </form>
+{{end}}
 
     <div class="pull-right">
       <ul class="nav navbar-nav">

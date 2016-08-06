@@ -322,7 +322,7 @@ func (c *StandardController) Standard_one_addbaidu() { //一对一模式
 		standard.Title = fileName
 	}
 	//这里增加Category
-	standard.Category = category
+	standard.Category = categoryname //2016-7-16这里改为GBT这种，空格前的名字
 	standard.Created = time.Now()
 	standard.Updated = time.Now()
 	standard.Route = "/attachment/standard/" + category + "/" + h.Filename

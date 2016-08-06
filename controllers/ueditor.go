@@ -128,7 +128,7 @@ func (c *UeditorController) ControllerUE() {
 			// content := c.Input().Get("content")
 			// category := c.Input().Get("category")
 			categoryid := c.Input().Get("categoryid")
-			beego.Info(categoryid)
+			// beego.Info(categoryid)
 			//保存上传的图片
 			_, h, err := c.GetFile("upfile")
 			if err != nil {
@@ -159,7 +159,7 @@ func (c *UeditorController) ControllerUE() {
 			}
 			filesize, _ = FileSize(path1)
 			filesize = filesize / 1000.0
-			c.Data["json"] = map[string]interface{}{"state": "SUCCESS", "url": url + newname, "title": newname, "original": newname}
+			c.Data["json"] = map[string]interface{}{"state": "SUCCESS", "url": url + newname, "title": newname, "original": h.Filename}
 			c.ServeJSON()
 		case "wiki": //添加wiki
 			// title := c.Input().Get("title")
@@ -200,7 +200,7 @@ func (c *UeditorController) ControllerUE() {
 			}
 			filesize, _ = FileSize(path1)
 			filesize = filesize / 1000.0
-			c.Data["json"] = map[string]interface{}{"state": "SUCCESS", "url": Url + newname, "title": newname, "original": newname}
+			c.Data["json"] = map[string]interface{}{"state": "SUCCESS", "url": Url + newname, "title": h.Filename, "original": h.Filename}
 			c.ServeJSON()
 		default: //添加封面、简介
 			number := c.Input().Get("number")

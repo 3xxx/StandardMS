@@ -134,7 +134,7 @@ func (c *SpiderController) GetSpider() {
 	c.Data["SpiderCategory"] = spidercategory
 }
 
-//解析jason里的数组……得到ip地址后传给creatspider
+//解析json里的数组……得到ip地址后传给creatspider
 func TestJsonStartsWithArray() {
 	// beego.Info("err!")
 	jsonconf, err := config.NewConfig("json", "./conf/testjsonWithArray.conf")

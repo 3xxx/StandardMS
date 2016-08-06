@@ -102,15 +102,16 @@ func DeletWiki(tid string) error { //应该在controllers中显示警告
 			return err
 		}
 	}
-	attachment := Attachment{TopicId: tidNum}
-	if o.Read(&attachment, "WikiId") == nil {
-		// oldCate = wiki.Category
-		_, err = o.Delete(&attachment)
-		if err != nil {
-			return err
-		}
-	}
-	_, err = o.Delete(&wiki) //这句为何重复？
+
+	// attachment := Attachment{TopicId: tidNum}
+	// if o.Read(&attachment, "WikiId") == nil {
+	// oldCate = wiki.Category
+	// _, err = o.Delete(&attachment)
+	// if err != nil {
+	// return err
+	// }
+	// }
+	// _, err = o.Delete(&wiki) //这句为何重复？
 	return err
 }
 

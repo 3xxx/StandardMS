@@ -68,7 +68,7 @@ func (c *AttachController) Get() {
 			c.Redirect("/roleerr?url="+route, 302)
 			return
 		}
-	case ".pdf":
+	case ".pdf", ".mp4":
 		//2.如果登录或ip在允许范围内，进行访问权限检查
 		uname, role, _ := checkRoleread(c.Ctx) //login里的
 		rolename, _ = strconv.Atoi(role)

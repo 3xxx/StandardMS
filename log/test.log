@@ -646,3 +646,6 @@
 2016/05/21 22:13:29 [topic.go:1746][I] 127.0.0.1 ListAllTopic
 2016/05/21 22:13:30 [default.go:102][I] 127.0.0.1
 2016/05/21 22:14:05 [default.go:102][I] 127.0.0.1
+2016/07/07 19:31:11 [topic.go:1794][I] 127.0.0.1 ListAllTopic
+2016/07/07 19:31:14 [category.go:411][I] 127.0.0.1 ViewCategory
+2016/07/07 19:31:16 [category.go:242][I] 127.0.0.1 ViewCategory 秦工的设计笔记
