@@ -3,11 +3,11 @@ package controllers
 import (
 	// "fmt"
 	"github.com/astaxie/beego"
+	"hydrocms/models"
 	"io"
 	"net/url"
 	"os"
 	"path"
-	"quick/models"
 	"strconv"
 	// "strings"
 )

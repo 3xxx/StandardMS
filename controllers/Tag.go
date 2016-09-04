@@ -5,7 +5,7 @@ import (
 	"encoding/hex"
 	"github.com/astaxie/beego"
 	"github.com/tealeg/xlsx"
-	m "quick/models"
+	m "hydrocms/models"
 	"strconv"
 	"time"
 )

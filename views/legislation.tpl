@@ -3,9 +3,15 @@
 <title>首页 - 水利设计CMS系统</title>
 
 <head>
+    <!-- <meta charset="UTF-8"> -->
     <link href="/static/youdao/g3.css" rel="stylesheet" type="text/css">
     <link href="/static/youdao/fanyi.css" rel="stylesheet" type="text/css">
     <script type="text/javascript" src="/static/js/jquery-2.1.3.min.js"></script>
+        
+    <!-- <meta name="viewport" content="width=device-width, initial-scale=1"> -->
+    <!-- <meta http-equiv="X-UA-Compatible" content="IE=edge"> -->
+    <!-- <script src="/static/js/respond.min.js"></script> -->
+    <!-- <script src="/static/js/html5shiv.min.js"></script> -->
 </head>
 
 <body class="open result-default">
@@ -31,7 +37,7 @@
                                 </div>
                             </div>
                             <div class="row border content" id="inputContent">
-                                <textarea id="inputText" class="text" dir="ltr" tabindex="1" wrap="SOFT" name="name" placeholder="请输入要对标的内容，一行一条，《法规名称》"></textarea>
+                                <textarea id="inputText" class="text" dir="ltr" tabindex="1" wrap="SOFT" name="name" placeholder="将报告中的法规复制粘贴到这里，一行一条，《法规名称必须放在书名号中》；自动记录未查询到的法规，以便改进。致谢：ZLP,YGL,LXH,ZCW,JSL,YM……"></textarea>
                                 <!-- <div class="typo-suggest" style="display: none;">
                                     您是不是要翻译：
                                     <a class="spell-corrected" href="/#"></a>
@@ -86,13 +92,13 @@
                             <div class="row desc">
 
                                 <div id="selectorSwitcher" class="selector-sprite selector-enable" style="display: block;">
-                                    <span id="selectorStatus">划词</span>
+                                    <span id="selectorStatus">显示执行日期</span>
                                 </div>
-
+                                
                                 <div class="read-mode" id="compareMode" style="display: block;">
                                     <label class="compare-mode compare-disable" for="compare">
-                                        <input id="compare" name="compare" class="clog-js" type="checkbox" data-clog="COMPARE_CLICK" data-pos="web.o.righttop">
-                                        <span class="compare-message">双语对照</span>
+                                        <input id="compare" name="compare"  type="checkbox"><!-- class="clog-js" data-clog="COMPARE_CLICK" data-pos="web.o.righttop" -->
+                                        <span class="compare-message">法规显示大会通过</span>
                                     </label>
 
                                 </div>
@@ -112,6 +118,7 @@
                                             <em></em>
                                             <span></span>
                                         </div>
+
                                         <span class="copy-notice">复制</span>
                                     </div>
                                     <a class="actions copyIt-js">
@@ -144,16 +151,16 @@
 <div id="c_footer">
     <a href="/about.html">关于对标</a>
     <span class="c_fnl">|</span>
-    <a href="/openapi">对标API</a>
+    <a href="/">HydroCMS首页</a>
     <span class="c_fnl">|</span>
-    <a href="/copyright">HydroCMS首页</a>
+    <a href="/category">HydroCMS项目</a>
     <span class="c_fnl">|</span>
-    <a href="/">CMS智选</a>
+    <a href="/topic">HydroCMS成果</a>
     <span class="c_fnl">|</span>
-    <a href="/about/index.html">关于HydroCMS</a>
+    <a href="/standard">HydroCMS规范</a>
     <span class="c_fnl">|</span>
-    <a href="/">官方博客</a>
-    <p class="c_fcopyright">© 2016 3xxx QQ504284</p>
+    <a href="https://github.com/3xxx">源码托管</a>
+    <p class="c_fcopyright">© 2016 <a href="https://github.com/3xxx" target="_blank" rel="nofollow">3xxx</a> QQ504284</p>
 </div>
 
 <script type="text/javascript">

@@ -2,7 +2,7 @@ package controllers
 
 import (
 	"github.com/astaxie/beego"
-	"quick/models"
+	"hydrocms/models"
 )
 
 type ReplyController struct {

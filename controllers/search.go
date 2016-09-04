@@ -3,7 +3,7 @@ package controllers
 import (
 	"github.com/astaxie/beego"
 	// "path"
-	"quick/models"
+	"hydrocms/models"
 )
 
 type SearchController struct {
@@ -77,7 +77,8 @@ func (c *SearchController) SearchWiki() { //search用的是get方法
 	}
 }
 
-//水利设计院本地搜索
+//水利设计院本地搜索，实际上就是搜索本地topic成果名称
+//这个已经作废，用下面代替。
 func (c *SearchController) Searchlocal() { //search用的是get方法
 	tid := c.Input().Get("name")
 	c.Data["IsSearch"] = true
@@ -92,6 +93,39 @@ func (c *SearchController) Searchlocal() { //search用的是get方法
 		c.ServeJSON()
 	}
 
+	//var err error
+	//	c.Data["Search"], err = models.GetAllSearchs()
+	//	if err != nil {
+	//		beego.Error(err)
+	//	}
+}
+
+//水利设计院本地和全局搜索，实际上就是搜索spider数据库
+func (c *SearchController) Searchspider() { //search用的是get方法
+	tid := c.Input().Get("name")
+	c.Data["IsSearch"] = true
+	c.Data["IsLogin"] = checkAccount(c.Ctx)
+	// c.TplName = "search.tpl"
+	radio := c.Input().Get("radiostring")
+	if radio == "local" {
+		Searchs, err := models.SearchTopics(tid, false) //这里也应该像下面一样包含搜索项目
+		if err != nil {
+			beego.Error(err.Error)
+		} else {
+			// c.Data["Searchs"] = Searchs
+			c.Data["json"] = Searchs //这里必须要是c.Data["json"]，其他c.Data["Data"]不行
+			c.ServeJSON()
+		}
+	} else {
+		Searchs, _, err := models.Searchspidertopics(tid, false)
+		if err != nil {
+			beego.Error(err.Error)
+		} else {
+			// c.Data["Searchs"] = Searchs
+			c.Data["json"] = Searchs //这里必须要是c.Data["json"]，其他c.Data["Data"]不行
+			c.ServeJSON()
+		}
+	}
 	//var err error
 	//	c.Data["Search"], err = models.GetAllSearchs()
 	//	if err != nil {

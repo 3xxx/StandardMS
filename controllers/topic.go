@@ -6,10 +6,10 @@ import (
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/utils/pagination"
 	"github.com/tealeg/xlsx"
+	"hydrocms/models"
 	"os"
 	"path"
 	"path/filepath"
-	"quick/models"
 	// "regexp"
 	"strconv"
 	"strings"
@@ -1442,7 +1442,7 @@ func (c *TopicController) Delete() { //应该显示警告
 	var rolename int
 	var uname string
 	//2.如果登录或ip在允许范围内，进行访问权限检查
-	uname, role, _ := checkRoleread(c.Ctx) //login里的
+	uname, role, _ := checkRolewrite(c.Ctx) //login里的
 	if role != "0" {
 		rolename, _ = strconv.Atoi(role)
 		c.Data["Uname"] = uname

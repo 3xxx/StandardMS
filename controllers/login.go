@@ -7,7 +7,7 @@ import (
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/context"
 	// "net/url"
-	"quick/models"
+	"hydrocms/models"
 	"strconv"
 	// "github.com/astaxie/beego/session"
 )

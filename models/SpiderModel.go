@@ -12,7 +12,7 @@ import (
 	// . "github.com/beego/admin/src/lib"
 )
 
-//成果表
+//成果表//这个是测试用，已经作废
 type Spider struct {
 	Id       int64
 	Number   string
@@ -153,7 +153,7 @@ func AddSpiderTopic(number, name, link, username, userip string) (id int64, err 
 	return id, err
 }
 
-//缺少排序，由项目名称获取项目下所有成果，如果没有项目名称，则获取所有成果
+//缺少排序，获取所有成果
 func GetSpiderTopic() ([]*Spidertopic, error) {
 	o := orm.NewOrm()
 	spidertopic := make([]*Spidertopic, 0)
@@ -163,6 +163,7 @@ func GetSpiderTopic() ([]*Spidertopic, error) {
 	return spidertopic, err
 }
 
+//获取所有项目
 func GetSpiderCategory() ([]*Spidercategory, error) {
 	o := orm.NewOrm()
 	spidercategory := make([]*Spidercategory, 0)
@@ -173,4 +174,35 @@ func GetSpiderCategory() ([]*Spidercategory, error) {
 	_, err = qs.OrderBy("-created").All(&spidercategory)
 	// _, err := qs.All(&cates)
 	return spidercategory, err
+}
+
+//设计院首页全局搜索
+func Searchspidertopics(title string, isDesc bool) ([]*Spidertopic, []*Spidercategory, error) {
+	o := orm.NewOrm()
+	spidertopics := make([]*Spidertopic, 0)
+	spidercategories := make([]*Spidercategory, 0)
+	// spidercategories := make([]*Spidercategory, 0)
+	qs := o.QueryTable("spidertopic")
+	var err error
+	if isDesc {
+		if len(title) > 0 {
+			qs = qs.Filter("Name__contains", title) //这里取回
+		}
+		_, err = qs.OrderBy("-created").All(&spidertopics)
+	} else {
+		_, err = qs.Filter("Name__contains", title).OrderBy("-created").All(&spidertopics)
+		//o.QueryTable("user").Filter("name", "slene").All(&users)
+	}
+	qs1 := o.QueryTable("spidercategory")
+	if isDesc {
+		if len(title) > 0 {
+			qs1 = qs1.Filter("Name__contains", title) //这里取回
+		}
+		_, err = qs1.OrderBy("-created").All(&spidercategories)
+	} else {
+		_, err = qs1.Filter("Name__contains", title).OrderBy("-created").All(&spidercategories)
+		//o.QueryTable("user").Filter("name", "slene").All(&users)
+	}
+
+	return spidertopics, spidercategories, err
 }

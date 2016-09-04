@@ -3,7 +3,7 @@ package routers
 import (
 	"github.com/astaxie/beego"
 	// "github.com/beego/admin" //admin 包
-	"quick/controllers"
+	"hydrocms/controllers"
 )
 
 func init() {
@@ -84,10 +84,15 @@ func init() {
 	beego.Router("/searchcategory", &controllers.SearchController{}, "get:SearchCategory")
 	beego.Router("/searchproduction", &controllers.SearchController{}, "get:SearchProduction")
 	beego.Router("/searchwiki", &controllers.SearchController{}, "get:SearchWiki")
-	//水利院本地搜索
+	//水利院本地搜索,这个已经作废，用下面代替
 	beego.Router("/searchlocal", &controllers.SearchController{}, "post:Searchlocal")
+	//水利院本地和全局搜索
+	beego.Router("/searchspider", &controllers.SearchController{}, "post:Searchspider")
 
 	beego.Router("/category", &controllers.CategoryController{}) //相当于get
+	//这个给爬虫用，取得所有项目
+	beego.Router("/category/getallcategory", &controllers.CategoryController{}, "get:Getallcategory")
+
 	//删除一个项目
 	beego.Router("/category/delete", &controllers.CategoryController{}, "post:Delete")
 	//添加项目视图第一步
@@ -202,8 +207,8 @@ func init() {
 
 	beego.Router("/role/AddAndEdit", &controllers.RoleController{}, "*:AddAndEdit")
 	beego.Router("/role/DelRole", &controllers.RoleController{}, "*:DelRole")
-	beego.Router("/role/AccessToNode", &controllers.RoleController{}, "*:AccessToNode")
-	beego.Router("/role/AddAccess", &controllers.RoleController{}, "*:AddAccess")
+	// beego.Router("/role/AccessToNode", &controllers.RoleController{}, "*:AccessToNode")
+	// beego.Router("/role/AddAccess", &controllers.RoleController{}, "*:AddAccess")
 	beego.Router("/role/RoleToUserList", &controllers.RoleController{}, "*:RoleToUserList")
 	beego.Router("/role/AddRoleToUser", &controllers.RoleController{}, "*:AddRoleToUser")
 	beego.Router("/role/Getlist", &controllers.RoleController{}, "*:Getlist")

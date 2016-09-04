@@ -12,7 +12,7 @@ import (
 	// "fmt"
 	// "net"
 	// "os"
-	// m "quick/models"
+	// m "hydrocms/models"
 	// "regexp"
 	"strconv"
 	// "strings"

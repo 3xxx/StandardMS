@@ -1,3 +1,4 @@
+<!-- 设计院首页 -->
 <!DOCTYPE html>
 {{template "header"}}
 <title>项目&成果 - 水利设计CMS系统</title>
@@ -56,11 +57,11 @@ ul.nav li ul{float:left;margin:0;padding:0;}*/
 <div class="text-center">
   <h1 > <i class="glyphicon glyphicon-chevron-right"></i> <i class="glyphicon glyphicon-minus"></i>
   </h1>
-  <h1 >搜索888个 文件</h1>
+  <h1 >搜索{{.Length}}个 文件</h1>
   <p class="large">
-    HydroCMS 是一个微服务系统，您可以在自己电脑上运行HydroCMS，像本站这样发布资料，还可以将资料打包共享。
+    HydroCMS 是一个微服务系统，您可以在自己电脑上运行HydroCMS，管理和发布资料，方便知识的继承。
   </p>
-  <p class="large">在任何一个 HydroCMS 上可搜索到局域网上所有资源，最终组成一个交织的文档体系。</p>
+  <p class="large">在任何一个 HydroCMS 上可搜索到局域网上所有资源，最终组成一个交织的设计资源体系。</p>
 
   <div class="col-lg-4">
 </div>
@@ -96,8 +97,8 @@ ul.nav li ul{float:left;margin:0;padding:0;}*/
               <th >编号</th>
               <th >名称</th>
               <th>链接</th>
-              <th>分类</th>
-              <th>上传者</th>
+              <th>分类/Ip</th>
+              <th>上传者/主机</th>
             </tr>
           </thead>
           <tbody id="results">
@@ -223,41 +224,84 @@ ul.nav li ul{float:left;margin:0;padding:0;}*/
     //   <button type="submit" class="btn btn-default">Submit</button>
     // </form>
 
+    // 下面这个没用，仅为参考
+function update(){
+      var radio =$("input[type='radio']:checked").val();
+      var categoryName = $('#cname').val();
+      var parentid = $('#cid').val();
+      var categoryid = $('#categoryid').val();
+      // $('#myModal').on('hide.bs.modal', function () {  
+         if (categoryName)
+        {  
+            $.ajax({
+                type:"post",
+                url:"/category/userdefinedpostone",
+                data: {pid:parentid,cid:categoryid,title:categoryName,radiostring:radio},//父级id
+                success:function(data,status){
+                  alert("添加“"+data+"”成功！(status:"+status+".)");
+
+                 }
+            });  
+        } 
+        // $(function(){$('#myModal').modal('hide')}); 
+          $('#myModal').modal('hide');
+          // "/category/modifyfrm?cid="+cid
+          window.location.reload();//刷新页面
+  } 
+
 $(document).ready(function(){
-$("#search").click(function(){//这里应该用button的id来区分按钮的哪一个,因为本页有好几个button
-                $.ajax({
-                type:"post",//这里是否一定要用post，是的，因为get会缓存？？
-                url:"/searchlocal",
-                data: {name: $("#name").val()},
-                success:function(data,status){//数据提交成功时返回数据
-                  // alert(data);
-                  // alert(data[1].Uname);
-                  $.each(data,function(i,d){
-                    var tr=$("<tr></tr>");
-                    var th1=$('<th>' + data[i].Tnumber + '</th>');
-                    var th2=$('<th>' + data[i].Title + '</th>');
-                    var th3=$('<th><a href=/topic/view_b/' + data[i].Id + ' target="_black"><i                    class="glyphicon glyphicon-download-alt"></i>下载</a></th>');
-                    var th4=$('<th>' + data[i].Category + '</th>');
-                    var th5=$('<th>' + data[i].Author + '</th>');
-                    tr.append(th1);
-                    tr.append(th2);
-                    tr.append(th3);
-                    tr.append(th4);
-                    tr.append(th5);
-                    $("#results").append(tr);
-                    }); 
-                  }       
-            });
+  $("#search").click(function(){//这里应该用button的id来区分按钮的哪一个,因为本页有好几个button
+  var radio =$("input[type='radio']:checked").val();
+    $.ajax({
+        type:"post",//这里是否一定要用post，是的，因为get会缓存？？
+        url:"/searchspider",
+        data: {name: $("#name").val(),radiostring:radio},
+        success:function(data,status){//数据提交成功时返回数据
+          // alert(data);
+          // alert(data[1].Uname);
+          $.each(data,function(i,d){
+            if (radio=="local"){
+               var tr=$("<tr></tr>");
+               var th1=$('<th>' + data[i].Tnumber + '</th>');
+               var th2=$('<th>' + data[i].Title + '</th>');
+               var th3=$('<th><a href=/topic/view_b/' + data[i].Id + '    target="_black"><i class="glyphicon glyphicon-download-alt"></i>下载</a></th>');
+               var th4=$('<th>' + data[i].Category + '</th>');
+               var th5=$('<th>' + data[i].Author + '</th>');
+               tr.append(th1);
+               tr.append(th2);
+               tr.append(th3);
+               tr.append(th4);
+               tr.append(th5);
+               $("#results").append(tr);
+            }else{
+              var tr=$("<tr></tr>");
+               var th1=$('<th>' + data[i].Number + '</th>');
+               var th2=$('<th>' + data[i].Name + '</th>');
+               var th3=$('<th><a href=' + data[i].Link + ' target="_black"><i class="glyphicon glyphicon-download-alt"></i>'+data[i].Link+'</a></th>');
+               var th4=$('<th><a href=' + data[i].UserIp + ' target="_black">'+data[i].UserIp+'</a></th>');
+               var th5=$('<th>' + data[i].UserName + '</th>');
+               tr.append(th1);
+               tr.append(th2);
+               tr.append(th3);
+               tr.append(th4);
+               tr.append(th5);
+               $("#results").append(tr);
+            }
+          }); 
+        }       
+    });              
  });
 });
+
 function getKey()  
 {  
     if(event.keyCode==13){  
      // alert('click enter'); 
+     var radio =$("input[type='radio']:checked").val();
       $.ajax({
                 type:"post",//这里是否一定要用post？？？
-                url:"/searchlocal",
-                data: {name: $("#name").val()},
+                url:"/searchspider",
+                data: {name: $("#name").val(),radiostring:radio},
                 success:function(data,status){//数据提交成功时返回数据
                   // alert(data);
                   $.each(data,function(i,d){

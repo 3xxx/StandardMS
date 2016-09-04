@@ -56,7 +56,7 @@ color:#DC143C;
       <tr>
         <!--tr表格的行，td定义一个单元格，<th>
         标签定义表格内的表头单元格-->
-        <th>{{$index}}</th>
+        <th>{{$index|indexaddone}}</th>
         <th>
           <a href="/topic/view_b/{{.Id}}" id="number">{{substr .Tnumber 0 15}}</a>
         </th>

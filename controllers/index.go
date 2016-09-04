@@ -6,7 +6,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"github.com/astaxie/beego"
-	"quick/models"
+	"hydrocms/models"
 )
 
 type IndexController struct {

@@ -3,7 +3,7 @@ package controllers
 // import (
 // 	// m "github.com/beego/admin/src/models"
 // 	"github.com/astaxie/beego"
-// 	m "quick/models"
+// 	m "hydrocms/models"
 // )
 
 // type GroupController struct {

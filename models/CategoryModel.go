@@ -1621,11 +1621,11 @@ func SearchCategories(categoryname string, isDesc bool) ([]*Category, []*Label, 
 	var err error
 	if isDesc {
 		if len(categoryname) > 0 {
-			qs = qs.Filter("Title__contains", categoryname) //这里取回
+			qs = qs.Filter("Title__contains", categoryname).Filter("ParentId", 0) //这里取回
 		}
 		_, err = qs.OrderBy("-created").All(&categories)
 	} else {
-		_, err = qs.Filter("Title__contains", categoryname).OrderBy("-created").All(&categories)
+		_, err = qs.Filter("Title__contains", categoryname).Filter("ParentId", 0).OrderBy("-created").All(&categories)
 		//o.QueryTable("user").Filter("name", "slene").All(&users)
 	}
 	labels := make([]*Label, 0)

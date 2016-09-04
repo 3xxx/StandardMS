@@ -3,7 +3,8 @@ package controllers
 import (
 	"encoding/json"
 	"github.com/astaxie/beego"
-	"quick/models"
+	"github.com/astaxie/beego/logs"
+	"hydrocms/models"
 	"strconv"
 	"strings"
 	"time"
@@ -29,6 +30,11 @@ func (c *TaskController) Get() {
 		c.Data["Tasks1"] = tasks1
 		c.Data["Tasks2"] = tasks2
 	}
+	logs := logs.NewLogger(1000)
+	logs.SetLogger("file", `{"filename":"log/test.log"}`)
+	logs.EnableFuncCallDepth(true)
+	logs.Info(c.Ctx.Input.IP() + " " + "Viewtodo")
+	logs.Close()
 	// c.Render()
 }
 
@@ -80,9 +86,9 @@ func (c *TaskController) AddTask() {
 	array := strings.Split(daterange, " - ")
 	// for _, v := range array {
 	starttime1 := array[0]
-	beego.Info(array[0])
+	// beego.Info(array[0])
 	endtime1 := array[1]
-	beego.Info(array[1])
+	// beego.Info(array[1])
 	// }
 	// starttime1 := c.Input().Get("starttime")
 	// endtime1 := c.Input().Get("endtime")
@@ -107,14 +113,37 @@ func (c *TaskController) AddTask() {
 		beego.Error(err)
 	}
 	c.Redirect("/todo", 302)
+	logs := logs.NewLogger(1000)
+	logs.SetLogger("file", `{"filename":"log/test.log"}`)
+	logs.EnableFuncCallDepth(true)
+	logs.Info(c.Ctx.Input.IP() + " " + "addtask")
+	logs.Close()
 }
 
 func (c *TaskController) Delete() {
+
+	//2.如果登录或ip在允许范围内，进行访问权限检查
+	uname, role, _ := checkRolewrite(c.Ctx) //login里的
+	rolename, _ := strconv.Atoi(role)
+	c.Data["Uname"] = uname
+	if rolename > 2 { //
+		// port := strconv.Itoa(c.Ctx.Input.Port())//c.Ctx.Input.Site() + ":" + port +
+		route := c.Ctx.Request.URL.String()
+		c.Data["Url"] = route
+		c.Redirect("/roleerr?url="+route, 302)
+		// c.Redirect("/roleerr", 302)
+		return
+	}
 	err := models.DeleteTask(c.Input().Get("tid")) //(c.Ctx.Input.Param("0"))
 	if err != nil {
 		beego.Error(err)
 	}
 	c.Redirect("/todo", 302)
+	logs := logs.NewLogger(1000)
+	logs.SetLogger("file", `{"filename":"log/test.log"}`)
+	logs.EnableFuncCallDepth(true)
+	logs.Info(c.Ctx.Input.IP() + " " + "deletetask")
+	logs.Close()
 }
 func (c *TaskController) Update() {
 	err := models.UpdateTaskstate(c.Input().Get("tid"))

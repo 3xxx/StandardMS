@@ -6,7 +6,7 @@ import (
 	"github.com/astaxie/beego/logs"
 	"github.com/tealeg/xlsx"
 	// "io"
-	"quick/models"
+	"hydrocms/models"
 	"regexp"
 	"strconv"
 	"strings"
@@ -71,36 +71,62 @@ func (c *LegislationController) Index() { //
 
 //搜索规范或者图集的名称或编号
 func (c *LegislationController) Checklist() { //checklist用的是post方法
+	logs := logs.NewLogger(1000)
+	logs.SetLogger("file", `{"filename":"log/test.log"}`)
+	logs.EnableFuncCallDepth(true)
+
 	name := c.Input().Get("name")
-	beego.Info(name)
+	// beego.Info(name)
 	array := strings.Split(name, "\n")
 	aa := make([]Legislationmore, len(array))
 	for i, v := range array {
 		// beego.Info(v)
 		//1、正则取到名称
-		reg := regexp.MustCompile(`[《].*[》]`) //(`^\\<.*\\>`)
-		text2 := reg.FindAllString(v, -1)
-		text3 := SubString(text2[0], 1, len([]rune(text2[0]))-2)
-		//2、根据名称搜索标准版本库，取得名称和版本号
-		library, err := models.SearchLiabraryName(text3)
-		if err != nil {
-			beego.Error(err.Error)
-		}
-		text4 := strconv.Itoa(i + 1)
-		Id1, _ := strconv.ParseInt(text4, 10, 64)
-		aa[i].Id = Id1
+		if v != "" { //空行的处理
+			reg := regexp.MustCompile(`[《].*[》]`) //(`^\\<.*\\>`)
+			text2 := reg.FindAllString(v, -1)
+			// beego.Info(text2)
+			if text2 != nil { //无书名号的处理。因为text2是数组，所以要用nil进行判断，而不能用""。
+				text3 := SubString(text2[0], 1, len([]rune(text2[0]))-2)
+				//2、根据名称搜索标准版本库，取得名称和版本号
+				library, err := models.SearchLiabraryName(text3)
+				// beego.Info(library)
+				if err != nil {
+					beego.Error(err.Error)
+				}
+				text4 := strconv.Itoa(i + 1)
+				Id1, err := strconv.ParseInt(text4, 10, 64)
+				if err != nil {
+					beego.Error(err.Error)
+				}
+				aa[i].Id = Id1
 
-		if library != nil {
-			//3、构造struct
-			aa[i].LibraryNumber = library.LiNumber //规范有效版本库中的完整编号
-			aa[i].LibraryTitle = library.Title
-			aa[i].Execute = library.Execute //执行日期
-		} else {
-			// aa[i].Number = library.Number //`orm:"unique"`
-			// aa[i].Title = text3
-			aa[i].LibraryNumber = "No LibraryNumber Match Find!"
-			aa[i].LibraryTitle = text3
-			aa[i].Execute = ""
+				if len(library) != 0 { //library != nil这样不行，空数组不是nil
+					beego.Info(library)
+					//3、构造struct
+					for j, w := range library {
+						// beego.Info(w)
+						if j == 0 {
+							aa[i].LibraryNumber = w.LiNumber //规范有效版本库中的完整编号
+							aa[i].LibraryTitle = w.Title
+							aa[i].Execute = w.Execute //执行日期
+						} else {
+							aa[i].LibraryNumber = aa[i].LibraryNumber + "," + w.LiNumber //规范有效版本库中的完整编号
+							aa[i].LibraryTitle = w.Title
+							aa[i].Execute = aa[i].Execute + "," + w.Execute //执行日期
+						}
+					}
+				} else {
+					// beego.Info(library)
+					// aa[i].Number = library.Number //`orm:"unique"`
+					// aa[i].Title = text3
+					aa[i].LibraryNumber = "No LibraryNumber Match Find!"
+					aa[i].LibraryTitle = text3
+					aa[i].Execute = ""
+					logs.Info(c.Ctx.Input.IP() + " " + "No LibraryNumber:" + text3)
+					// beego.Info(aa[i])
+				}
+			}
 		}
 	}
 	c.Data["IsLegislation"] = true
@@ -176,9 +202,6 @@ func (c *LegislationController) Checklist() { //checklist用的是post方法
 	c.Data["json"] = aa //这里必须要是c.Data["json"]，其他c.Data["Data"]不行
 	c.ServeJSON()
 
-	logs := logs.NewLogger(1000)
-	logs.SetLogger("file", `{"filename":"log/test.log"}`)
-	logs.EnableFuncCallDepth(true)
 	logs.Info(c.Ctx.Input.IP() + " " + "SearchLegislationsName:" + name)
 	logs.Close()
 }

@@ -329,3 +329,28 @@ h1[id] {
     </script>
 </body>
 </html>
+
+<!-- 关于实现判断用户是在PC端和还是移动端访问。<script type="text/javascript">
+function uaredirect(f){  
+    try{if(  
+    document.getElementById("bdmark")!=null){  
+    return  
+    }  
+    var b=false;  
+    if(arguments[1]){  
+    var e=window.location.host;var a=window.location.href;  
+        if(isSubdomain(arguments[1],e)==1){  
+            f=f+"/#m/"+a;b=true}else{if(isSubdomain(arguments[1],e)==2){f=f+"/#m/"+a;b=true}  
+        else{f=a;b=false}}}  
+    else{b=true}if(b){var c=window.location.hash;  
+    if(!c.match("fromapp")){  
+    if((navigator.userAgent.match(/(iPhone|iPod|Android|ios|Windows Phone)/i))){location.replace(f)}
+  }
+}
+}
+catch(d)<br>{
+  <br>
+}
+<br>
+}
+</script> -->

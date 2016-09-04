@@ -4,15 +4,22 @@ import (
 	// "fmt"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
-	// "github.com/astaxie/beego/toolbox"
+	"github.com/astaxie/beego/toolbox"
 	// "github.com/beego/i18n"
+	"hydrocms/controllers"
+	_ "hydrocms/routers"
 	"os"
-	// "quick/controllers"
-	_ "quick/routers"
-	// "quick/models"
+	// "hydrocms/models"
 )
 
+//自定义模板函数，序号加1
+func Indexaddone(index int) (index1 int) {
+	index1 = index + 1
+	return
+}
+
 func main() {
+	beego.AddFuncMap("indexaddone", Indexaddone) //模板中使用{{indexaddone $index或.Content | hi}}
 	//开启orm调试模式
 	orm.Debug = true
 	//自动建表
@@ -29,20 +36,20 @@ func main() {
 	// 需要先注册一个模板函数
 	// beego.AddFuncMap("i18n", i18n.Tr)
 
-	// time := beego.AppConfig.String("spec") //"0/time * * * * *"
-	// time1 := "0/" + time + " * * * * *"
-	// time1 := "0 0 */" + time + " * * *"
-	// tk1 := toolbox.NewTask("tk1", time1, func() error { controllers.TestJsonStartsWithArray(); return nil }) //func() error { fmt.Println("tk1"); return nil }
-	// toolbox.AddTask("tk1", tk1)
-	// toolbox.StartTask()
-	// defer toolbox.StopTask()
-
+	if beego.AppConfig.String("spider") == "on" {
+		time := beego.AppConfig.String("spec") //"0/time * * * * *"
+		// time1 := "0/" + time + " * * * * *"
+		time1 := "0 0 */" + time + " * * *"
+		tk1 := toolbox.NewTask("tk1", time1, func() error { controllers.TestJsonStartsWithArray(); return nil }) //func() error { fmt.Println("tk1"); return nil }
+		toolbox.AddTask("tk1", tk1)
+		toolbox.StartTask()
+		defer toolbox.StopTask()
+	}
 	//启动beeego
 	beego.Run()
 }
 
 // spec 格式是参照 crontab 做的，详细的解释如下所示：
-
 //前6个字段分别表示：
 //       秒钟：0-59
 //       分钟：0-59
@@ -86,7 +93,6 @@ func main() {
 
 // 请问一下 map[string]string{"a":"apple", "b":"banana"}  这个 value 是什么类型
 // package main
-
 // import (
 // 	"encoding/json"
 // 	"flag"
@@ -101,13 +107,22 @@ func main() {
 // 	var m string
 // 	flag.StringVar(&m, "m", "", "map data")
 // 	flag.Parse()
-
 // 	jsonData := fmt.Sprintf("{\"data\":%s}", m)
 // 	jsonHolder := JsonHolder{}
 // 	json.Unmarshal([]byte(jsonData), &jsonHolder)
-
 // 	mp := jsonHolder.Data
-
 // 	fmt.Printf("%#v\n", mp)
+// }
 
+// Datetime := time.Now()  //假设当前时间为：2014-08-27 10:30:21
+// 按照某格式显示：
+// fmt.Println(Datetime..String()) //输出：2014-08-27 10:30:21.8645659 +0800 CST
+// fmt.Println(Datetime.Format("2006-01-0215:04:05")  )    //输出：2014-08-27 10:30:21
+// fmt.Println(Datetime.Format("2006-01-0215:04")  )    //输出：2014-08-27 10:30
+
+// 你自己判断访问是来自移动还是电脑比如
+// if isMobile {
+// 	c.ServeJSON()
+// } else {
+// 	c.TplName = "xxx"
 // }

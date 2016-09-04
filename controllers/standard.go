@@ -4,8 +4,8 @@ import (
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
 	"github.com/tealeg/xlsx"
+	"hydrocms/models"
 	"os"
-	"quick/models"
 	"time"
 )
 
@@ -61,7 +61,7 @@ func (c *StandardController) Index() { //
 	if err != nil {
 		beego.Error(err.Error)
 	} else {
-		c.Data["Standards"] = standards
+		// c.Data["Standards"] = standards   //这个没用吧
 		c.Data["Length"] = len(standards) //得到总记录数
 	}
 
@@ -148,7 +148,7 @@ func (c *StandardController) Search() { //search用的是post方法
 	// }
 }
 
-//上传excel文件，导入到数据库
+//上传excel文件，导入到规范数据库，用于批量导入规范文件
 //引用来自category的查看成果类型里的成果
 func (c *StandardController) ImportExcel() {
 	//获取上传的文件
@@ -215,7 +215,7 @@ func (c *StandardController) ImportExcel() {
 	c.Redirect("/standard", 302)
 }
 
-//上传excel文件，导入到数据库
+//上传excel文件，导入到有效版本数据库
 //引用来自category的查看成果类型里的成果
 func (c *StandardController) ImportLibrary() {
 	//获取上传的文件
@@ -251,20 +251,41 @@ func (c *StandardController) ImportLibrary() {
 		beego.Error(err)
 	}
 	for _, sheet := range xlFile.Sheets {
-		for _, row := range sheet.Rows {
-			// 这里要判断单元格列数，如果超过单元格使用范围的列数，则出错for j := 2; j < 7; j += 5 {
-			j := 0
-			library.Number, err = row.Cells[j].String()
-			library.Title, err = row.Cells[j+1].String()
-			library.Category, err = row.Cells[j+2].String()
-			library.LiNumber, err = row.Cells[j+3].String()
-			library.Created = time.Now()
-			library.Updated = time.Now()
-			_, err = models.SaveLibrary(library)
-			if err != nil {
-				beego.Error(err)
+		for i, row := range sheet.Rows {
+			if i != 0 {
+				// 这里要判断单元格列数，如果超过单元格使用范围的列数，则出错for j := 2; j < 7; j += 5 {
+				j := 0
+				library.Number, err = row.Cells[j].String()
+				if err != nil {
+					beego.Error(err)
+				}
+				library.Title, err = row.Cells[j+1].String()
+				if err != nil {
+					beego.Error(err)
+				}
+				library.Category, err = row.Cells[j+2].String()
+				if err != nil {
+					beego.Error(err)
+				}
+				library.LiNumber, err = row.Cells[j+3].String()
+				if err != nil {
+					beego.Error(err)
+				}
+				library.Year, err = row.Cells[j+4].String()
+				if err != nil {
+					beego.Error(err)
+				}
+				library.Execute, err = row.Cells[j+5].String()
+				if err != nil {
+					beego.Error(err)
+				}
+				library.Created = time.Now()
+				library.Updated = time.Now()
+				_, err = models.SaveLibrary(library)
+				if err != nil {
+					beego.Error(err)
+				}
 			}
-			// }
 			// for _, cell := range row.Cells {这里要继续循环cells，不能为空，即超出单元格使用范围
 			// 	fmt.Printf("%s\n", cell.String())
 			// }

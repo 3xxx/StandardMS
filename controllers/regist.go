@@ -6,7 +6,7 @@ import (
 	// "encoding/json"
 	"fmt"
 	"github.com/astaxie/beego"
-	"quick/models"
+	"hydrocms/models"
 	"time"
 )
 

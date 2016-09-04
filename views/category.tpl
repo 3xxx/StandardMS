@@ -40,7 +40,7 @@ color:#DC143C;
          {{range $index, $elem :=.Category}}
          <tr>
          <input type="hidden" id="categoryid" name="{{.Id}}" value="{{.Id}}" />
-          <th> {{printf "%d" $index}}</th><!-- {{$index}} -->
+          <th> {{indexaddone $index}}</th><!--{{printf "%d" $index}} -->
           <th><a href="/category?op=view&id={{.Id}}" id="number">{{.Number}}</a></th>
          <th><a href="/category?op=view&id={{.Id}}" id="name"><i class="glyphicon glyphicon-plane"></i>{{.Title}}</a></th>
          <th>

@@ -3,7 +3,7 @@ package controllers
 import (
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
-	"quick/models"
+	"hydrocms/models"
 	//（1）导入session包
 	// "encoding/json"
 	// "fmt"

@@ -9,7 +9,7 @@ import (
 	// "os"
 	// "path"
 	// "github.com/astaxie/beego"
-	// "strconv"
+	"strconv"
 	// "strings"
 	"time"
 	//"github.com/Unknwon/com
@@ -41,14 +41,15 @@ type Standard struct {
 
 type Library struct {
 	Id       int64
-	Number   string //`orm:"unique"`
+	Number   string //规范的编号`orm:"unique"`
 	Title    string
-	LiNumber string //完整编号
-	Category string
+	LiNumber string    //完整编号，含年份
+	Category string    //行业分类
+	Year     string    //编号里的年份
+	Execute  string    //执行时间
 	Content  string    `orm:"sie(5000)"`
 	Created  time.Time `orm:"index","auto_now_add;type(datetime)"`
 	Updated  time.Time `orm:"index","auto_now;type(datetime)"`
-	Execute  string    //执行时间
 }
 
 //附件,attachment 和 Standard 是 ManyToOne 关系，也就是 ForeignKey 为 Standard
@@ -114,7 +115,8 @@ func SaveLibrary(library Library) (lid int64, err error) {
 	//判断是否有重名
 	// var spider Spider //下面这个filter放在topic=&Topic{后面用返回one(topic)则查询出错！
 	//只有编号和主机都不同才写入。
-	err = o.QueryTable("library").Filter("number", library.Number).Filter("title", library.Title).One(&library, "Id")
+	var library1 Library //数据库中已有的数据
+	err = o.QueryTable("library").Filter("number", library.Number).Filter("title", library.Title).One(&library1)
 	// err = o.QueryTable("topic").Filter("categoryid", cid).Filter("tnumber", tnumber).One(&topic, "Id")
 	if err == orm.ErrNoRows { //Filter("tnumber", tnumber).One(topic, "Id")==nil则无法建立
 		// 没有找到记录
@@ -131,9 +133,33 @@ func SaveLibrary(library Library) (lid int64, err error) {
 		if err != nil {
 			return 0, err //如果文章编号相同，则唯一性检查错误，返回id吗？
 		}
-	} else {
-		//进行更新操作
-		lid, err = o.Update(&library)
+	} else { //如果有记录，则进行判断年份，还要判断是否有值
+		//判断年份，如果是新则进行更新操作
+		//如果年份旧，就判断有无值，没有值的才更新
+		// 年份string转成int
+		if library1.Year != "" { //如果数据库中的year有值，则进行判断
+			Year, err := strconv.Atoi(library.Year)
+			if err != nil {
+				return 0, err
+			}
+			Year1, err := strconv.Atoi(library1.Year)
+			if err != nil {
+				return 0, err
+			}
+			if Year >= Year1 { //如果比数据库中的新，进行更新操作
+				library1.LiNumber = library.LiNumber //完整编号，含年份
+				library1.Year = library.Year
+				library1.Execute = library.Execute
+				library1.Updated = time.Now()
+				lid, err = o.Update(&library1)
+			}
+		} else { //如果数据库中的year没有值，则直接进行update
+			library1.LiNumber = library.LiNumber //完整编号，含年份
+			library1.Year = library.Year
+			library1.Execute = library.Execute
+			library1.Updated = time.Now()
+			lid, err = o.Update(&library1)
+		}
 	}
 	return lid, err
 	// 原来的代码orm := orm.NewOrm()
@@ -203,13 +229,24 @@ func GetAllStandards() ([]*Standard, error) {
 }
 
 //由法规名称精确搜索有效版本库
-func SearchLiabraryName(Name string) (*Library, error) {
+func SearchLiabraryName(Name string) ([]*Library, error) {
 	o := orm.NewOrm()
-	library := new(Library)
+	// library := new(Library)
+	var libraries []*Library
 	qs := o.QueryTable("library")
-	err := qs.Filter("title", Name).One(library)
+	_, err := qs.Filter("title", Name).All(&libraries) //(library)这样也可以。多条时会出错
+	// if err == orm.ErrMultiRows {
+	// 	// 多条的时候报错
+	// 	// fmt.Printf("Returned Multi Rows Not One")
+	// 	return nil, err
+	// }
+	// if err == orm.ErrNoRows {
+	// 	// 没有找到记录
+	// 	// fmt.Printf("Not row found")
+	// 	return nil, err
+	// }
 	if err != nil {
 		return nil, err
 	}
-	return library, err
+	return libraries, err
 }

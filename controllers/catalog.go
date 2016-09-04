@@ -8,8 +8,8 @@ import (
 	// 	// "os"
 	// 	"path"
 	// 	// "path/filepath"
-	// "quick/models"
-	m "quick/models"
+	// "hydrocms/models"
+	m "hydrocms/models"
 	"time"
 	// 	// "regexp"
 	"strconv"
@@ -258,7 +258,7 @@ func (c *CatalogController) ModifyCatalog() {
 		id = string(cid[3:len(cid)])
 		// beego.Info(id)
 	}
-	catalog.Created = time.Now()
+	// catalog.Created = time.Now()
 	catalog.Updated = time.Now()
 	catalog.Views = 0
 	catalog.Author = uname

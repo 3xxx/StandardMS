@@ -15,8 +15,9 @@ import (
 	"github.com/PuerkitoBio/goquery"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/config"
+	"github.com/astaxie/beego/logs"
+	"hydrocms/models"
 	"log"
-	"quick/models"
 	// "reflect"
 	//	"strings"
 	// "testing"
@@ -58,7 +59,19 @@ func (c *SpiderController) GetSpider() {
 	c.Data["Uname"] = uname
 
 	// c.Data["Id"] = c.Ctx.Input.Param(":id")
+	//取得所有可供检索文件数量
+	//取爬取的成果数量
 	spidertopic, err := models.GetSpiderTopic()
+	if err != nil {
+		beego.Error(err)
+	}
+	//取爬取的项目数量
+	spidercategory, err := models.GetSpiderCategory()
+	if err != nil {
+		beego.Error(err)
+	}
+	//取本地成果数量
+	topics, err := models.GetAllTopics("", false) //这里传入空字符串
 	if err != nil {
 		beego.Error(err)
 	}
@@ -125,12 +138,15 @@ func (c *SpiderController) GetSpider() {
 	// for _, v := range spidertopic {
 	// 	beego.Info(v.UserName)
 	// }
+	c.Data["Length"] = len(spidertopic) + len(spidercategory) + len(topics) //得到总记录数
+	logs := logs.NewLogger(1000)
+	logs.SetLogger("file", `{"filename":"log/test.log"}`)
+	logs.EnableFuncCallDepth(true)
+	logs.Info(c.Ctx.Input.IP() + " " + "ViewSpider")
+	logs.Close()
+
 	c.Data["Service"] = sservice
 	c.Data["SpiderTopic"] = spidertopic
-	spidercategory, err := models.GetSpiderCategory()
-	if err != nil {
-		beego.Error(err)
-	}
 	c.Data["SpiderCategory"] = spidercategory
 }
 
@@ -186,7 +202,7 @@ func CreatSpider(rootArrayCasted []interface{}) {
 			// beego.Info(v.Name, v.Number)
 			models.AddSpiderTopic(v.Number, v.Name, v.Link, user, elem["serviceAPI"].(string)+":"+elem["port"].(string))
 		}
-		m1 := Scrape(elem["serviceAPI"].(string)+":"+elem["port"].(string), "/category")
+		m1 := Scrape(elem["serviceAPI"].(string)+":"+elem["port"].(string), "/category/getallcategory")
 		for _, v := range m1 {
 			// models.AddSpider(v.Number, v.Name, v.Link, user, elem["serviceAPI"].(string)+":"+elem["port"].(string))
 			models.AddSpiderCategory(v.Number, v.Name, v.Link, user, elem["serviceAPI"].(string)+":"+elem["port"].(string))

@@ -5,7 +5,7 @@ package controllers
 // 	"github.com/astaxie/beego"
 // 	"github.com/astaxie/beego/orm"
 // 	// m "github.com/beego/admin/src/models"
-// 	m "quick/models"
+// 	m "hydrocms/models"
 // )
 
 // type NodeController struct {

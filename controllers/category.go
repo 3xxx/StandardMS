@@ -5,9 +5,9 @@ import (
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
 	"github.com/astaxie/beego/utils/pagination"
+	"hydrocms/models"
 	"image/png"
 	"os"
-	"quick/models"
 	"strconv"
 	"strings"
 	"time"
@@ -423,6 +423,21 @@ func (c *CategoryController) Get() {
 	if err != nil {
 		beego.Error(err)
 	}
+}
+
+//这个给爬虫用，取得所有项目
+func (c *CategoryController) Getallcategory() {
+	c.Data["IsCategory"] = true
+	c.TplName = "category.tpl"
+	c.Data["IsLogin"] = checkAccount(c.Ctx)
+	uname, _, _ := checkRoleread(c.Ctx) //login里的
+	// rolename, _ = strconv.Atoi(role)
+	c.Data["Uname"] = uname
+	categories, err := models.GetAllCategories()
+	if err != nil {
+		beego.Error(err)
+	}
+	c.Data["Category"] = categories
 }
 
 //这个给UI用

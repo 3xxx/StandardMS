@@ -1,13 +1,13 @@
 package controllers
 
 import (
-	"encoding/json"
+	// "encoding/json"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/orm"
 	"strconv"
 	"strings"
 	// m "github.com/beego/admin/src/models"
-	m "quick/models"
+	m "hydrocms/models"
 )
 
 type RoleController struct {
@@ -105,61 +105,60 @@ func (c *RoleController) Getlist() {
 	return
 }
 
-func (c *RoleController) AccessToNode() {
-	roleid, _ := c.GetInt64("Id")
-	if c.IsAjax() {
-		groupid, _ := c.GetInt64("group_id")
-		nodes, count := m.GetNodelistByGroupid(groupid)
-		list, _ := m.GetNodelistByRoleId(roleid)
-		for i := 0; i < len(nodes); i++ {
-			if nodes[i]["Pid"] != 0 {
-				nodes[i]["_parentId"] = nodes[i]["Pid"]
-			} else {
-				nodes[i]["state"] = "closed"
-			}
-			for x := 0; x < len(list); x++ {
-				if nodes[i]["Id"] == list[x]["Id"] {
-					nodes[i]["checked"] = 1
-				}
-			}
-		}
-		if len(nodes) < 1 {
-			nodes = []orm.Params{}
-		}
-		c.Data["json"] = &map[string]interface{}{"total": count, "rows": &nodes}
-		c.ServeJSON()
-		return
-	} else {
-		grouplist := m.GroupList()
-		b, _ := json.Marshal(grouplist)
-		c.Data["grouplist"] = string(b)
-		c.Data["roleid"] = roleid
-		// c.TplName = c.GetTemplatetype() + "/rbac/accesstonode.tpl"
-	}
+// func (c *RoleController) AccessToNode() {
+// 	roleid, _ := c.GetInt64("Id")
+// 	if c.IsAjax() {
+// 		groupid, _ := c.GetInt64("group_id")
+// 		nodes, count := m.GetNodelistByGroupid(groupid)
+// 		list, _ := m.GetNodelistByRoleId(roleid)
+// 		for i := 0; i < len(nodes); i++ {
+// 			if nodes[i]["Pid"] != 0 {
+// 				nodes[i]["_parentId"] = nodes[i]["Pid"]
+// 			} else {
+// 				nodes[i]["state"] = "closed"
+// 			}
+// 			for x := 0; x < len(list); x++ {
+// 				if nodes[i]["Id"] == list[x]["Id"] {
+// 					nodes[i]["checked"] = 1
+// 				}
+// 			}
+// 		}
+// 		if len(nodes) < 1 {
+// 			nodes = []orm.Params{}
+// 		}
+// 		c.Data["json"] = &map[string]interface{}{"total": count, "rows": &nodes}
+// 		c.ServeJSON()
+// 		return
+// 	} else {
+// 		grouplist := m.GroupList()
+// 		b, _ := json.Marshal(grouplist)
+// 		c.Data["grouplist"] = string(b)
+// 		c.Data["roleid"] = roleid
+// 		// c.TplName = c.GetTemplatetype() + "/rbac/accesstonode.tpl"
+// 	}
+// }
 
-}
+// func (c *RoleController) AddAccess() {
+// 	roleid, _ := c.GetInt64("roleid")
+// 	group_id, _ := c.GetInt64("group_id")
+// 	err := m.DelGroupNode(roleid, group_id)
+// 	if err != nil {
+// 		// c.Rsp(false, err.Error())
+// 		beego.Error(err.Error)
+// 	}
+// 	ids := c.GetString("ids")
+// 	nodeids := strings.Split(ids, ",")
+// 	for _, v := range nodeids {
+// 		id, _ := strconv.Atoi(v)
+// 		_, err := m.AddRoleNode(roleid, int64(id))
+// 		if err != nil {
+// 			// c.Rsp(false, err.Error())
+// 			beego.Error(err.Error)
+// 		}
+// 	}
+// 	// c.Rsp(true, "success")
 
-func (c *RoleController) AddAccess() {
-	roleid, _ := c.GetInt64("roleid")
-	group_id, _ := c.GetInt64("group_id")
-	err := m.DelGroupNode(roleid, group_id)
-	if err != nil {
-		// c.Rsp(false, err.Error())
-		beego.Error(err.Error)
-	}
-	ids := c.GetString("ids")
-	nodeids := strings.Split(ids, ",")
-	for _, v := range nodeids {
-		id, _ := strconv.Atoi(v)
-		_, err := m.AddRoleNode(roleid, int64(id))
-		if err != nil {
-			// c.Rsp(false, err.Error())
-			beego.Error(err.Error)
-		}
-	}
-	// c.Rsp(true, "success")
-
-}
+// }
 
 func (c *RoleController) RoleToUserList() {
 	roleid, _ := c.GetInt64("Id")

@@ -38,9 +38,9 @@
   </h1>
   <h1 >搜索{{.Length}}个 文件</h1>
   <p class="large">
-    HydroCMS 是一个微服务系统，你可以上传你的资料，也可以在自己电脑上运行HydroCMS，像本站这样发布资料，还可以将资料打包共享。
+    HydroCMS 是一个微服务系统，您可以在自己电脑上运行HydroCMS，管理和发布资料，方便知识的继承。
   </p>
-  <p class="large">HydroCMS 与院《规范目录版本管理》数据进行比对，标记库中录入的规范是否有效。</p>
+  <p class="large">HydroCMS 与《规范目录有效版本》数据进行比对，标记库中录入的规范是否有效。</p>
 
   <div class="col-lg-4">
 </div>

@@ -180,6 +180,7 @@ func ModifyCatalog(cid string, catalog1 Catalog) error {
 	return err
 }
 
+//删除一条
 func DeletCatalog(cid string) error { //应该在controllers中显示警告
 	cidNum, err := strconv.ParseInt(cid, 10, 64)
 	if err != nil {
