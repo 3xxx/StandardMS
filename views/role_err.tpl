@@ -33,7 +33,7 @@
       -->
       <!-- <input type="hidden" name="_once" value="dRFmv4aizZ">
       -->
-      <span style="color: #ff0000;"><input type="hidden" name="returnUrl" value="{{.Url}}"/></span>
+      <span style="color: #ff0000;"><input type="hidden" name="url" value="{{.Url}}"/></span>
       <div class="form-group">
         <label class="control-label" for="LoginForm-UserName">用户名 或 邮箱</label>
         <input id="uname" name="uname" type="text" value="" class="form-control" placeholder="Enter account"></div>

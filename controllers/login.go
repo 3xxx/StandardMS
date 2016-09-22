@@ -114,8 +114,15 @@ func (c *LoginController) Loginerr() {
 
 func (c *LoginController) Post() {
 	// uname := c.Input().Get("uname")
-	url := c.Input().Get("returnUrl")
-
+	// url := c.Input().Get("url")
+	url1 := c.Input().Get("url")
+	url2 := c.Input().Get("mid")
+	var url string
+	if url2 == "" {
+		url = url1
+	} else {
+		url = url1 + "&mid=" + url2
+	}
 	//（4）获取当前的请求会话，并返回当前请求会话的对象
 	sess, _ := globalSessions.SessionStart(c.Ctx.ResponseWriter, c.Ctx.Request)
 	defer sess.SessionRelease(c.Ctx.ResponseWriter)
