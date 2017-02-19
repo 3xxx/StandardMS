@@ -6,6 +6,8 @@ import (
 	"github.com/tealeg/xlsx"
 	"hydrocms/models"
 	"os"
+	"strconv"
+	"strings"
 	"time"
 )
 
@@ -29,25 +31,68 @@ type Standardmore struct {
 	LiNumber      string //完整编号
 }
 
-func (c *StandardController) Get() { //这个没用到
+//显示所有规范
+func (c *StandardController) GetStandard() {
 	c.Data["IsStandard"] = true //这里修改到ListAllPosts()
 	c.TplName = "standard.tpl"
 	c.Data["IsLogin"] = checkAccount(c.Ctx)
 	uname, _, _ := checkRoleread(c.Ctx) //login里的
-	// rolename, _ = strconv.Atoi(role)
 	c.Data["Uname"] = uname
-	topics, err := models.GetAllTopics("", false) //这里传入空字符串
+	standards, err := models.GetAllStandards()
 	if err != nil {
 		beego.Error(err.Error)
 	} else {
-		c.Data["Topics"] = topics
-		c.Data["Length"] = len(topics)
+		c.Data["json"] = standards
+		c.ServeJSON()
 	}
-	//var err error
-	//	c.Data["Topic"], err = models.GetAllTopics()
-	//	if err != nil {
-	//		beego.Error(err)
-	//	}
+}
+
+//修改规范
+func (c *StandardController) UpdateStandard() {
+	id := c.Input().Get("cid")
+	idNum, err := strconv.ParseInt(id, 10, 64)
+	if err != nil {
+		beego.Error(err)
+	}
+	number := c.Input().Get("number")
+	title := c.Input().Get("title")
+	route := c.Input().Get("route")
+	// uname := c.Input().Get("uname")
+	err = models.UpdateStandard(idNum, number, title, route)
+	if err != nil {
+		beego.Error(err)
+		c.Data["json"] = "修改出错"
+		c.ServeJSON()
+	} else {
+		c.Data["json"] = "ok"
+		c.ServeJSON()
+	}
+}
+
+//删除规范
+func (c *StandardController) DeleteStandard() {
+	ids := c.GetString("ids")
+	array := strings.Split(ids, ",")
+	// beego.Info(array)
+	for _, v := range array {
+		// pid = strconv.FormatInt(v1, 10)
+		//id转成64位
+		idNum, err := strconv.ParseInt(v, 10, 64)
+		if err != nil {
+			beego.Error(err)
+		}
+		//循环删除成果
+		//根据成果id取得所有附件
+		err = models.DeleteStandard(idNum)
+		if err != nil {
+			beego.Error(err)
+			c.Data["json"] = "删除出错"
+			c.ServeJSON()
+		} else {
+			c.Data["json"] = "ok"
+			c.ServeJSON()
+		}
+	}
 }
 
 func (c *StandardController) Index() { //
@@ -75,64 +120,74 @@ func (c *StandardController) Index() { //
 //搜索规范或者图集的名称或编号
 func (c *StandardController) Search() { //search用的是post方法
 	name := c.Input().Get("name")
-	c.Data["IsStandard"] = true //
-	c.TplName = "standard.tpl"
-	c.Data["IsLogin"] = checkAccount(c.Ctx)
-	uname, _, _ := checkRoleread(c.Ctx) //login里的
-	// rolename, _ = strconv.Atoi(role)
-	c.Data["Uname"] = uname
-	//搜索名称
-	Results1, err := models.SearchStandardsName(name, false)
-	if err != nil {
-		beego.Error(err.Error)
-	}
-	// beego.Info(Results1[0].Title)
-	// beego.Info(Results1[1].Title)
-	//搜索编号
-	Results2, err := models.SearchStandardsNumber(name, false)
-	if err != nil {
-		beego.Error(err.Error)
-	}
-	// Standards := make([]*Standard, 0)
-	Results1 = append(Results1, Results2...)
-	//由categoryid查categoryname
-	aa := make([]Standardmore, len(Results1))
-	//由standardnumber查librarynumber
-	for i, v := range Results1 {
-		//由userid查username
-		user := models.GetUserByUserId(v.Uid)
-		// beego.Info(v.Uid)
-		// beego.Info(user.Username)
-		//由standardnumber正则得到编号50268和分类GB
-		Category, _, Number := SplitStandardFileNumber(v.Number)
-		//由分类和编号查有效版本库中的编号
-		library, err := models.SearchLiabraryNumber(Category, Number)
+	if name == "allstandard" {
+		standards, err := models.GetAllStandards()
+		if err != nil {
+			beego.Error(err.Error)
+		} else {
+			c.Data["json"] = standards
+			c.ServeJSON()
+		}
+	} else {
+		c.Data["IsStandard"] = true //
+		c.TplName = "standard.tpl"
+		c.Data["IsLogin"] = checkAccount(c.Ctx)
+		uname, _, _ := checkRoleread(c.Ctx) //login里的
+		// rolename, _ = strconv.Atoi(role)
+		c.Data["Uname"] = uname
+		//搜索名称
+		Results1, err := models.SearchStandardsName(name, false)
 		if err != nil {
 			beego.Error(err.Error)
 		}
-		aa[i].Id = v.Id
-		aa[i].Number = v.Number //`orm:"unique"`
-		aa[i].Title = v.Title
-		aa[i].Uname = user.Username //换成用户名
-		// beego.Info(aa[i].Uname)
-		// CategoryName   //换成规范类别GB、DL……
-		// Content
-		aa[i].Route = v.Route
-		aa[i].Created = v.Created
-		aa[i].Updated = v.Updated
-		aa[i].Views = v.Views
-		if library != nil {
-			aa[i].LibraryNumber = library.Number //规范有效版本库中的编号
-			aa[i].LibraryTitle = library.Title
-			aa[i].LiNumber = library.LiNumber //完整编号
-		} else {
-			aa[i].LiNumber = "No LibraryNumber Match Find!"
-			aa[i].LibraryTitle = ""
-			aa[i].LibraryNumber = ""
+		// beego.Info(Results1[0].Title)
+		// beego.Info(Results1[1].Title)
+		//搜索编号
+		Results2, err := models.SearchStandardsNumber(name, false)
+		if err != nil {
+			beego.Error(err.Error)
 		}
+		// Standards := make([]*Standard, 0)
+		Results1 = append(Results1, Results2...)
+		//由categoryid查categoryname
+		aa := make([]Standardmore, len(Results1))
+		//由standardnumber查librarynumber
+		for i, v := range Results1 {
+			//由userid查username
+			user := models.GetUserByUserId(v.Uid)
+			// beego.Info(v.Uid)
+			// beego.Info(user.Username)
+			//由standardnumber正则得到编号50268和分类GB
+			Category, _, Number := SplitStandardFileNumber(v.Number)
+			//由分类和编号查有效版本库中的编号
+			library, err := models.SearchLiabraryNumber(Category, Number)
+			if err != nil {
+				beego.Error(err.Error)
+			}
+			aa[i].Id = v.Id
+			aa[i].Number = v.Number //`orm:"unique"`
+			aa[i].Title = v.Title
+			aa[i].Uname = user.Username //换成用户名
+			// beego.Info(aa[i].Uname)
+			// CategoryName   //换成规范类别GB、DL……
+			// Content
+			aa[i].Route = v.Route
+			aa[i].Created = v.Created
+			aa[i].Updated = v.Updated
+			aa[i].Views = v.Views
+			if library != nil {
+				aa[i].LibraryNumber = library.Number //规范有效版本库中的编号
+				aa[i].LibraryTitle = library.Title
+				aa[i].LiNumber = library.LiNumber //完整编号
+			} else {
+				aa[i].LiNumber = "No LibraryNumber Match Find!"
+				aa[i].LibraryTitle = ""
+				aa[i].LibraryNumber = ""
+			}
+		}
+		c.Data["json"] = aa //这里必须要是c.Data["json"]，其他c.Data["Data"]不行
+		c.ServeJSON()
 	}
-	c.Data["json"] = aa //这里必须要是c.Data["json"]，其他c.Data["Data"]不行
-	c.ServeJSON()
 
 	logs := logs.NewLogger(1000)
 	logs.SetLogger("file", `{"filename":"log/test.log"}`)
@@ -146,6 +201,61 @@ func (c *StandardController) Search() { //search用的是post方法
 	// 	c.Data["Standards"] = standards
 	// 	c.Data["Length"] = len(standards) //得到总记录数
 	// }
+}
+
+//显示所有有效库
+func (c *StandardController) Valid() { //search用的是post方法
+	// name := c.Input().Get("name")
+	c.Data["IsStandard"] = true //
+	c.TplName = "standard.tpl"
+	c.Data["IsLogin"] = checkAccount(c.Ctx)
+	uname, _, _ := checkRoleread(c.Ctx) //login里的
+	// rolename, _ = strconv.Atoi(role)
+	c.Data["Uname"] = uname
+	//搜索名称
+	valids, err := models.GetAllValids()
+	if err != nil {
+		beego.Error(err.Error)
+	}
+	c.Data["json"] = valids //这里必须要是c.Data["json"]，其他c.Data["Data"]不行
+	c.ServeJSON()
+
+	logs := logs.NewLogger(1000)
+	logs.SetLogger("file", `{"filename":"log/test.log"}`)
+	logs.EnableFuncCallDepth(true)
+	logs.Info(c.Ctx.Input.IP() + " " + "valid:")
+	logs.Close()
+}
+
+//删除有效库中选中
+func (c *StandardController) DeleteValid() { //search用的是post方法
+	ids := c.GetString("ids")
+	array := strings.Split(ids, ",")
+	// beego.Info(array)
+	for _, v := range array {
+		// pid = strconv.FormatInt(v1, 10)
+		//id转成64位
+		idNum, err := strconv.ParseInt(v, 10, 64)
+		if err != nil {
+			beego.Error(err)
+		}
+		//循环删除成果
+		//根据成果id取得所有附件
+		err = models.DeleteValid(idNum)
+		if err != nil {
+			beego.Error(err)
+			c.Data["json"] = "删除出错"
+			c.ServeJSON()
+		} else {
+			c.Data["json"] = "ok"
+			c.ServeJSON()
+		}
+	}
+	logs := logs.NewLogger(1000)
+	logs.SetLogger("file", `{"filename":"log/test.log"}`)
+	logs.EnableFuncCallDepth(true)
+	logs.Info(c.Ctx.Input.IP() + " " + "valid:")
+	logs.Close()
 }
 
 //上传excel文件，导入到规范数据库，用于批量导入规范文件

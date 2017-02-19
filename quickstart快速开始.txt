@@ -1,12 +1,11 @@
 ***********************************
-	������״�ʹ�ã��룺
-	��ѹ��d:\HydroCMS\
-	�޸�conf\���app.conf.sampleΪapp.conf,��app.conf,���������httpport = 80�����Ҫ�޸ĳ�8080�����޸ĺ󱣴档
-	�޸�conf\���iprole.txt.sampleΪiprole.txt������������д�Լ�׼���������ʵ�ip��ַ�Ρ���ʱ����Ҳû��ϵ��
-	�޸�database\hydrocms.db.sampleΪhydrocms.db��
-	����hydrocms.exe������������������Լ���ip��ַ���з��ʡ��������8080�˿ڣ�����Ҫip��ַ�����:8080���ƵĶ˿ںš���http://127.0.0.1:8080
+	如果是首次使用，请：
+	解压到d:\HydroCMS\
+	修改conf\里的app.conf.sample为app.conf,打开app.conf,看到里面的httpport = 80，如果要修改成8080，请修改后保存。
+	修改conf\里的iprole.txt.sample为iprole.txt。并照样子填写自己准备允许访问的ip地址段。暂时不改也没关系。
+	修改database\hydrocms.db.sample为hydrocms.db。
+	运行hydrocms.exe即可在浏览器中输入自己的ip地址进行访问。如果不是8080端口，则需要ip地址后面加:8080类似的端口号。如http://127.0.0.1:8080
 ************************************
-	������������룺
-	�����Լ��޸ĵ��ļ���Ȼ���ѹ���ǡ�
-	Ĭ�ϲ��Ḳ��app.conf��iprole.txt�Լ������ļ�hydrocms.db��
-
+	如果是升级，请：
+	备份自己修改的文件，然后解压覆盖。
+	默认不会覆盖app.conf、iprole.txt以及数据文件hydrocms.db。

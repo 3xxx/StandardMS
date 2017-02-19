@@ -220,6 +220,17 @@ func init() {
 	beego.Router("/standard/importexcel", &controllers.StandardController{}, "*:ImportExcel")
 	beego.Router("/standard/standard_one_addbaidu", &controllers.StandardController{}, "post:Standard_one_addbaidu")
 	beego.Router("/standard/importlibrary", &controllers.StandardController{}, "post:ImportLibrary")
+	//显示规范所有
+	beego.Router("/standard/getstandard", &controllers.StandardController{}, "get:GetStandard")
+	//修改规范库
+	beego.Router("/standard/updatestandard", &controllers.StandardController{}, "post:UpdateStandard")
+	//删除规范库
+	beego.Router("/standard/deletestandard", &controllers.StandardController{}, "post:DeleteStandard")
+
+	//显示有效库所有
+	beego.Router("/standard/valid", &controllers.StandardController{}, "get:Valid")
+	//删除有效库中选中
+	beego.Router("/standard/deletevalid", &controllers.StandardController{}, "post:DeleteValid")
 
 	beego.Router("/legislation", &controllers.LegislationController{}, "*:Index")
 	beego.Router("/legislation/checklist", &controllers.LegislationController{}, "*:Checklist")
@@ -234,7 +245,7 @@ func init() {
 	beego.SetStaticPath("/d", "database")
 	// 作为静态文件：beego.SetStaticPath("/attachment", "attachment")
 	//beego.Router("/attachment/:all", &controllers.AttachController{})
-	beego.Router("/attachment/*", &controllers.AttachController{})
+	beego.Router("/attachment/*", &controllers.AttachController{}, "get:DownloadAttachment")
 	beego.SetStaticPath("/attachment/wiki", "attachment/wiki")
 	// *全匹配方式 //匹配 /download/ceshi/file/api.json :splat=file/api.json
 

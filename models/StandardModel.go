@@ -204,7 +204,7 @@ func SearchStandardsNumber(number string, isDesc bool) ([]*Standard, error) {
 	return Standards, err
 }
 
-//由分类和编号搜索有效版本库
+//由分类SL和编号搜索有效版本库
 func SearchLiabraryNumber(Category, Number string) (*Library, error) {
 	o := orm.NewOrm()
 	library := new(Library)
@@ -226,6 +226,35 @@ func GetAllStandards() ([]*Standard, error) {
 	_, err = qs.OrderBy("-created").All(&standards)
 	// _, err := qs.All(&cates)
 	return standards, err
+}
+
+func UpdateStandard(id int64, number, title, route string) error {
+	o := orm.NewOrm()
+	standard := &Standard{Id: id}
+	if o.Read(standard) == nil {
+		standard.Number = number
+		standard.Title = title
+		standard.Updated = time.Now()
+		standard.Route = route
+		_, err := o.Update(standard)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func DeleteStandard(id int64) error {
+	var err error
+	o := orm.NewOrm()
+	standard := Standard{Id: id}
+	if o.Read(&standard) == nil {
+		_, err = o.Delete(&standard)
+		if err != nil {
+			return err
+		}
+	}
+	return err
 }
 
 //由法规名称精确搜索有效版本库
@@ -250,3 +279,44 @@ func SearchLiabraryName(Name string) ([]*Library, error) {
 	}
 	return libraries, err
 }
+
+func GetAllValids() ([]*Library, error) {
+	o := orm.NewOrm()
+	librarys := make([]*Library, 0)
+	qs := o.QueryTable("library")
+	var err error
+	//这里进行过滤，parentid为空的才显示
+	// qs = qs.Filter("ParentId", 0)
+	_, err = qs.OrderBy("-created").All(&librarys)
+	// _, err := qs.All(&cates)
+	return librarys, err
+}
+
+func DeleteValid(id int64) error {
+	var err error
+	o := orm.NewOrm()
+	// Read 默认通过查询主键赋值，可以使用指定的字段进行查询：
+	// user := User{Name: "slene"}
+	// err = o.Read(&user, "Name")
+	valid := Library{Id: id}
+	if o.Read(&valid) == nil {
+		_, err = o.Delete(&valid)
+		if err != nil {
+			return err
+		}
+	}
+	return err
+}
+
+//删除_把附件也一并删除（在controllers中实现吧）
+// func DeleteProduct(cid int64) error {
+// 	o := orm.NewOrm()
+// 	product := &Product{Id: cid}
+// 	if o.Read(product) == nil {
+// 		_, err := o.Delete(product)
+// 		if err != nil {
+// 			return err
+// 		}
+// 	}
+// 	return nil
+// }

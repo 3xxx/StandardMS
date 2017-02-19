@@ -3,8 +3,10 @@ package controllers
 import (
 	// "fmt"
 	"github.com/astaxie/beego"
+	// "github.com/astaxie/beego/httplib"
 	"hydrocms/models"
 	"io"
+	"net/http"
 	"net/url"
 	"os"
 	"path"
@@ -16,7 +18,7 @@ type AttachController struct {
 	beego.Controller
 }
 
-func (c *AttachController) Get() {
+func (c *AttachController) Get1() {
 	var rolename int
 	var uname, role string
 	var route string
@@ -107,5 +109,59 @@ func (c *AttachController) Get() {
 	if err != nil {
 		c.Ctx.WriteString(err.Error())
 		return
+	}
+}
+
+func (c *AttachController) DownloadAttachment() {
+	// c.Data["IsLogin"] = checkAccount(c.Ctx)
+	//4.取得客户端用户名
+	// var uname string
+	// sess, _ := globalSessions.SessionStart(c.Ctx.ResponseWriter, c.Ctx.Request)
+	// defer sess.SessionRelease(c.Ctx.ResponseWriter)
+	// v := sess.Get("uname")
+	// var role, userrole int
+	// if v != nil {
+	// 	uname = v.(string)
+	// 	c.Data["Uname"] = v.(string)
+	// 	user, err := models.GetUserByUsername(uname)
+	// 	if err != nil {
+	// 		beego.Error(err)
+	// 	}
+	// 	userrole = user.Role
+	// } else {
+	// 	userrole = 5
+	// }
+
+	// iprole := Getiprole(c.Ctx.Input.IP())
+	// if iprole <= userrole {
+	// 	role = iprole
+	// } else {
+	// 	role = userrole
+	// }
+
+	filePath, err := url.QueryUnescape(c.Ctx.Request.RequestURI[1:]) //  attachment/SL2016测试添加成果/A/FB/1/Your First Meteor Application.pdf
+	if err != nil {
+		beego.Error(err)
+	}
+	fileext := path.Ext(filePath)
+	switch fileext {
+	case ".pdf", ".PDF":
+		// if role <= 3 {
+		http.ServeFile(c.Ctx.ResponseWriter, c.Ctx.Request, filePath)
+		// } else {
+		// 	route := c.Ctx.Request.URL.String()
+		// 	c.Data["Url"] = route
+		// 	c.Redirect("/roleerr?url="+route, 302)
+		// 	return
+		// }
+	default:
+		// if role <= 2 {
+		http.ServeFile(c.Ctx.ResponseWriter, c.Ctx.Request, filePath)
+		// } else {
+		// 	route := c.Ctx.Request.URL.String()
+		// 	c.Data["Url"] = route
+		// 	c.Redirect("/roleerr?url="+route, 302)
+		// 	return
+		// }
 	}
 }

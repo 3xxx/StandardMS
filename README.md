@@ -4,7 +4,7 @@
 HydroCMS水利档案管理系统是一款方便中小团队和工程师个人管理资料的web应用.
 
 
-##Quick Start
+## Quick Start
 ######Download and run
 
     解压压缩包到硬盘上，运行HydroCMS-win64.exe或HydroCMS-win32.exe，在浏览器中打开IP即可访问。本地IP即127.0.0.1
