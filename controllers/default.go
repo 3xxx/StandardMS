@@ -15,12 +15,12 @@ import (
 var globalSessions *session.Manager
 
 //（3）在初始化“全局session mananger对象”
-func init() {
-	globalSessions, _ = session.NewManager("memory", `{"cookieName":"gosessionid", "enableSetCookie,omitempty": true, "gclifetime":36000, "maxLifetime": 36000, "secure": false, "sessionIDHashFunc": "sha1", "sessionIDHashKey": "", "cookieLifeTime": 36000, "providerConfig": ""}`)
-	go globalSessions.GC()
-	// globalSessions, _ = session.NewManager("memory", `{"cookieName":"gosessionid","gclifetime":3600}`)
-	// go globalSessions.GC()
-}
+// func init() {
+// globalSessions, _ = session.NewManager("memory", `{"cookieName":"gosessionid", "enableSetCookie,omitempty": true, "gclifetime":36000, "maxLifetime": 36000, "secure": false, "sessionIDHashFunc": "sha1", "sessionIDHashKey": "", "cookieLifeTime": 36000, "providerConfig": ""}`)
+// go globalSessions.GC()
+// globalSessions, _ = session.NewManager("memory", `{"cookieName":"gosessionid","gclifetime":3600}`)
+// go globalSessions.GC()
+// }
 
 type MainController struct {
 	beego.Controller
@@ -38,9 +38,9 @@ type MainController struct {
 func (c *MainController) Help() {
 	c.Data["IsLogin"] = checkAccount(c.Ctx)
 	c.Data["IsHelp"] = true
-	sess, _ := globalSessions.SessionStart(c.Ctx.ResponseWriter, c.Ctx.Request)
-	defer sess.SessionRelease(c.Ctx.ResponseWriter)
-	v := sess.Get("uname")
+	// sess, _ := globalSessions.SessionStart(c.Ctx.ResponseWriter, c.Ctx.Request)
+	// defer sess.SessionRelease(c.Ctx.ResponseWriter)
+	v := c.GetSession("uname")
 	if v != nil {
 
 		// } else {
@@ -85,8 +85,8 @@ func (c *MainController) Get() {
 	// 	sess.Set("username", r.Form["username"])
 	// }
 	//（4）获取当前的请求会话，并返回当前请求会话的对象
-	sess, _ := globalSessions.SessionStart(c.Ctx.ResponseWriter, c.Ctx.Request)
-	defer sess.SessionRelease(c.Ctx.ResponseWriter)
+	// sess, _ := globalSessions.SessionStart(c.Ctx.ResponseWriter, c.Ctx.Request)
+	// defer sess.SessionRelease(c.Ctx.ResponseWriter)
 	//（5）根据当前请求对象，设置一个session
 	// sess.Set("mySession", "qq504284")
 
@@ -108,7 +108,7 @@ func (c *MainController) Get() {
 	//2.取得客户端用户名
 	// sess, _ = globalSessions.SessionStart(c.Ctx.ResponseWriter, c.Ctx.Request)
 	// defer sess.SessionRelease(c.Ctx.ResponseWriter)
-	v := sess.Get("uname")
+	v := c.GetSession("uname")
 	if v != nil {
 		c.Data["Uname"] = v.(string) //ck.Value
 	} else {
@@ -176,9 +176,9 @@ func (c *MainController) Post() {
 	//     ResponseWriter *Response
 	//     // contains filtered or unexported fields
 	// }
-	sess, _ := globalSessions.SessionStart(c.Ctx.ResponseWriter, c.Ctx.Request)
-	defer sess.SessionRelease(c.Ctx.ResponseWriter)
-	v := sess.Get("uname")
+	// sess, _ := globalSessions.SessionStart(c.Ctx.ResponseWriter, c.Ctx.Request)
+	// defer sess.SessionRelease(c.Ctx.ResponseWriter)
+	v := c.GetSession("uname")
 	if v != nil {
 		c.Data["Uname"] = v.(string) //ck.Value
 	}

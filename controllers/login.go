@@ -223,9 +223,9 @@ func checkAccount(ctx *context.Context) bool {
 	var user models.User
 	//（4）获取当前的请求会话，并返回当前请求会话的对象
 	//但是我还是建议大家采用 SetSession、GetSession、DelSession 三个方法来操作，避免自己在操作的过程中资源没释放的问题
-	sess, _ := globalSessions.SessionStart(ctx.ResponseWriter, ctx.Request)
-	defer sess.SessionRelease(ctx.ResponseWriter)
-	v := sess.Get("uname")
+	// sess, _ := globalSessions.SessionStart(ctx.ResponseWriter, ctx.Request)
+	// defer sess.SessionRelease(ctx.ResponseWriter)
+	v := ctx.Input.CruSession.Get("uname")
 	if v == nil {
 		role1 := Getiprole(ctx.Input.IP())
 		if role1 != 0 {
@@ -235,8 +235,8 @@ func checkAccount(ctx *context.Context) bool {
 		}
 	} else {
 		user.Username = v.(string)
-		v = sess.Get("pwd")        //没必要检查密码吧，因为只有登录了才产生session，才能获取用户名
-		user.Password = v.(string) //ck.Value
+		v = ctx.Input.CruSession.Get("pwd") //没必要检查密码吧，因为只有登录了才产生session，才能获取用户名
+		user.Password = v.(string)          //ck.Value
 		err := models.ValidateUser(user)
 		if err == nil {
 			return true
@@ -251,9 +251,9 @@ func checkRoleread(ctx *context.Context) (uname, role string, err error) { //这
 	var user models.User
 	var roles []*models.Role
 	//（4）获取当前的请求会话，并返回当前请求会话的对象
-	sess, _ := globalSessions.SessionStart(ctx.ResponseWriter, ctx.Request)
-	defer sess.SessionRelease(ctx.ResponseWriter)
-	v := sess.Get("uname")
+	// sess, _ := globalSessions.SessionStart(ctx.ResponseWriter, ctx.Request)
+	// defer sess.SessionRelease(ctx.ResponseWriter)
+	v := ctx.Input.CruSession.Get("uname")
 	if v != nil {
 		user.Username = v.(string) //ck.Value
 		roles, _, err = models.GetRoleByUsername(user.Username)
@@ -278,9 +278,9 @@ func checkRolewrite(ctx *context.Context) (uname, role string, err error) { //�
 	var user models.User
 	var roles []*models.Role
 	//（4）获取当前的请求会话，并返回当前请求会话的对象
-	sess, _ := globalSessions.SessionStart(ctx.ResponseWriter, ctx.Request)
-	defer sess.SessionRelease(ctx.ResponseWriter)
-	v := sess.Get("uname")
+	// sess, _ := globalSessions.SessionStart(ctx.ResponseWriter, ctx.Request)
+	// defer sess.SessionRelease(ctx.ResponseWriter)
+	v := ctx.Input.CruSession.Get("uname")
 	if v != nil {
 		user.Username = v.(string) //ck.Value
 		roles, _, err = models.GetRoleByUsername(user.Username)

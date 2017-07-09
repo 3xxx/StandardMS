@@ -34,9 +34,9 @@ type Standard struct {
 	Route    string
 	// AttachmentId int64
 	// Attachments     []*Attachment `orm:"reverse(many)"` // fk 的反向关系
-	Created time.Time `orm:"index","auto_now_add;type(datetime)"`
-	Updated time.Time `orm:"index","auto_now;type(datetime)"`
-	Views   int64     `orm:"index"`
+	Created time.Time `orm:"auto_now_add;type(datetime)"`
+	Updated time.Time `orm:"auto_now;type(datetime)"`
+	Views   int64
 }
 
 type Library struct {
@@ -48,8 +48,8 @@ type Library struct {
 	Year     string    //编号里的年份
 	Execute  string    //执行时间
 	Content  string    `orm:"sie(5000)"`
-	Created  time.Time `orm:"index","auto_now_add;type(datetime)"`
-	Updated  time.Time `orm:"index","auto_now;type(datetime)"`
+	Created  time.Time `orm:"auto_now_add;type(datetime)"`
+	Updated  time.Time `orm:"auto_now;type(datetime)"`
 }
 
 //附件,attachment 和 Standard 是 ManyToOne 关系，也就是 ForeignKey 为 Standard
@@ -112,11 +112,13 @@ func SaveStandard(standard Standard) (sid int64, err error) {
 //有效版本库存入数据库
 func SaveLibrary(library Library) (lid int64, err error) {
 	o := orm.NewOrm()
+	//关闭写同步
+	o.Raw("PRAGMA synchronous = OFF; ", 0, 0, 0).Exec()
 	//判断是否有重名
 	// var spider Spider //下面这个filter放在topic=&Topic{后面用返回one(topic)则查询出错！
 	//只有编号和主机都不同才写入。
 	var library1 Library //数据库中已有的数据
-	err = o.QueryTable("library").Filter("number", library.Number).Filter("title", library.Title).One(&library1)
+	err = o.QueryTable("library").Filter("number", library.Number).Filter("title", library.Title).Filter("category", library.Category).One(&library1)
 	// err = o.QueryTable("topic").Filter("categoryid", cid).Filter("tnumber", tnumber).One(&topic, "Id")
 	if err == orm.ErrNoRows { //Filter("tnumber", tnumber).One(topic, "Id")==nil则无法建立
 		// 没有找到记录
@@ -147,14 +149,14 @@ func SaveLibrary(library Library) (lid int64, err error) {
 				return 0, err
 			}
 			if Year >= Year1 { //如果比数据库中的新，进行更新操作
-				library1.LiNumber = library.LiNumber //完整编号，含年份
+				// library1.LiNumber = library.LiNumber //完整编号，含年份
 				library1.Year = library.Year
 				library1.Execute = library.Execute
 				library1.Updated = time.Now()
 				lid, err = o.Update(&library1)
 			}
 		} else { //如果数据库中的year没有值，则直接进行update
-			library1.LiNumber = library.LiNumber //完整编号，含年份
+			// library1.LiNumber = library.LiNumber //完整编号，含年份
 			library1.Year = library.Year
 			library1.Execute = library.Execute
 			library1.Updated = time.Now()
@@ -287,7 +289,7 @@ func GetAllValids() ([]*Library, error) {
 	var err error
 	//这里进行过滤，parentid为空的才显示
 	// qs = qs.Filter("ParentId", 0)
-	_, err = qs.OrderBy("-created").All(&librarys)
+	_, err = qs.OrderBy("-created").Limit(10000).All(&librarys)
 	// _, err := qs.All(&cates)
 	return librarys, err
 }

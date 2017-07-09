@@ -118,6 +118,7 @@ func (c *StandardController) Index() { //
 }
 
 //搜索规范或者图集的名称或编号
+//20170704：linumber没有用。因为用category+编号+年份比较好
 func (c *StandardController) Search() { //search用的是post方法
 	name := c.Input().Get("name")
 	if name == "allstandard" {
@@ -178,7 +179,7 @@ func (c *StandardController) Search() { //search用的是post方法
 			if library != nil {
 				aa[i].LibraryNumber = library.Number //规范有效版本库中的编号
 				aa[i].LibraryTitle = library.Title
-				aa[i].LiNumber = library.LiNumber //完整编号
+				aa[i].LiNumber = library.Category + " " + library.Number + "-" + library.Year //完整编号
 			} else {
 				aa[i].LiNumber = "No LibraryNumber Match Find!"
 				aa[i].LibraryTitle = ""

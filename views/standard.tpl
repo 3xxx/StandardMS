@@ -138,7 +138,8 @@
           <th data-formatter="index1">#</th>
           <th data-field="Category" data-sortable="true">行业</th>
           <th data-field="Number" data-sortable="true">编号</th>
-          <th data-field="LiNumber">完整编号</th>
+          <th data-field="Year">年份</th>
+          <th data-field="action" data-formatter="actionFormatter">完整编号</th>
           <th data-field="Title">名称</th>
         </tr>
       </thead>
@@ -368,6 +369,9 @@
 </div>
 
 <script>
+  function actionFormatter(value, row, index) {
+                return row.Category+' '+row.Number+'-'+row.Year
+              }
   function index1(value,row,index){
   // alert( "Data Loaded: " + index );
     return index+1
@@ -736,39 +740,57 @@ jQuery(function() {
     });
 });
 
+function getKey(){
+  var title = $('#name').val();
+  if(event.keyCode==13){ 
+    if (title.length>=2){
+          $.ajax({
+          type:"post",//这里是否一定要用post？？？
+          url:"/standard/search",
+          data: {name: $("#name").val()},
+          success:function(data,status){//数据提交成功时返回数据
+            $("#details").show();
+            //追加数据
+            $('#table').bootstrapTable('append', data);
+            $('#table').bootstrapTable('scrollTo', 'bottom');
+            }       
+          });
+        }else{
+          alert("请输入2个以上字符");
+        }
+  }   
+}
 
-
-function getKey()  
-{  
-    if(event.keyCode==13){  
-     // alert('click enter'); 
-      $.ajax({
-                type:"post",//这里是否一定要用post？？？
-                url:"/standard/search",
-                data: {name: $("#name").val()},
-                success:function(data,status){//数据提交成功时返回数据
-                  // alert(data);
-                  $.each(data,function(i,d){
-                    var tr=$("<tr></tr>");
-                    var th1=$('<th>' + data[i].Number + '</th>');
-                    var th2=$('<th>' + data[i].Title + '</th>');
-                    var th3=$('<th><a href="' + data[i].Route + '"  target="_black"><i                    class="glyphicon glyphicon-download-alt"></i>下载</a></th>');
-                    var th4=$('<th>' + data[i].Uname + '</th>');
-                    var th5=$('<th>' + data[i].LiNumber + data[i].LibraryTitle + '</th>');
-                    tr.append(th1);
-                    tr.append(th2);
-                    tr.append(th3);
-                    tr.append(th4);
-                    tr.append(th5);
-                    $("#results").append(tr);
-                  // <a href="/topic/view_b/{{.Id}}"><i class="glyphicon glyphicon-download-alt"></i>下载</a>
-                  // $("#results").append("<li>"+data[i].Title+"</li>");
-                            }); 
-                    // alert("成功！"+data[0].Title); 
-                  }       
-            });
-    }     
-} 
+// function getKey(){  
+//     if(event.keyCode==13){  
+//      // alert('click enter'); 
+//       $.ajax({
+//                 type:"post",//这里是否一定要用post？？？
+//                 url:"/standard/search",
+//                 data: {name: $("#name").val()},
+//                 success:function(data,status){//数据提交成功时返回数据
+//                   // alert(data);
+//                   $.each(data,function(i,d){
+//                     var tr=$("<tr></tr>");
+//                     var th1=$('<th>' + data[i].Number + '</th>');
+//                     var th2=$('<th>' + data[i].Title + '</th>');
+//                     var th3=$('<th><a href="' + data[i].Route + '"  target="_black"><i class="glyphicon glyphicon-download-alt"></i>下载</a></th>');
+//                     var th4=$('<th>' + data[i].Uname + '</th>');
+//                     var th5=$('<th>' + data[i].LiNumber + data[i].LibraryTitle + '</th>');
+//                     tr.append(th1);
+//                     tr.append(th2);
+//                     tr.append(th3);
+//                     tr.append(th4);
+//                     tr.append(th5);
+//                     $("#results").append(tr);
+//                   // <a href="/topic/view_b/{{.Id}}"><i class="glyphicon glyphicon-download-alt"></i>下载</a>
+//                   // $("#results").append("<li>"+data[i].Title+"</li>");
+//                   }); 
+//                     // alert("成功！"+data[0].Title); 
+//                 }       
+//             });
+//     }     
+// } 
 </script>
 
 

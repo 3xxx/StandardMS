@@ -34,11 +34,11 @@ type Topic struct {
 	CategoryId        int64
 	Content           string `orm:"sie(5000)"`
 	Attachment        string
-	Created           time.Time `orm:"index","auto_now_add;type(datetime)"`
-	Updated           time.Time `orm:"index","auto_now;type(datetime)"`
-	Views             int64     `orm:"index"`
+	Created           time.Time `orm:"auto_now_add;type(datetime)"`
+	Updated           time.Time `orm:"auto_now;type(datetime)"`
+	Views             int64
 	Author            string
-	ReplyTime         time.Time `orm:"index"`
+	ReplyTime         time.Time
 	ReplyCount        int64
 	ReplyLastUserName string
 	// Attachments     []*Attachment `orm:"reverse(many)"` // fk 的反向关系
@@ -55,9 +55,9 @@ type Attachment struct {
 	Route         string
 	Content       string    `orm:"sie(200)"`
 	TopicId       int64     //*Topic    `orm:"rel(fk)"`
-	Created       time.Time `orm:"index","auto_now_add;type(datetime)"`
-	Updated       time.Time `orm:"index","auto_now;type(datetime)"`
-	Views         int64     `orm:"index"`
+	Created       time.Time `orm:"auto_now_add;type(datetime)"`
+	Updated       time.Time `orm:"auto_now;type(datetime)"`
+	Views         int64
 	Author        string
 }
 

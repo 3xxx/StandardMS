@@ -22,9 +22,9 @@ type Catalog struct {
 	DesignStage string
 	Section     string
 	Projec      string
-	Created     time.Time `orm:"index"`
-	Updated     time.Time `orm:"index"`
-	Views       int64     `form:"-",orm:"index"`
+	Created     time.Time ``
+	Updated     time.Time ``
+	Views       int64     `form:"-"`
 	Author      string
 	Exist       bool
 	TopicId     int64

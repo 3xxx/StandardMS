@@ -24,8 +24,8 @@ type Commenttopic struct {
 	Id      int64
 	Tid     int64
 	Name    string
-	Content string    `orm:"size(1000)"`
-	Created time.Time `orm:"index"`
+	Content string `orm:"size(1000)"`
+	Created time.Time
 }
 
 //wiki评论
@@ -33,8 +33,8 @@ type Commentwiki struct {
 	Id      int64
 	Tid     int64
 	Name    string
-	Content string    `orm:"size(1000)"`
-	Created time.Time `orm:"index"`
+	Content string `orm:"size(1000)"`
+	Created time.Time
 }
 
 func init() {

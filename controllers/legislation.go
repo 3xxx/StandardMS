@@ -107,11 +107,11 @@ func (c *LegislationController) Checklist() { //checklist用的是post方法
 					for j, w := range library {
 						// beego.Info(w)
 						if j == 0 {
-							aa[i].LibraryNumber = w.LiNumber //规范有效版本库中的完整编号
+							aa[i].LibraryNumber = w.Category + " " + w.Number + "-" + w.Year //规范有效版本库中的完整编号
 							aa[i].LibraryTitle = w.Title
 							aa[i].Execute = w.Execute //执行日期
 						} else {
-							aa[i].LibraryNumber = aa[i].LibraryNumber + "," + w.LiNumber //规范有效版本库中的完整编号
+							aa[i].LibraryNumber = aa[i].LibraryNumber + "," + w.Category + " " + w.Number + "-" + w.Year //规范有效版本库中的完整编号
 							aa[i].LibraryTitle = w.Title
 							aa[i].Execute = aa[i].Execute + "," + w.Execute //执行日期
 						}

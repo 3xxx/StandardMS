@@ -34,9 +34,9 @@ type Legislation struct {
 	Route    string
 	// AttachmentId int64
 	// Attachments     []*Attachment `orm:"reverse(many)"` // fk 的反向关系
-	Created time.Time `orm:"index","auto_now_add;type(datetime)"`
-	Updated time.Time `orm:"index","auto_now;type(datetime)"`
-	Views   int64     `orm:"index"`
+	Created time.Time `orm:"auto_now_add;type(datetime)"`
+	Updated time.Time `orm:"auto_now;type(datetime)"`
+	Views   int64
 }
 
 //附件,attachment 和 Legislation 是 ManyToOne 关系，也就是 ForeignKey 为 Legislation

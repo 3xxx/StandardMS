@@ -20,8 +20,8 @@ type Spider struct {
 	Link     string
 	UserName string
 	UserIp   string
-	Created  time.Time `orm:"index","auto_now_add;type(datetime)"`
-	Updated  time.Time `orm:"index","auto_now_add;type(datetime)"`
+	Created  time.Time `orm:"auto_now_add;type(datetime)"`
+	Updated  time.Time `orm:"auto_now_add;type(datetime)"`
 }
 
 //成果表
@@ -32,8 +32,8 @@ type Spidertopic struct {
 	Link     string
 	UserName string
 	UserIp   string
-	Created  time.Time `orm:"index","auto_now_add;type(datetime)"`
-	Updated  time.Time `orm:"index","auto_now_add;type(datetime)"`
+	Created  time.Time `orm:"auto_now_add;type(datetime)"`
+	Updated  time.Time `orm:""auto_now_add;type(datetime)"`
 }
 
 //项目表
@@ -44,8 +44,8 @@ type Spidercategory struct {
 	Link     string
 	UserName string
 	UserIp   string
-	Created  time.Time `orm:"index","auto_now_add;type(datetime)"`
-	Updated  time.Time `orm:"index","auto_now_add;type(datetime)"`
+	Created  time.Time `orm:"auto_now_add;type(datetime)"`
+	Updated  time.Time `orm:"auto_now_add;type(datetime)"`
 }
 
 func init() {

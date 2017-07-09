@@ -19,9 +19,9 @@ type Category struct {
 	Content         string    `orm:"sie(5000)"` //项目简介
 	Cover           string    `orm:"sie(5000)"` //封面文字介绍
 	Route           string    //封面图片的链接地址
-	Created         time.Time `orm:"index","auto_now_add;type(datetime)"`
-	Updated         time.Time `orm:"index","auto_now_add;type(datetime)"`
-	Views           int64     `form:"-",orm:"index"`
+	Created         time.Time `orm:"auto_now_add;type(datetime)"`
+	Updated         time.Time `orm:"auto_now_add;type(datetime)"`
+	Views           int64     `form:"-"`
 	Author          string    //这个改成uid代替
 	TopicCount      int64     //`form:"-"`
 	TopicLastUserId int64     //`form:"-"`
