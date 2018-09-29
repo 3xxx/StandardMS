@@ -3,30 +3,30 @@ package main
 import (
 	// "fmt"
 	"github.com/astaxie/beego"
-	"github.com/astaxie/beego/orm"
-	"github.com/astaxie/beego/toolbox"
+	// "github.com/astaxie/beego/orm"
+	// "github.com/astaxie/beego/toolbox"
 	// "github.com/beego/i18n"
-	"hydrocms/controllers"
+	// "hydrocms/controllers"
 	_ "hydrocms/routers"
-	"os"
+	// "os"
 	// "hydrocms/models"
 )
 
 //自定义模板函数，序号加1
-func Indexaddone(index int) (index1 int) {
-	index1 = index + 1
-	return
-}
+// func Indexaddone(index int) (index1 int) {
+// 	index1 = index + 1
+// 	return
+// }
 
 func main() {
-	beego.AddFuncMap("indexaddone", Indexaddone) //模板中使用{{indexaddone $index或.Content | hi}}
+	// beego.AddFuncMap("indexaddone", Indexaddone) //模板中使用{{indexaddone $index或.Content | hi}}
 	//开启orm调试模式
-	orm.Debug = true
+	// orm.Debug = true
 	//自动建表
-	orm.RunSyncdb("default", false, true)
+	// orm.RunSyncdb("default", false, true)
 
 	//创建附件目录
-	os.Mkdir("attachment", os.ModePerm)
+	// os.Mkdir("attachment", os.ModePerm)
 	//作為靜態文件
 	//beego.SetStaticPath("/attachment", "attachment")
 	//作为单独一个控制器来处理
@@ -36,15 +36,15 @@ func main() {
 	// 需要先注册一个模板函数
 	// beego.AddFuncMap("i18n", i18n.Tr)
 
-	if beego.AppConfig.String("spider") == "on" {
-		time := beego.AppConfig.String("spec") //"0/time * * * * *"
-		// time1 := "0/" + time + " * * * * *"
-		time1 := "0 0 */" + time + " * * *"
-		tk1 := toolbox.NewTask("tk1", time1, func() error { controllers.TestJsonStartsWithArray(); return nil }) //func() error { fmt.Println("tk1"); return nil }
-		toolbox.AddTask("tk1", tk1)
-		toolbox.StartTask()
-		defer toolbox.StopTask()
-	}
+	// if beego.AppConfig.String("spider") == "on" {
+	// 	time := beego.AppConfig.String("spec") //"0/time * * * * *"
+	// 	// time1 := "0/" + time + " * * * * *"
+	// 	time1 := "0 0 */" + time + " * * *"
+	// 	tk1 := toolbox.NewTask("tk1", time1, func() error { controllers.TestJsonStartsWithArray(); return nil }) //func() error { fmt.Println("tk1"); return nil }
+	// 	toolbox.AddTask("tk1", tk1)
+	// 	toolbox.StartTask()
+	// 	defer toolbox.StopTask()
+	// }
 	//启动beeego
 	beego.Run()
 }

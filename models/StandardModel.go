@@ -71,8 +71,8 @@ type Library struct {
 
 func init() {
 	orm.RegisterModel(new(Standard), new(Library)) //, new(Attachment), new(Article)
-	// orm.RegisterDriver("sqlite", orm.DRSqlite)
-	// orm.RegisterDataBase("default", "sqlite3", "database/orm_test.db", 10)
+	orm.RegisterDriver("sqlite", orm.DRSqlite)
+	orm.RegisterDataBase("default", "sqlite3", "database/hydrocms.db", 10)
 }
 
 //标准存入数据库

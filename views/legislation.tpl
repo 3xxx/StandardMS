@@ -1,27 +1,18 @@
 <!DOCTYPE html>
-
 <title>首页 - 水利设计CMS系统</title>
-
 <head>
     <!-- <meta charset="UTF-8"> -->
     <link href="/static/youdao/g3.css" rel="stylesheet" type="text/css">
     <link href="/static/youdao/fanyi.css" rel="stylesheet" type="text/css">
     <script type="text/javascript" src="/static/js/jquery-2.1.3.min.js"></script>
-        
-    <!-- <meta name="viewport" content="width=device-width, initial-scale=1"> -->
-    <!-- <meta http-equiv="X-UA-Compatible" content="IE=edge"> -->
-    <!-- <script src="/static/js/respond.min.js"></script> -->
-    <!-- <script src="/static/js/html5shiv.min.js"></script> -->
 </head>
-
 <body class="open result-default">
-
     <div id="w" class="cf">
         <div id="transBackground">
             <div id="main" class="cf show-translate">
                 <div id="transBtnTip">
                     <div id="transBtnTipInner">
-                        点击翻译按钮继续，查看网页翻译结果。
+                        点击对标按钮继续，查看网页对标结果。
                         <p class="ar">
                             <a href="/#" id="transBtnTipOK">我知道了</a>
                         </p> <b id="transBtnTipArrow"></b>
@@ -37,9 +28,9 @@
                                 </div>
                             </div>
                             <div class="row border content" id="inputContent">
-                                <textarea id="inputText" class="text" dir="ltr" tabindex="1" wrap="SOFT" name="name" placeholder="将报告中的法规复制粘贴到这里，一行一条，《法规名称必须放在书名号中》；自动记录未查询到的法规，以便改进。致谢：ZLP,YGL,LXH,ZCW,JSL,YM……"></textarea>
+                                <textarea id="inputText" class="text" dir="ltr" tabindex="1" wrap="SOFT" name="name" placeholder="将报告中的法规复制粘贴到这里，一行一条，《法规名称必须放在书名号中》；自动记录未查询到的法规，以便改进。"></textarea>
                                 <!-- <div class="typo-suggest" style="display: none;">
-                                    您是不是要翻译：
+                                    您是不是要对标：
                                     <a class="spell-corrected" href="/#"></a>
                                 </div> -->
                             </div>
@@ -140,11 +131,7 @@
 
         </div>
         <!-- end of main --> </div>
-    
-
 </div>
-<!-- end of w -->
-
 
 <script type="text/javascript" src="/static/youdao/openapi.do" charset="utf-8"></script>
 
@@ -160,7 +147,7 @@
     <a href="/standard">HydroCMS规范</a>
     <span class="c_fnl">|</span>
     <a href="https://github.com/3xxx">源码托管</a>
-    <p class="c_fcopyright">© 2016 <a href="https://github.com/3xxx" target="_blank" rel="nofollow">3xxx</a> QQ504284</p>
+    <p class="c_fcopyright">© 2018 <a href="https://github.com/3xxx" target="_blank" rel="nofollow">3xxx</a> QQ504284</p>
 </div>
 
 <script type="text/javascript">
@@ -184,10 +171,7 @@ $("#checklist").click(function(){//这里应该用button的id来区分按钮的�
     $("#translated")[0].style.display = 'block';
     $('#translated').css('display','block');
     $("#translated").css({ display: "block"});
-                // alert(document.getElementById("inputText").value);
-                // alert($("#inputText").val());
-                // alert($("#inputText").text());//空
-                // alert($("#inputText").html());//空
+
                 $.ajax({
                 type:"post",//这里是否一定要用post？？？
                 url:"/legislation/checklist",
@@ -198,78 +182,12 @@ $("#checklist").click(function(){//这里应该用button的id来区分按钮的�
                         // alert(data[i].Title);
                         $(".translated_result").append('<p>('+data[i].Id+')&nbsp;《'+data[i].LibraryTitle+'》&nbsp;('+data[i].LibraryNumber+')</p>');
                     }); 
-                  // alert(data[1].Uname);
-                  // $.each(data,function(i,d){
-                  //   var tr=$("<tr></tr>");
-                  //   var th1=$('<th>' + data[i].Number + '</th>');
-                  //   var th2=$('<th>' + data[i].Title + '</th>');
-                  //   var th3=$('<th><a href="' + data[i].Route + '"  target="_black"><i                    class="glyphicon glyphicon-download-alt"></i>下载</a></th>');
-                  //   var th4=$('<th>' + data[i].Uname + '</th>');
-                  //   var th5=$('<th>' + data[i].LiNumber + data[i].LibraryTitle + '</th>');
-                  //   tr.append(th1);
-                  //   tr.append(th2);
-                  //   tr.append(th3);
-                  //   tr.append(th4);
-                  //   tr.append(th5);
-                  //   $("#results").append(tr);
-                  //   }); 
+
                   }       
             });
         });
      });
   </script> 
-                  <!--  // function addRow(){
-                    //     //声明tr td对象
-                    //     var tr=$("<tr></tr>");
-                    //     var td1=$("<td></td>");//拼接td，如果有td里有内容拼接时候填充进去
-                    //     var td2=$("<td></td>");//拼接td，如果有td里有内容拼接时候填充进去
-                    //     var td3=$("<td></td>");//拼接td，如果有td里有内容拼接时候填充进去
-                    //     var td4=$("<td></td>");//拼接td，如果有td里有内容拼接时候填充进去
-                    //     //将td添加到tr里
-                    //     tr.append(td1);
-                    //     tr.append(td2);
-                    //     tr.append(td3);
-                    //     tr.append(td4);
-                    //     //或者
-                    //     var tr="<tr><td></td> <td></td> <td></td> <td></td></tr>";//                 拼接html，如果有td里有内容拼接时候填充进去
-                        
-                    //     //再将tr添加到表格内
-                    //     $("#表格的id").append(tr);
-                    // } -->
-                     
-    
-
-
-<!-- <script type="text/javascript">
-  _ntes_nacc = "ydfanyiweb";
-  neteaseTracker();
-</script> -->
-<!-- END NetEase Devilfish 2006 -->
-<!-- START rlog -->
-<!-- <script type="text/javascript">
-  __rl_npid = "fanyiweb";
-  (function() {
-    var _rl = document.createElement('script');
-    _rl.type = 'text/javascript'; _rl.async = true;
-    _rl.src = 'http://rlogs.youdao.com/rlog.js';
-    var s = document.getElementsByTagName('script')[0];
-    s.parentNode.insertBefore(_rl, s);
-  })();
-</script> -->
-<!-- END rlog -->
-
-
-<!-- <div class="cpm-wrap">
-    <div class="cpm">
-        <div class="dict-cpm-mask"></div>
-        <div class="cpm-click dict-inline-block dict-vam">
-            <a class="cpm-close clog-js" data-clog="click-mac-close" href="javascript:;"></a>
-        </div>
-        <div class="cpm-height dict-inline-block dict-vam"></div>
-    </div>
-</div> -->
-
-
 
 </body>
 </html>

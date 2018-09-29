@@ -2,14 +2,14 @@
 {{template "header"}}
 <title>查阅规范、图集、计算书</title>
   <link rel="stylesheet" type="text/css" href="/static/fex-team-webuploader/css/webuploader.css">
-  <script type="text/javascript" src="/static/fex-team-webuploader/dist/webuploader.js"></script>
+  <script type="text/javascript" src="/static/fex-team-webuploader/dist/webuploader.min.js"></script>
   <link rel="stylesheet" type="text/css" href="/static/css/bootstrap-table.min.css"/>
-  <script type="text/javascript" src="/static/js/jquery.tablesorter.min.js"></script>
   <script type="text/javascript" src="/static/js/bootstrap-table.min.js"></script>
   <script type="text/javascript" src="/static/js/bootstrap-table-zh-CN.min.js"></script>
   <script type="text/javascript" src="/static/js/bootstrap-table-export.min.js"></script>
+  <script type="text/javascript" src="/static/js/tableExport.js"></script>
   <link rel="stylesheet" type="text/css" href="/static/font-awesome-4.7.0/css/font-awesome.min.css"/>
-  <script src="/static/js/tableExport.js"></script>
+  
 </head>
 
 <body>
@@ -155,7 +155,7 @@
   </div>
 
   <div class="col-lg-6">
-    <h4>Copyright © 2016~2017 EngineerCMS</h4>
+    <h4>Copyright © 2016~2018 EngineerCMS</h4>
     <p>
       网站由 <i class="user icon"></i>
       <a target="_blank" href="https://github.com/3xxx">@3xxx</a>
@@ -168,7 +168,7 @@
 
     <p>
       请给 <i class="glyphicon glyphicon-envelope"></i>
-      <a class="email" href="mailto:qin.xc@gpdiwe.com">我</a>
+      <a class="email" href="mailto:504284@qq.com">我</a>
       发送反馈信息或提交
       <i class="tasks icon"></i>
       <a target="_blank" href="https://github.com/3xxx/engineercms/issues">应用问题</a>
@@ -182,7 +182,7 @@
         <a href="https://github.com/3xxx/hydrows">水利供水管线设计工具</a>
       </p>
       <p>
-        <a href="https://github.com/3xxx/merit">成果与价值管理系统</a>
+        <a href="https://github.com/3xxx/meritms">成果与价值管理系统</a>
       </p>
       <p>
         <a href="https://github.com/3xxx/engineercms">工程师知识管理系统</a>
@@ -288,7 +288,7 @@
           </div>
           <div class="modal-body">
               <!-- <div class="form-group"> -->
-                <form method="post" action="/standard/importexcel" enctype="multipart/form-data">
+                <form method="post" action="/importexcel" enctype="multipart/form-data">
                   <label>
                     <input type="file" name="excel" id="excel" class="btn btn-default"/>
                   </label>
@@ -306,7 +306,7 @@
 
 <!-- 修改有效版本库 -->
 <div class="container form-horizontal">
-  <div class="modal fade" id="modalTable1">
+  <div class="modal fade" id="editorvalidmodal">
     <div class="modal-dialog">
       <div class="modal-content">
           <div class="modal-header">
@@ -317,19 +317,24 @@
           </div>
           <div class="modal-body">
             <div class="form-group must">
+              <label class="col-sm-3 control-label">行业</label>
+              <div class="col-sm-7">
+                <input type="text" class="form-control" id="category2"></div>
+            </div>
+            <div class="form-group must">
+              <label class="col-sm-3 control-label">编号</label>
+              <div class="col-sm-7">
+                <input type="text" class="form-control" id="number2"></div>
+            </div>
+            <div class="form-group must">
+              <label class="col-sm-3 control-label">年份</label>
+              <div class="col-sm-7">
+                <input type="text" class="form-control" id="year2"></div>
+            </div>
+            <div class="form-group must">
               <label class="col-sm-3 control-label">名称</label>
               <div class="col-sm-7">
-                <input type="text" class="form-control" id="title1"></div>
-            </div>
-            <div class="form-group must">
-              <label class="col-sm-3 control-label">内容</label>
-              <div class="col-sm-7">
-                <input type="text" class="form-control" id="content1"></div>
-            </div>
-            <div class="form-group must">
-              <label class="col-sm-3 control-label">备注</label>
-              <div class="col-sm-7">
-                <input type="tel" class="form-control" id="about1"></div>
+                <input type="text" class="form-control" id="title2"></div>
             </div>
           </div>
           <div class="modal-footer">
@@ -353,7 +358,7 @@
             <h3 class="modal-title">导入有效版本数据</h3>
           </div>
           <div class="modal-body">
-            <form method="post" action="/standard/importlibrary" enctype="multipart/form-data">
+            <form method="post" action="/importlibrary" enctype="multipart/form-data">
               <label>
                 <input type="file" name="excel" id="excel" class="btn btn-default"/>
               </label>
@@ -400,16 +405,15 @@ $(document).ready(function(){
     //显示和管理有效版本库
     $("#valid").click(function() {
       $("#details2").show();
-      $('#table1').bootstrapTable('refresh', {url:'/standard/valid'});
+      $('#table1').bootstrapTable('refresh', {url:'/valid'});
     })
 
   $("#search").click(function(){//这里应该用button的id来区分按钮的哪一个,因为本页有好几个button
     var title = $('#name').val();
-    if (title.length>=2)
-        {
+    if (title.length>=2){
           $.ajax({
           type:"post",//这里是否一定要用post？？？
-          url:"/standard/search",
+          url:"/search",
           data: {name: $("#name").val()},
           success:function(data,status){//数据提交成功时返回数据
             $("#details").show();
@@ -443,13 +447,10 @@ $(document).ready(function(){
                   // alert("成功！"+data[0].Title); 
             }       
           });
-
         }else{
           alert("请输入2个以上字符");
         }
-
     });
-  
   });
 
   //规范表格增删改
@@ -518,7 +519,7 @@ $(document).ready(function(){
 
         $.ajax({
           type:"post",
-          url:"/standard/deletestandard",
+          url:"/deletestandard",
           data: {ids:ids},
           success:function(data,status){
             alert("删除“"+data+"”成功！(status:"+status+".)");
@@ -562,10 +563,10 @@ $(document).ready(function(){
       $("input#cid").remove();
       var th1="<input id='cid' type='hidden' name='cid' value='" +selectRow[0].Id+"'/>"
       $(".modal-body").append(th1);//这里是否要换名字$("p").remove();
-      $("#Iptitle1").val(selectRow[0].Title);
-      $("#StartIp1").val(selectRow[0].StartIp);
-      $("#EndIp1").val(selectRow[0].EndIp);
-      $("#Iprole1").val(selectRow[0].Iprole);
+      $("#category2").val(selectRow[0].Category);
+      $("#number2").val(selectRow[0].Number);
+      $("#year2").val(selectRow[0].Year);
+      $("#title2").val(selectRow[0].Title);
         $('#editorvalidmodal').modal({
         show:true,
         backdrop:'static'
@@ -578,7 +579,6 @@ $(document).ready(function(){
         alert("请先勾选！");
         return false;
       }
-
       if(confirm("确定删除吗？一旦删除将无法恢复！")){
         var title=$.map(selectRow,function(row){
           return row.Title;
@@ -591,14 +591,12 @@ $(document).ready(function(){
             ids=ids+","+selectRow[i].Id;
           }  
         }
-
         var ids1=$.map(selectRow,function(row){
         return row.id;
         })
-
         $.ajax({
           type:"post",
-          url:"/standard/deletevalid",
+          url:"/deletevalid",
           data: {ids:ids},
           success:function(data,status){
             alert("删除“"+data+"”成功！(status:"+status+".)");
@@ -610,7 +608,6 @@ $(document).ready(function(){
           }
         });
       } 
-      
     })
   })
 
@@ -626,7 +623,7 @@ $(document).ready(function(){
       {  
         $.ajax({
           type:"post",
-          url:"/standard/updatestandard",
+          url:"/updatestandard",
           data: {cid:cid,number:number1,title:title1,route:route1,uname:uname1},
           success:function(data,status){
             alert("添加“"+data+"”成功！(status:"+status+".)");
@@ -635,13 +632,14 @@ $(document).ready(function(){
       } 
       // $(function(){$('#myModal').modal('hide')});
         $('#editorstandardmodal').modal('hide');
-        $('#table').bootstrapTable('refresh', {url:'/standard/getstandard'});
+        $('#table').bootstrapTable('refresh', {url:'/getstandard'});
         // "/category/modifyfrm?cid="+cid
         // window.location.reload();//刷新页面
   }
-// 文件上传
-jQuery(function() {
-    var $ = jQuery,
+
+  // 文件上传
+  jQuery(function() {
+      var $ = jQuery,
         $list = $('#thelist'),
         $btn = $('#ctlBtn'),
         state = 'pending',
@@ -652,39 +650,39 @@ jQuery(function() {
         // swf文件路径
         swf: '/static/fex-team-webuploader/dist/Uploader.swf',
         // 文件接收服务端。
-        server: '/standard/standard_one_addbaidu',
+        server: '/standard_one_addbaidu',
         // 选择文件的按钮。可选。
         // 内部根据当前运行是创建，可能是input元素，也可能是flash.
         pick: '#picker'
-    });
+      });
 
-    // 当有文件添加进来的时候
-    uploader.on( 'fileQueued', function( file ) {
-        $list.append( '<div id="' + file.id + '" class="item">' +
-            '<h4 class="info">' + file.name + '</h4>' +
-            '<p class="state">等待上传...</p>' +
-        '</div>' );
-    });
-//当某个文件的分块在发送前触发，主要用来询问是否要添加附带参数，
-//大文件在开起分片上传的前提下此事件可能会触发多次。
-// uploader.on( 'fileQueued', function( file ) {
-    // do some things.
-// });
-
- // uploader.on( 'startUpload', function() {
- //    var tnumber = $('#tnumber').val();
- //    var title = $('#title').val();
- //    var categoryid = $('#categoryid').val();
- //    var category = $('#category').val();
- //    var html = ue.getContent();
- //      uploader.option('formData', {
- //        "tnumber":tnumber,
- //        "title":title,
- //        "categoryid":categoryid,
- //        "category":category,
- //        'content':html,
- //      });        
- //    });
+      // 当有文件添加进来的时候
+      uploader.on( 'fileQueued', function( file ) {
+          $list.append( '<div id="' + file.id + '" class="item">' +
+              '<h4 class="info">' + file.name + '</h4>' +
+              '<p class="state">等待上传...</p>' +
+          '</div>' );
+      });
+      //当某个文件的分块在发送前触发，主要用来询问是否要添加附带参数，
+      //大文件在开起分片上传的前提下此事件可能会触发多次。
+      // uploader.on( 'fileQueued', function( file ) {
+          // do some things.
+      // });
+      
+      // uploader.on( 'startUpload', function() {
+      //    var tnumber = $('#tnumber').val();
+      //    var title = $('#title').val();
+      //    var categoryid = $('#categoryid').val();
+      //    var category = $('#category').val();
+      //    var html = ue.getContent();
+      //      uploader.option('formData', {
+      //        "tnumber":tnumber,
+      //        "title":title,
+      //        "categoryid":categoryid,
+      //        "category":category,
+      //        'content':html,
+      //      });        
+      //    });
 
     // 文件上传过程中创建进度条实时显示。
     uploader.on( 'uploadProgress', function( file, percentage ) {
@@ -738,62 +736,30 @@ jQuery(function() {
             uploader.upload();
         }
     });
-});
+  });
 
-function getKey(){
-  var title = $('#name').val();
-  if(event.keyCode==13){ 
-    if (title.length>=2){
-          $.ajax({
-          type:"post",//这里是否一定要用post？？？
-          url:"/standard/search",
-          data: {name: $("#name").val()},
-          success:function(data,status){//数据提交成功时返回数据
-            $("#details").show();
-            //追加数据
-            $('#table').bootstrapTable('append', data);
-            $('#table').bootstrapTable('scrollTo', 'bottom');
-            }       
-          });
-        }else{
-          alert("请输入2个以上字符");
-        }
-  }   
-}
+  function getKey(){
+    var title = $('#name').val();
+    if(event.keyCode==13){ 
+      if (title.length>=2){
+        $.ajax({
+        type:"post",//这里是否一定要用post？？？
+        url:"/search",
+        data: {name: $("#name").val()},
+        success:function(data,status){//数据提交成功时返回数据
+          $("#details").show();
+          //追加数据
+          $('#table').bootstrapTable('append', data);
+          $('#table').bootstrapTable('scrollTo', 'bottom');
+          }       
+        });
+      }else{
+        alert("请输入2个以上字符");
+      }
+    }   
+  }
 
-// function getKey(){  
-//     if(event.keyCode==13){  
-//      // alert('click enter'); 
-//       $.ajax({
-//                 type:"post",//这里是否一定要用post？？？
-//                 url:"/standard/search",
-//                 data: {name: $("#name").val()},
-//                 success:function(data,status){//数据提交成功时返回数据
-//                   // alert(data);
-//                   $.each(data,function(i,d){
-//                     var tr=$("<tr></tr>");
-//                     var th1=$('<th>' + data[i].Number + '</th>');
-//                     var th2=$('<th>' + data[i].Title + '</th>');
-//                     var th3=$('<th><a href="' + data[i].Route + '"  target="_black"><i class="glyphicon glyphicon-download-alt"></i>下载</a></th>');
-//                     var th4=$('<th>' + data[i].Uname + '</th>');
-//                     var th5=$('<th>' + data[i].LiNumber + data[i].LibraryTitle + '</th>');
-//                     tr.append(th1);
-//                     tr.append(th2);
-//                     tr.append(th3);
-//                     tr.append(th4);
-//                     tr.append(th5);
-//                     $("#results").append(tr);
-//                   // <a href="/topic/view_b/{{.Id}}"><i class="glyphicon glyphicon-download-alt"></i>下载</a>
-//                   // $("#results").append("<li>"+data[i].Title+"</li>");
-//                   }); 
-//                     // alert("成功！"+data[0].Title); 
-//                 }       
-//             });
-//     }     
-// } 
 </script>
-
-
 
 </body>
 </html> 

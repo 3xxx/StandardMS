@@ -3,16 +3,16 @@ package controllers
 import (
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
-	"hydrocms/models"
+	// "hydrocms/models"
 	//（1）导入session包
 	// "encoding/json"
 	// "fmt"
-	"github.com/astaxie/beego/session"
+	// "github.com/astaxie/beego/session"
 	// "github.com/bitly/go-simplejson" // for json get
 )
 
 //（2）建立一个全局session mananger对象
-var globalSessions *session.Manager
+// var globalSessions *session.Manager
 
 //（3）在初始化“全局session mananger对象”
 // func init() {
@@ -35,26 +35,26 @@ type MainController struct {
 
 // }
 
-func (c *MainController) Help() {
-	c.Data["IsLogin"] = checkAccount(c.Ctx)
-	c.Data["IsHelp"] = true
-	// sess, _ := globalSessions.SessionStart(c.Ctx.ResponseWriter, c.Ctx.Request)
-	// defer sess.SessionRelease(c.Ctx.ResponseWriter)
-	v := c.GetSession("uname")
-	if v != nil {
+// func (c *MainController) Help() {
+// 	// c.Data["IsLogin"] = checkAccount(c.Ctx)
+// 	c.Data["IsHelp"] = true
+// 	// sess, _ := globalSessions.SessionStart(c.Ctx.ResponseWriter, c.Ctx.Request)
+// 	// defer sess.SessionRelease(c.Ctx.ResponseWriter)
+// 	v := c.GetSession("uname")
+// 	if v != nil {
 
-		// } else {
-		// }
-		//2.取得客户端用户名
-		// ck, err := c.Ctx.Request.Cookie("uname")
-		// if err != nil {
-		// beego.Error(err)
-		// } else {
-		c.Data["Uname"] = v.(string) //ck.Value
-	}
-	c.TplName = "help.html"
+// 		// } else {
+// 		// }
+// 		//2.取得客户端用户名
+// 		// ck, err := c.Ctx.Request.Cookie("uname")
+// 		// if err != nil {
+// 		// beego.Error(err)
+// 		// } else {
+// 		c.Data["Uname"] = v.(string) //ck.Value
+// 	}
+// 	c.TplName = "help.html"
 
-}
+// }
 func (c *MainController) Test() {
 	// c.Data["IsLogin"] = checkAccount(c.Ctx)
 	// c.Data["IsHelp"] = true
@@ -104,16 +104,16 @@ func (c *MainController) Get() {
 	// beego.Info(Getiprole(c.Ctx.Input.IP()))
 	c.Data["IsHome"] = true
 	c.TplName = "index.tpl"
-	c.Data["IsLogin"] = checkAccount(c.Ctx) //大小写害死人！IsLogin
+	// c.Data["IsLogin"] = checkAccount(c.Ctx) //大小写害死人！IsLogin
 	//2.取得客户端用户名
 	// sess, _ = globalSessions.SessionStart(c.Ctx.ResponseWriter, c.Ctx.Request)
 	// defer sess.SessionRelease(c.Ctx.ResponseWriter)
-	v := c.GetSession("uname")
-	if v != nil {
-		c.Data["Uname"] = v.(string) //ck.Value
-	} else {
-		c.Data["Uname"] = c.Ctx.Input.IP()
-	}
+	// v := c.GetSession("uname")
+	// if v != nil {
+	// 	c.Data["Uname"] = v.(string) //ck.Value
+	// } else {
+	// 	c.Data["Uname"] = c.Ctx.Input.IP()
+	// }
 	// ck, err := c.Ctx.Request.Cookie("uname")
 	// if err != nil {
 	// 	beego.Error(err)
@@ -121,27 +121,27 @@ func (c *MainController) Get() {
 	// 	c.Data["Uname"] = ck.Value
 	// }
 	//下面这个没用了吧
-	c.Data["Id"] = c.Ctx.Input.Param(":id")
-	topics, err := models.GetAllTopics(c.Input().Get("cate"), true)
-	if err != nil {
-		beego.Error(err)
-	}
-	c.Data["Topics"] = topics
+	// c.Data["Id"] = c.Ctx.Input.Param(":id")
+	// topics, err := models.GetAllTopics(c.Input().Get("cate"), true)
+	// if err != nil {
+	// 	beego.Error(err)
+	// }
+	// c.Data["Topics"] = topics
 
-	categories, err := models.GetAllCategories()
-	if err != nil {
-		beego.Error(err)
-	}
-	c.Data["Categories"] = categories
+	// categories, err := models.GetAllCategories()
+	// if err != nil {
+	// 	beego.Error(err)
+	// }
+	// c.Data["Categories"] = categories
 	//查出所有图文category，并查出其中的topic
 	//标准目录下，category的三级名字是 设计/修改通知单——要找到所有下级
 	//自定义目录下，category的graphicmode是true
 
-	graphictopics, err := models.GetAllGraphicTopics()
-	if err != nil {
-		beego.Error(err)
-	}
-	c.Data["Graphictopics"] = graphictopics
+	// graphictopics, err := models.GetAllGraphicTopics()
+	// if err != nil {
+	// 	beego.Error(err)
+	// }
+	// c.Data["Graphictopics"] = graphictopics
 	//c.Ctx.Output.Download("database/1.txt", "1.txt")
 	//试验控制器数据赋值
 	// ss := []string{"a", "b", "c"}
@@ -160,7 +160,7 @@ func (c *MainController) Get() {
 func (c *MainController) Post() {
 	c.Data["IsHome"] = true
 	c.TplName = "index.tpl"
-	c.Data["IsLogin"] = checkAccount(c.Ctx) //大小写害死人！IsLogin
+	// c.Data["IsLogin"] = checkAccount(c.Ctx) //大小写害死人！IsLogin
 	//2.取得客户端用户名
 	// 	type Controller
 	// type Controller struct {
@@ -178,10 +178,10 @@ func (c *MainController) Post() {
 	// }
 	// sess, _ := globalSessions.SessionStart(c.Ctx.ResponseWriter, c.Ctx.Request)
 	// defer sess.SessionRelease(c.Ctx.ResponseWriter)
-	v := c.GetSession("uname")
-	if v != nil {
-		c.Data["Uname"] = v.(string) //ck.Value
-	}
+	// v := c.GetSession("uname")
+	// if v != nil {
+	// c.Data["Uname"] = v.(string) //ck.Value
+	// }
 	// ck, err := c.Ctx.Request.Cookie("uname")
 	// if err != nil {
 	// 	beego.Error(err)
@@ -189,15 +189,15 @@ func (c *MainController) Post() {
 	// 	c.Data["Uname"] = ck.Value
 	// }
 	c.Data["Id"] = c.Ctx.Input.Param(":id")
-	topics, err := models.GetAllTopics(c.Input().Get("cate"), true)
-	if err != nil {
-		beego.Error(err)
-	}
-	c.Data["Topics"] = topics
-	categories, err := models.GetAllCategories()
-	if err != nil {
-		beego.Error(err)
-	}
+	// topics, err := models.GetAllTopics(c.Input().Get("cate"), true)
+	// if err != nil {
+	// 	beego.Error(err)
+	// }
+	// c.Data["Topics"] = topics
+	// categories, err := models.GetAllCategories()
+	// if err != nil {
+	// 	beego.Error(err)
+	// }
 	// c.Data["Categories"] = categories
 	//c.Ctx.Output.Download("database/1.txt", "1.txt")
 	//试验控制器数据赋值
@@ -207,11 +207,11 @@ func (c *MainController) Post() {
 	//转换成json数据
 	// beego.Info(uname1[0].Username)
 	// b, err := json.Marshal(categories)
-	if err == nil {
-		// c.Ctx.WriteString(string(b))
-		c.Data["json"] = categories
-		c.ServeJSON()
-	}
+	// if err == nil {
+	// 	// c.Ctx.WriteString(string(b))
+	// 	c.Data["json"] = categories
+	// 	c.ServeJSON()
+	// }
 	// 你自己判断比如
 	// if isMobile {
 	// 	c.ServeJSON()

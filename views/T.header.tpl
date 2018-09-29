@@ -6,15 +6,9 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<!-- <meta name="author" content="Jophy" /> -->
 	<link rel="stylesheet" type="text/css" href="/static/css/bootstrap.min.css"/>	
-	<!-- <link rel="stylesheet" href="/static/css/style.css"> -->
-	<!--[if lte IE 9]>兼容ie的方面：先引用bootstrapcss，再引用js
-	<script src="bootstrap/js/respond.min.js"></script>
-	<script src="bootstrap/js/html5.js"></script>
-	<![endif]-->
 	
 <script type="text/javascript" src="/static/js/jquery-2.1.3.min.js"></script>
 <script type="text/javascript" src="/static/js/bootstrap.min.js"></script>
-<script type="text/javascript" src="/static/js/jquery.tablesorter.js"></script> 
 <script src="/static/js/respond.min.js"></script>
 <script src="/static/js/html5shiv.min.js"></script>
  <link rel="shortcut icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQAAAAEACAYAAABccqhmAAAi20lEQVR42u2dD4xcx13HZ5OWOE3a

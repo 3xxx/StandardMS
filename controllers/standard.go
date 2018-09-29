@@ -35,9 +35,9 @@ type Standardmore struct {
 func (c *StandardController) GetStandard() {
 	c.Data["IsStandard"] = true //这里修改到ListAllPosts()
 	c.TplName = "standard.tpl"
-	c.Data["IsLogin"] = checkAccount(c.Ctx)
-	uname, _, _ := checkRoleread(c.Ctx) //login里的
-	c.Data["Uname"] = uname
+	// c.Data["IsLogin"] = checkAccount(c.Ctx)
+	// uname, _, _ := checkRoleread(c.Ctx) //login里的
+	// c.Data["Uname"] = uname
 	standards, err := models.GetAllStandards()
 	if err != nil {
 		beego.Error(err.Error)
@@ -98,10 +98,10 @@ func (c *StandardController) DeleteStandard() {
 func (c *StandardController) Index() { //
 	c.Data["IsStandard"] = true //
 	c.TplName = "standard.tpl"
-	c.Data["IsLogin"] = checkAccount(c.Ctx)
-	uname, _, _ := checkRoleread(c.Ctx) //login里的
+	// c.Data["IsLogin"] = checkAccount(c.Ctx)
+	// uname, _, _ := checkRoleread(c.Ctx) //login里的
 	// rolename, _ = strconv.Atoi(role)
-	c.Data["Uname"] = uname
+	// c.Data["Uname"] = uname
 	standards, err := models.GetAllStandards() //这里传入空字符串
 	if err != nil {
 		beego.Error(err.Error)
@@ -132,10 +132,10 @@ func (c *StandardController) Search() { //search用的是post方法
 	} else {
 		c.Data["IsStandard"] = true //
 		c.TplName = "standard.tpl"
-		c.Data["IsLogin"] = checkAccount(c.Ctx)
-		uname, _, _ := checkRoleread(c.Ctx) //login里的
+		// c.Data["IsLogin"] = checkAccount(c.Ctx)
+		// uname, _, _ := checkRoleread(c.Ctx) //login里的
 		// rolename, _ = strconv.Atoi(role)
-		c.Data["Uname"] = uname
+		// c.Data["Uname"] = uname
 		//搜索名称
 		Results1, err := models.SearchStandardsName(name, false)
 		if err != nil {
@@ -155,7 +155,7 @@ func (c *StandardController) Search() { //search用的是post方法
 		//由standardnumber查librarynumber
 		for i, v := range Results1 {
 			//由userid查username
-			user := models.GetUserByUserId(v.Uid)
+			// user := models.GetUserByUserId(v.Uid)
 			// beego.Info(v.Uid)
 			// beego.Info(user.Username)
 			//由standardnumber正则得到编号50268和分类GB
@@ -168,7 +168,7 @@ func (c *StandardController) Search() { //search用的是post方法
 			aa[i].Id = v.Id
 			aa[i].Number = v.Number //`orm:"unique"`
 			aa[i].Title = v.Title
-			aa[i].Uname = user.Username //换成用户名
+			// aa[i].Uname = user.Username //换成用户名
 			// beego.Info(aa[i].Uname)
 			// CategoryName   //换成规范类别GB、DL……
 			// Content
@@ -209,10 +209,10 @@ func (c *StandardController) Valid() { //search用的是post方法
 	// name := c.Input().Get("name")
 	c.Data["IsStandard"] = true //
 	c.TplName = "standard.tpl"
-	c.Data["IsLogin"] = checkAccount(c.Ctx)
-	uname, _, _ := checkRoleread(c.Ctx) //login里的
+	// c.Data["IsLogin"] = checkAccount(c.Ctx)
+	// uname, _, _ := checkRoleread(c.Ctx) //login里的
 	// rolename, _ = strconv.Atoi(role)
-	c.Data["Uname"] = uname
+	// c.Data["Uname"] = uname
 	//搜索名称
 	valids, err := models.GetAllValids()
 	if err != nil {
@@ -417,7 +417,7 @@ func (c *StandardController) Standard_one_addbaidu() { //一对一模式
 	//是否应该增加一个返回值，将真实的GBT返回来。
 	category, categoryname, fileNumber, year, fileName, _ := SplitStandardName(h.Filename)
 	var path string
-	var filesize int64
+	// var filesize int64
 	if h != nil {
 		//保存附件
 		if category != "" {
@@ -435,17 +435,17 @@ func (c *StandardController) Standard_one_addbaidu() { //一对一模式
 		if err != nil {
 			beego.Error(err)
 		}
-		filesize, _ = FileSize(path)
-		filesize = filesize / 1000.0
+		// filesize, _ = FileSize(path)
+		// filesize = filesize / 1000.0
 	}
 	//纯英文下没有取到汉字字符，所以没有名称
 	if fileName == "" {
 		fileName = fileNumber
 	}
 
-	uname, _, _ := checkRoleread(c.Ctx) //login里的
+	// uname, _, _ := checkRoleread(c.Ctx) //login里的
 	// rolename, _ = strconv.Atoi(role)
-	c.Data["Uname"] = uname
+	// c.Data["Uname"] = uname
 	if category != "Atlas" {
 		standard.Number = categoryname + " " + fileNumber + "-" + year
 		standard.Title = fileName

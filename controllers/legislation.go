@@ -26,34 +26,34 @@ type Legislationmore struct {
 	Execute       string //执行时间
 }
 
-func (c *LegislationController) Get() { //这个没用到
-	c.Data["IsLegislation"] = true //这里修改到ListAllPosts()
-	c.TplName = "legislation.tpl"
-	c.Data["IsLogin"] = checkAccount(c.Ctx)
-	uname, _, _ := checkRoleread(c.Ctx) //login里的
-	// rolename, _ = strconv.Atoi(role)
-	c.Data["Uname"] = uname
-	topics, err := models.GetAllTopics("", false) //这里传入空字符串
-	if err != nil {
-		beego.Error(err.Error)
-	} else {
-		c.Data["Topics"] = topics
-		c.Data["Length"] = len(topics)
-	}
-	//var err error
-	//	c.Data["Topic"], err = models.GetAllTopics()
-	//	if err != nil {
-	//		beego.Error(err)
-	//	}
-}
+// func (c *LegislationController) Get() { //这个没用到
+// 	c.Data["IsLegislation"] = true //这里修改到ListAllPosts()
+// 	c.TplName = "legislation.tpl"
+// 	c.Data["IsLogin"] = checkAccount(c.Ctx)
+// 	uname, _, _ := checkRoleread(c.Ctx) //login里的
+// 	// rolename, _ = strconv.Atoi(role)
+// 	c.Data["Uname"] = uname
+// 	topics, err := models.GetAllTopics("", false) //这里传入空字符串
+// 	if err != nil {
+// 		beego.Error(err.Error)
+// 	} else {
+// 		c.Data["Topics"] = topics
+// 		c.Data["Length"] = len(topics)
+// 	}
+// 	//var err error
+// 	//	c.Data["Topic"], err = models.GetAllTopics()
+// 	//	if err != nil {
+// 	//		beego.Error(err)
+// 	//	}
+// }
 
 func (c *LegislationController) Index() { //
 	c.Data["IsLegislation"] = true //
 	c.TplName = "legislation.tpl"
-	c.Data["IsLogin"] = checkAccount(c.Ctx)
-	uname, _, _ := checkRoleread(c.Ctx) //login里的
+	// c.Data["IsLogin"] = checkAccount(c.Ctx)
+	// uname, _, _ := checkRoleread(c.Ctx) //login里的
 	// rolename, _ = strconv.Atoi(role)
-	c.Data["Uname"] = uname
+	// c.Data["Uname"] = uname
 	legislations, err := models.GetAllLegislations() //这里传入空字符串
 	if err != nil {
 		beego.Error(err.Error)
@@ -131,10 +131,10 @@ func (c *LegislationController) Checklist() { //checklist用的是post方法
 	}
 	c.Data["IsLegislation"] = true
 	c.TplName = "legislation.tpl"
-	c.Data["IsLogin"] = checkAccount(c.Ctx)
-	uname, _, _ := checkRoleread(c.Ctx) //login里的
+	// c.Data["IsLogin"] = checkAccount(c.Ctx)
+	// uname, _, _ := checkRoleread(c.Ctx) //login里的
 	// rolename, _ = strconv.Atoi(role)
-	c.Data["Uname"] = uname
+	// c.Data["Uname"] = uname
 	//逐行读取
 	// br := bufio.NewReader(name)
 	// for {
