@@ -34,5 +34,5 @@ StandardMS电子规范管理系统是一款方便中小团队和工程师个人�
 
 ## LICENSE
 
-HydroCMS source code is licensed under the Apache Licence, Version 2.0
+StandardMS source code is licensed under the Apache Licence, Version 2.0
 (http://www.apache.org/licenses/LICENSE-2.0.html).
