@@ -22,6 +22,18 @@ StandardMS电子规范管理系统是一款方便中小团队和工程师个人�
 * 快捷批量上传
 * 对报告中的规范名称进行批量核对
 
+# 规范查阅
+
+![snap11](https://user-images.githubusercontent.com/10678867/46246124-66ac3600-c42b-11e8-8961-8a09511cce9e.png)
+
+# 有效版本数据库维护
+
+![snap2](https://user-images.githubusercontent.com/10678867/46246127-6ca21700-c42b-11e8-89b0-1067888b09a7.png)
+
+# 对标
+
+![snap3](https://user-images.githubusercontent.com/10678867/46246128-6f047100-c42b-11e8-877b-87b6507af6c2.png)
+
 
 ## Documentation
 
