@@ -12,10 +12,12 @@ StandardMS电子规范管理系统是一款方便中小团队和工程师个人�
 
     Windows系统：解压压缩包到硬盘上，运行StandardMS-win64.exe或StandardMS-win32.exe，在浏览器中打开IP即可访问。本地IP即127.0.0.1。
     
-    Linuxx系统：go get——go build编译即可。
+    Linuxx系统：git clone https://github.com/3xxx/EngineerCMS.git
+    
+    go build main.go编译即可。
 
 ## 特性
-* 采用golang语言，无需部署，直接运行
+* 采用golang语言，sqlite数据库，无需部署，直接运行
 * 设计规范、计算书、图集等查阅
 * 快捷批量上传
 * 对报告中的规范名称进行批量核对
